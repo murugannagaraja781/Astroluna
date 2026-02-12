@@ -1,0 +1,841 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<!--
+3    AndroidManifest.xml for FCM Incoming Call App
+4
+5    WHY THESE PERMISSIONS EXIST:
+6    - INTERNET: Required for FCM and API calls
+7    - POST_NOTIFICATIONS: Required for Android 13+ to show any notifications
+8    - FOREGROUND_SERVICE: Required to keep call handling alive
+9    - FOREGROUND_SERVICE_PHONE_CALL: Android 14+ requires specific foreground service types
+10    - USE_FULL_SCREEN_INTENT: Allows full-screen intent on lock screen
+11    - VIBRATE: Vibrate device on incoming call
+12    - WAKE_LOCK: Keep CPU awake during call processing
+13    - RECEIVE_BOOT_COMPLETED: Optional - re-register FCM token after device reboot
+14-->
+15<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+16    package="com.astroluna.app"
+17    android:versionCode="2"
+18    android:versionName="5.5.1" >
+19
+20    <uses-sdk
+21        android:minSdkVersion="24"
+22        android:targetSdkVersion="35" />
+23
+24    <!-- Network permissions -->
+25    <uses-permission android:name="android.permission.INTERNET" />
+25-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:19:5-67
+25-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:19:22-64
+26    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+26-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:20:5-79
+26-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:20:22-76
+27
+28    <!-- Notification permission (Android 13+) -->
+29    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+29-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:23:5-77
+29-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:23:22-74
+30
+31    <!-- Foreground service permissions -->
+32    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+32-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:26:5-77
+32-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:26:22-74
+33    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
+33-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:27:5-88
+33-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:27:22-85
+34    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+34-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:28:5-88
+34-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:28:22-85
+35    <uses-permission android:name="android.permission.MANAGE_OWN_CALLS" />
+35-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:29:5-75
+35-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:29:22-72
+36    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+36-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:30:5-78
+36-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:30:22-75
+37
+38    <!-- Full screen intent for lock screen (incoming call UI) -->
+39    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+39-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:33:5-81
+39-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:33:22-78
+40
+41    <!-- Ringtone and vibration -->
+42    <uses-permission android:name="android.permission.VIBRATE" />
+42-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:36:5-66
+42-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:36:22-63
+43
+44    <!-- Keep CPU awake during call processing -->
+45    <uses-permission android:name="android.permission.WAKE_LOCK" />
+45-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:39:5-68
+45-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:39:22-65
+46
+47    <!-- Optional: Re-register after reboot -->
+48    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+48-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:42:5-81
+48-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:42:22-78
+49
+50    <!-- WebRTC Permissions -->
+51    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+51-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:45:5-76
+51-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:45:22-73
+52    <uses-permission android:name="android.permission.CAMERA" />
+52-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:46:5-65
+52-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:46:22-62
+53    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+53-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:47:5-71
+53-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:47:22-68
+54    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+54-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:48:5-80
+54-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:48:22-77
+55
+56    <!-- Queries required for Android 11+ to open external UPI apps -->
+57    <queries>
+57-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:51:5-74:15
+58        <package android:name="com.phonepe.app" />
+58-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:52:9-51
+58-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:52:18-48
+59        <package android:name="com.phonepe.app.business" />
+59-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:53:9-60
+59-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:53:18-57
+60        <package android:name="com.google.android.apps.nbu.paisa.user" />
+60-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:54:9-74
+60-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:54:18-71
+61        <package android:name="net.one97.paytm" />
+61-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:55:9-51
+61-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:55:18-48
+62        <package android:name="in.org.npci.upiapp" />
+62-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:56:9-54
+62-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:56:18-51
+63        <package android:name="com.whatsapp" />
+63-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:57:9-48
+63-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:57:18-45
+64
+65        <intent>
+65-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:58:9-61:18
+66            <action android:name="android.intent.action.VIEW" />
+66-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:13-65
+66-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:21-62
+67
+68            <data android:scheme="upi" />
+68-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:13-42
+68-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:19-39
+69        </intent>
+70        <intent>
+70-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:62:9-65:18
+71            <action android:name="android.intent.action.VIEW" />
+71-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:13-65
+71-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:21-62
+72
+73            <data android:scheme="paytmmp" />
+73-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:13-42
+73-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:19-39
+74        </intent>
+75        <intent>
+75-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:66:9-69:18
+76            <action android:name="android.intent.action.VIEW" />
+76-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:13-65
+76-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:21-62
+77
+78            <data android:scheme="phonepe" />
+78-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:13-42
+78-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:19-39
+79        </intent>
+80        <intent>
+80-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:70:9-73:18
+81            <action android:name="android.intent.action.VIEW" />
+81-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:13-65
+81-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:21-62
+82
+83            <data android:scheme="tez" />
+83-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:13-42
+83-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:19-39
+84        </intent>
+85
+86        <package android:name="com.phonepe.simulator" />
+86-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:9:9-57
+86-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:9:18-54
+87
+88        <intent>
+88-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:11:9-17:18
+89            <action android:name="android.intent.action.VIEW" />
+89-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:13-65
+89-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:21-62
+90
+91            <data
+91-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:13-42
+92                android:host="pay"
+92-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:120:21-51
+93                android:scheme="upi" />
+93-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:19-39
+94        </intent>
+95        <intent>
+95-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:18:9-24:18
+96            <action android:name="android.intent.action.VIEW" />
+96-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:13-65
+96-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:21-62
+97
+98            <data
+98-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:13-42
+99                android:host="upi"
+99-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:120:21-51
+100                android:scheme="mandate" />
+100-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:19-39
+101        </intent>
+102    </queries>
+103
+104    <meta-data
+104-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:30:5-32:32
+105        android:name="android.webkit.WebView.EnableSafeBrowsing"
+105-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:31:9-65
+106        android:value="true" /> <!-- Required by older versions of Google Play services to create IID tokens -->
+106-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:32:9-29
+107    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+107-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:26:5-82
+107-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:26:22-79
+108    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE" />
+108-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:26:5-110
+108-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:26:22-107
+109    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+109-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:25:5-79
+109-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:25:22-76
+110    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" />
+110-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:26:5-88
+110-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:26:22-85
+111    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" />
+111-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:27:5-82
+111-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:27:22-79
+112
+113    <permission
+113-->[androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
+114        android:name="com.astroluna.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+114-->[androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
+115        android:protectionLevel="signature" />
+115-->[androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
+116
+117    <uses-permission android:name="com.astroluna.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+117-->[androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
+117-->[androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
+118
+119    <application
+119-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:76:5-241:19
+120        android:name="com.astroluna.app.AstrologerApp"
+120-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:83:9-38
+121        android:allowBackup="true"
+121-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:77:9-35
+122        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+122-->[androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:28:18-86
+123        android:debuggable="true"
+124        android:extractNativeLibs="false"
+125        android:icon="@mipmap/ic_launcher"
+125-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:78:9-43
+126        android:label="@string/app_name"
+126-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:79:9-41
+127        android:networkSecurityConfig="@xml/network_security_config"
+127-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:84:9-69
+128        android:roundIcon="@mipmap/ic_launcher_round"
+128-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:80:9-54
+129        android:supportsRtl="true"
+129-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:81:9-35
+130        android:theme="@style/Theme.FCMCallApp" >
+130-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:82:9-48
+131
+132        <!--
+133            MainActivity: Entry point for user registration
+134            - Standard launch mode
+135            - Shown in launcher
+136        -->
+137        <activity
+137-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:92:9-100:20
+138            android:name="com.astroluna.app.MainActivity"
+138-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:93:13-41
+139            android:exported="true"
+139-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:94:13-36
+140            android:theme="@style/Theme.FCMCallApp" >
+140-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:95:13-52
+141            <intent-filter>
+141-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:96:13-99:29
+142                <action android:name="android.intent.action.MAIN" />
+142-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:97:17-69
+142-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:97:25-66
+143
+144                <category android:name="android.intent.category.LAUNCHER" />
+144-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:98:17-77
+144-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:98:27-74
+145            </intent-filter>
+146        </activity>
+147        <activity android:name="com.astroluna.app.ui.guest.GuestDashboardActivity" />
+147-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:102:9-69
+147-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:102:19-66
+148        <activity android:name="com.astroluna.app.ui.academy.AcademyActivity" />
+148-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:103:9-64
+148-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:103:19-61
+149        <activity android:name="com.astroluna.app.ui.horoscope.FreeHoroscopeActivity" />
+149-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:104:9-72
+149-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:104:19-69
+150        <activity android:name="com.astroluna.app.ui.astro.AstrologerDashboardActivity" />
+150-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:105:9-74
+150-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:105:19-71
+151        <activity android:name="com.astroluna.app.ui.astro.AstrologerHistoryActivity" />
+151-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:106:9-72
+151-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:106:19-69
+152        <activity
+152-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:107:9-143
+153            android:name="com.astroluna.app.ui.admin.SuperPowerAdminDashboardActivity"
+153-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:107:19-76
+154            android:exported="false"
+154-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:107:77-101
+155            android:theme="@style/Theme.FCMCallApp" />
+155-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:107:102-141
+156        <activity android:name="com.astroluna.app.ui.settings.SettingsActivity" />
+156-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:108:9-66
+156-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:108:19-63
+157        <activity android:name="com.astroluna.app.ui.settings.ThemeSettingsActivity" />
+157-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:109:9-71
+157-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:109:19-68
+158        <activity android:name="com.astroluna.app.ui.rasipalan.RasipalanActivity" />
+158-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:110:9-68
+158-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:110:19-65
+159        <activity android:name="com.astroluna.app.ui.dashboard.GuestActivity" />
+159-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:111:9-64
+159-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:111:19-61
+160        <activity
+160-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:112:9-122:20
+161            android:name="com.astroluna.app.ui.payment.PaymentActivity"
+161-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:112:19-61
+162            android:exported="true" >
+162-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:113:13-36
+163            <intent-filter>
+163-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:114:13-121:29
+164                <action android:name="android.intent.action.VIEW" />
+164-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:13-65
+164-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:21-62
+165
+166                <category android:name="android.intent.category.DEFAULT" />
+166-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:116:17-75
+166-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:116:27-73
+167                <category android:name="android.intent.category.BROWSABLE" />
+167-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:117:17-77
+167-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:117:27-75
+168
+169                <data
+169-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:13-42
+170                    android:host="payment-success"
+170-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:120:21-51
+171                    android:scheme="astro5" />
+171-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:19-39
+172            </intent-filter>
+173        </activity>
+174        <activity android:name="com.astroluna.app.ui.auth.LoginActivity" />
+174-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:123:9-59
+174-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:123:19-56
+175        <activity android:name="com.astroluna.app.ui.auth.OtpVerificationActivity" />
+175-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:124:9-69
+175-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:124:19-66
+176        <activity android:name="com.astroluna.app.ui.home.HomeActivity" />
+176-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:125:9-58
+176-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:125:19-55
+177        <activity android:name="com.astroluna.app.ui.wallet.WalletActivity" />
+177-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:126:9-62
+177-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:126:19-59
+178        <activity
+178-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:127:9-100
+179            android:name="com.astroluna.app.ui.chat.ChatActivity"
+179-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:127:19-55
+180            android:windowSoftInputMode="adjustResize" />
+180-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:127:56-98
+181        <activity
+181-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:128:9-94
+182            android:name="com.astroluna.app.ui.call.CallActivity"
+182-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:128:19-55
+183            android:screenOrientation="portrait" />
+183-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:128:56-92
+184        <activity
+184-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:129:9-142
+185            android:name="com.astroluna.app.ui.intake.IntakeActivity"
+185-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:129:19-59
+186            android:screenOrientation="portrait"
+186-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:129:60-96
+187            android:windowSoftInputMode="adjustResize" />
+187-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:129:97-139
+188        <activity
+188-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:130:9-133:58
+189            android:name="com.astroluna.app.ui.chart.ChartDisplayActivity"
+189-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:130:19-64
+190            android:screenOrientation="portrait"
+190-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:132:13-49
+191            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+191-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:131:13-69
+192            android:windowSoftInputMode="adjustResize" />
+192-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:133:13-55
+193        <activity
+193-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:135:9-138:58
+194            android:name="com.astroluna.app.ui.chart.VipChartActivity"
+194-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:135:19-60
+195            android:screenOrientation="portrait"
+195-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:137:13-49
+196            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+196-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:136:13-69
+197            android:windowSoftInputMode="adjustResize" />
+197-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:138:13-55
+198        <activity
+198-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:140:9-142:51
+199            android:name="com.astroluna.app.ui.chart.MatchDisplayActivity"
+199-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:140:19-64
+200            android:screenOrientation="portrait"
+200-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:142:13-49
+201            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+201-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:141:13-69
+202        <activity
+202-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:144:9-145:55
+203            android:name="com.astroluna.app.ui.city.CitySearchActivity"
+203-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:144:19-61
+204            android:theme="@style/Theme.FCMCallApp" />
+204-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:145:13-52
+205        <activity
+205-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:147:9-158:20
+206            android:name="com.astroluna.app.ui.wallet.PaymentStatusActivity"
+206-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:148:13-60
+207            android:exported="true"
+207-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:149:13-36
+208            android:launchMode="singleTask"
+208-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:150:13-44
+209            android:theme="@style/Theme.FCMCallApp" >
+209-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:151:13-52
+210            <intent-filter>
+210-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:152:13-157:29
+211                <action android:name="android.intent.action.VIEW" />
+211-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:13-65
+211-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:59:21-62
+212
+213                <category android:name="android.intent.category.DEFAULT" />
+213-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:116:17-75
+213-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:116:27-73
+214                <category android:name="android.intent.category.BROWSABLE" />
+214-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:117:17-77
+214-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:117:27-75
+215
+216                <data android:scheme="astro5" />
+216-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:13-42
+216-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:60:19-39
+217            </intent-filter>
+218        </activity>
+219
+220        <!--
+221            IncomingCallActivity: Full-screen incoming call UI
+222
+223            WHY THESE FLAGS ARE CRITICAL:
+224            - showWhenLocked: Shows activity even when device is locked
+225            - turnScreenOn: Turns on the screen when activity starts
+226            - excludeFromRecents: Don't show in recent apps (it's a transient UI)
+227            - noHistory: Don't keep in activity stack
+228            - launchMode="singleInstance": Only one instance, brings existing to front
+229
+230            Without these flags, the incoming call UI won't show on locked devices!
+231        -->
+232        <activity
+232-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:172:9-181:66
+233            android:name="com.astroluna.app.IncomingCallActivity"
+233-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:173:13-49
+234            android:excludeFromRecents="true"
+234-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:177:13-46
+235            android:exported="false"
+235-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:174:13-37
+236            android:launchMode="singleInstance"
+236-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:179:13-48
+237            android:noHistory="true"
+237-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:178:13-37
+238            android:showWhenLocked="true"
+238-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:175:13-42
+239            android:taskAffinity=""
+239-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:180:13-36
+240            android:theme="@style/Theme.FCMCallApp.FullScreen"
+240-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:181:13-63
+241            android:turnScreenOn="true" />
+241-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:176:13-40
+242
+243        <!--
+244            FCMService: Handles incoming FCM messages
+245
+246            WHY THIS IS THE KEY COMPONENT:
+247            - This service receives FCM messages even when app is killed
+248            - Android's FCM infrastructure has special permission to wake apps
+249            - Without this, you cannot receive calls when app is not running
+250
+251            The exported="false" with MESSAGING_EVENT filter is the correct pattern.
+252        -->
+253        <service
+253-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:193:9-199:19
+254            android:name="com.astroluna.app.FCMService"
+254-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:194:13-39
+255            android:exported="false" >
+255-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:195:13-37
+256            <intent-filter>
+256-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:196:13-198:29
+257                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+257-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:197:17-78
+257-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:197:25-75
+258            </intent-filter>
+259        </service>
+260
+261        <!--
+262            CallForegroundService: Keeps call processing alive
+263
+264            WHY THIS MATTERS:
+265            - Android can kill any activity/service at any time
+266            - Foreground services have higher priority and show persistent notification
+267            - foregroundServiceType="phoneCall" tells Android this is a call
+268            - Without this, your call handling might be killed mid-process
+269        -->
+270        <service
+270-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:210:9-213:68
+271            android:name="com.astroluna.app.CallForegroundService"
+271-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:211:13-50
+272            android:exported="false"
+272-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:212:13-37
+273            android:foregroundServiceType="phoneCall|microphone" />
+273-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:213:13-65
+274
+275        <!-- Required meta-data for FCM default notification channel -->
+276        <meta-data
+276-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:216:9-218:46
+277            android:name="com.google.firebase.messaging.default_notification_channel_id"
+277-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:217:13-89
+278            android:value="incoming_calls" />
+278-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:218:13-43
+279
+280        <activity
+280-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:220:9-224:54
+281            android:name="com.astroluna.app.ui.profile.AstrologerProfileActivity"
+281-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:221:13-65
+282            android:exported="false"
+282-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:223:13-37
+283            android:screenOrientation="portrait"
+283-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:222:13-49
+284            android:theme="@style/Theme.FCMCallApp" />
+284-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:224:13-52
+285        <activity
+285-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:226:9-230:54
+286            android:name="com.astroluna.app.ui.profile.UserProfileActivity"
+286-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:227:13-59
+287            android:exported="false"
+287-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:229:13-37
+288            android:screenOrientation="portrait"
+288-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:228:13-49
+289            android:theme="@style/Theme.FCMCallApp" />
+289-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:230:13-52
+290
+291        <provider
+292            android:name="androidx.core.content.FileProvider"
+292-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:233:13-62
+293            android:authorities="com.astroluna.app.fileprovider"
+293-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:234:13-64
+294            android:exported="false"
+294-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:235:13-37
+295            android:grantUriPermissions="true" >
+295-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:236:13-47
+296            <meta-data
+296-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:237:13-239:54
+297                android:name="android.support.FILE_PATHS"
+297-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:238:17-58
+298                android:resource="@xml/file_paths" />
+298-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:239:17-51
+299        </provider>
+300
+301        <activity
+301-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:35:9-38:66
+302            android:name="com.phonepe.intent.sdk.ui.b2bPg.B2bPgActivity"
+302-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:36:13-73
+303            android:exported="false"
+303-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:37:13-37
+304            android:theme="@style/phonepeThemeInvisibleCompat" />
+304-->[phonepe.intentsdk.android.release:IntentSDK:5.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/f004d6fee3079bbafb17a0ae16ffdafc/transformed/jetified-IntentSDK-5.3.0/AndroidManifest.xml:38:13-63
+305
+306        <receiver
+306-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:29:9-40:20
+307            android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
+307-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:30:13-78
+308            android:exported="true"
+308-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:31:13-36
+309            android:permission="com.google.android.c2dm.permission.SEND" >
+309-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:32:13-73
+310            <intent-filter>
+310-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:33:13-35:29
+311                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+311-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:34:17-81
+311-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:34:25-78
+312            </intent-filter>
+313
+314            <meta-data
+314-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:37:13-39:40
+315                android:name="com.google.android.gms.cloudmessaging.FINISHED_AFTER_HANDLED"
+315-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:38:17-92
+316                android:value="true" />
+316-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:39:17-37
+317        </receiver>
+318        <!--
+319             FirebaseMessagingService performs security checks at runtime,
+320             but set to not exported to explicitly avoid allowing another app to call it.
+321        -->
+322        <service
+322-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:46:9-53:19
+323            android:name="com.google.firebase.messaging.FirebaseMessagingService"
+323-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:47:13-82
+324            android:directBootAware="true"
+324-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:48:13-43
+325            android:exported="false" >
+325-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:49:13-37
+326            <intent-filter android:priority="-500" >
+326-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:196:13-198:29
+327                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+327-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:197:17-78
+327-->/Users/wohozo/Documents/Astro-luna/astroluna.in/astroapp/android/app/src/main/AndroidManifest.xml:197:25-75
+328            </intent-filter>
+329        </service>
+330        <service
+330-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:54:9-63:19
+331            android:name="com.google.firebase.components.ComponentDiscoveryService"
+331-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:55:13-84
+332            android:directBootAware="true"
+332-->[com.google.firebase:firebase-common:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/814c34c12397a0e5db81def60f44780e/transformed/jetified-firebase-common-21.0.0/AndroidManifest.xml:32:13-43
+333            android:exported="false" >
+333-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:56:13-37
+334            <meta-data
+334-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:57:13-59:85
+335                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar"
+335-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:58:17-122
+336                android:value="com.google.firebase.components.ComponentRegistrar" />
+336-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:59:17-82
+337            <meta-data
+337-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:60:13-62:85
+338                android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
+338-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:61:17-119
+339                android:value="com.google.firebase.components.ComponentRegistrar" />
+339-->[com.google.firebase:firebase-messaging:24.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/43c24936aa77b146c052a27cce5be31f/transformed/jetified-firebase-messaging-24.0.0/AndroidManifest.xml:62:17-82
+340            <meta-data
+340-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:37:13-39:85
+341                android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar"
+341-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:38:17-139
+342                android:value="com.google.firebase.components.ComponentRegistrar" />
+342-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:39:17-82
+343            <meta-data
+343-->[com.google.firebase:firebase-installations:18.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/a22c2912bd14ad939b1be0aaa7274c9f/transformed/jetified-firebase-installations-18.0.0/AndroidManifest.xml:15:13-17:85
+344                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar"
+344-->[com.google.firebase:firebase-installations:18.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/a22c2912bd14ad939b1be0aaa7274c9f/transformed/jetified-firebase-installations-18.0.0/AndroidManifest.xml:16:17-130
+345                android:value="com.google.firebase.components.ComponentRegistrar" />
+345-->[com.google.firebase:firebase-installations:18.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/a22c2912bd14ad939b1be0aaa7274c9f/transformed/jetified-firebase-installations-18.0.0/AndroidManifest.xml:17:17-82
+346            <meta-data
+346-->[com.google.firebase:firebase-installations:18.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/a22c2912bd14ad939b1be0aaa7274c9f/transformed/jetified-firebase-installations-18.0.0/AndroidManifest.xml:18:13-20:85
+347                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
+347-->[com.google.firebase:firebase-installations:18.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/a22c2912bd14ad939b1be0aaa7274c9f/transformed/jetified-firebase-installations-18.0.0/AndroidManifest.xml:19:17-127
+348                android:value="com.google.firebase.components.ComponentRegistrar" />
+348-->[com.google.firebase:firebase-installations:18.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/a22c2912bd14ad939b1be0aaa7274c9f/transformed/jetified-firebase-installations-18.0.0/AndroidManifest.xml:20:17-82
+349            <meta-data
+349-->[com.google.firebase:firebase-common-ktx:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/5a543ed7d9e0483edc9a6c048ef0cf3e/transformed/jetified-firebase-common-ktx-21.0.0/AndroidManifest.xml:12:13-14:85
+350                android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar"
+350-->[com.google.firebase:firebase-common-ktx:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/5a543ed7d9e0483edc9a6c048ef0cf3e/transformed/jetified-firebase-common-ktx-21.0.0/AndroidManifest.xml:13:17-116
+351                android:value="com.google.firebase.components.ComponentRegistrar" />
+351-->[com.google.firebase:firebase-common-ktx:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/5a543ed7d9e0483edc9a6c048ef0cf3e/transformed/jetified-firebase-common-ktx-21.0.0/AndroidManifest.xml:14:17-82
+352            <meta-data
+352-->[com.google.firebase:firebase-common:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/814c34c12397a0e5db81def60f44780e/transformed/jetified-firebase-common-21.0.0/AndroidManifest.xml:35:13-37:85
+353                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+353-->[com.google.firebase:firebase-common:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/814c34c12397a0e5db81def60f44780e/transformed/jetified-firebase-common-21.0.0/AndroidManifest.xml:36:17-109
+354                android:value="com.google.firebase.components.ComponentRegistrar" />
+354-->[com.google.firebase:firebase-common:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/814c34c12397a0e5db81def60f44780e/transformed/jetified-firebase-common-21.0.0/AndroidManifest.xml:37:17-82
+355            <meta-data
+355-->[com.google.firebase:firebase-datatransport:18.2.0] /Users/wohozo/.gradle/caches/8.12/transforms/2f70347c704175359749bde471682522/transformed/jetified-firebase-datatransport-18.2.0/AndroidManifest.xml:25:13-27:85
+356                android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar"
+356-->[com.google.firebase:firebase-datatransport:18.2.0] /Users/wohozo/.gradle/caches/8.12/transforms/2f70347c704175359749bde471682522/transformed/jetified-firebase-datatransport-18.2.0/AndroidManifest.xml:26:17-115
+357                android:value="com.google.firebase.components.ComponentRegistrar" />
+357-->[com.google.firebase:firebase-datatransport:18.2.0] /Users/wohozo/.gradle/caches/8.12/transforms/2f70347c704175359749bde471682522/transformed/jetified-firebase-datatransport-18.2.0/AndroidManifest.xml:27:17-82
+358        </service>
+359
+360        <activity
+360-->[com.google.android.gms:play-services-base:18.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/c59dfcbc2d8301c469fc301178880ead/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:20:9-22:45
+361            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+361-->[com.google.android.gms:play-services-base:18.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/c59dfcbc2d8301c469fc301178880ead/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:20:19-85
+362            android:exported="false"
+362-->[com.google.android.gms:play-services-base:18.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/c59dfcbc2d8301c469fc301178880ead/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:22:19-43
+363            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+363-->[com.google.android.gms:play-services-base:18.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/c59dfcbc2d8301c469fc301178880ead/transformed/jetified-play-services-base-18.0.1/AndroidManifest.xml:21:19-78
+364
+365        <receiver
+365-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:29:9-33:20
+366            android:name="com.google.android.gms.measurement.AppMeasurementReceiver"
+366-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:30:13-85
+367            android:enabled="true"
+367-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:31:13-35
+368            android:exported="false" >
+368-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:32:13-37
+369        </receiver>
+370
+371        <service
+371-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:35:9-38:40
+372            android:name="com.google.android.gms.measurement.AppMeasurementService"
+372-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:36:13-84
+373            android:enabled="true"
+373-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:37:13-35
+374            android:exported="false" />
+374-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:38:13-37
+375        <service
+375-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:39:9-43:72
+376            android:name="com.google.android.gms.measurement.AppMeasurementJobService"
+376-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:40:13-87
+377            android:enabled="true"
+377-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:41:13-35
+378            android:exported="false"
+378-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:42:13-37
+379            android:permission="android.permission.BIND_JOB_SERVICE" />
+379-->[com.google.android.gms:play-services-measurement:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/e618e7a11fbb7cb1f64436390859a654/transformed/jetified-play-services-measurement-22.0.1/AndroidManifest.xml:43:13-69
+380
+381        <property
+381-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:30:9-32:61
+382            android:name="android.adservices.AD_SERVICES_CONFIG"
+382-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:31:13-65
+383            android:resource="@xml/ga_ad_services_config" />
+383-->[com.google.android.gms:play-services-measurement-api:22.0.1] /Users/wohozo/.gradle/caches/8.12/transforms/3b62ea735299d695692bec2141528b98/transformed/jetified-play-services-measurement-api-22.0.1/AndroidManifest.xml:32:13-58
+384
+385        <provider
+385-->[com.google.firebase:firebase-common:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/814c34c12397a0e5db81def60f44780e/transformed/jetified-firebase-common-21.0.0/AndroidManifest.xml:23:9-28:39
+386            android:name="com.google.firebase.provider.FirebaseInitProvider"
+386-->[com.google.firebase:firebase-common:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/814c34c12397a0e5db81def60f44780e/transformed/jetified-firebase-common-21.0.0/AndroidManifest.xml:24:13-77
+387            android:authorities="com.astroluna.app.firebaseinitprovider"
+387-->[com.google.firebase:firebase-common:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/814c34c12397a0e5db81def60f44780e/transformed/jetified-firebase-common-21.0.0/AndroidManifest.xml:25:13-72
+388            android:directBootAware="true"
+388-->[com.google.firebase:firebase-common:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/814c34c12397a0e5db81def60f44780e/transformed/jetified-firebase-common-21.0.0/AndroidManifest.xml:26:13-43
+389            android:exported="false"
+389-->[com.google.firebase:firebase-common:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/814c34c12397a0e5db81def60f44780e/transformed/jetified-firebase-common-21.0.0/AndroidManifest.xml:27:13-37
+390            android:initOrder="100" />
+390-->[com.google.firebase:firebase-common:21.0.0] /Users/wohozo/.gradle/caches/8.12/transforms/814c34c12397a0e5db81def60f44780e/transformed/jetified-firebase-common-21.0.0/AndroidManifest.xml:28:13-36
+391
+392        <service
+392-->[androidx.room:room-runtime:2.6.1] /Users/wohozo/.gradle/caches/8.12/transforms/f7b3df101e617979df83e3899b86967c/transformed/room-runtime-2.6.1/AndroidManifest.xml:24:9-28:63
+393            android:name="androidx.room.MultiInstanceInvalidationService"
+393-->[androidx.room:room-runtime:2.6.1] /Users/wohozo/.gradle/caches/8.12/transforms/f7b3df101e617979df83e3899b86967c/transformed/room-runtime-2.6.1/AndroidManifest.xml:25:13-74
+394            android:directBootAware="true"
+394-->[androidx.room:room-runtime:2.6.1] /Users/wohozo/.gradle/caches/8.12/transforms/f7b3df101e617979df83e3899b86967c/transformed/room-runtime-2.6.1/AndroidManifest.xml:26:13-43
+395            android:exported="false" />
+395-->[androidx.room:room-runtime:2.6.1] /Users/wohozo/.gradle/caches/8.12/transforms/f7b3df101e617979df83e3899b86967c/transformed/room-runtime-2.6.1/AndroidManifest.xml:27:13-37
+396
+397        <activity
+397-->[androidx.compose.ui:ui-tooling-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/327488f62b2f8bcaee4e0df034c6d898/transformed/jetified-ui-tooling-release/AndroidManifest.xml:23:9-25:39
+398            android:name="androidx.compose.ui.tooling.PreviewActivity"
+398-->[androidx.compose.ui:ui-tooling-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/327488f62b2f8bcaee4e0df034c6d898/transformed/jetified-ui-tooling-release/AndroidManifest.xml:24:13-71
+399            android:exported="true" />
+399-->[androidx.compose.ui:ui-tooling-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/327488f62b2f8bcaee4e0df034c6d898/transformed/jetified-ui-tooling-release/AndroidManifest.xml:25:13-36
+400
+401        <provider
+401-->[androidx.emoji2:emoji2:1.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/9372c14531cf97d5ab0dd11ddb952de3/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+402            android:name="androidx.startup.InitializationProvider"
+402-->[androidx.emoji2:emoji2:1.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/9372c14531cf97d5ab0dd11ddb952de3/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:25:13-67
+403            android:authorities="com.astroluna.app.androidx-startup"
+403-->[androidx.emoji2:emoji2:1.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/9372c14531cf97d5ab0dd11ddb952de3/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:26:13-68
+404            android:exported="false" >
+404-->[androidx.emoji2:emoji2:1.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/9372c14531cf97d5ab0dd11ddb952de3/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:27:13-37
+405            <meta-data
+405-->[androidx.emoji2:emoji2:1.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/9372c14531cf97d5ab0dd11ddb952de3/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+406                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+406-->[androidx.emoji2:emoji2:1.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/9372c14531cf97d5ab0dd11ddb952de3/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:30:17-75
+407                android:value="androidx.startup" />
+407-->[androidx.emoji2:emoji2:1.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/9372c14531cf97d5ab0dd11ddb952de3/transformed/jetified-emoji2-1.3.0/AndroidManifest.xml:31:17-49
+408            <meta-data
+408-->[androidx.lifecycle:lifecycle-process:2.8.0] /Users/wohozo/.gradle/caches/8.12/transforms/1580015fa512765aacec72cf9f138b20/transformed/jetified-lifecycle-process-2.8.0/AndroidManifest.xml:29:13-31:52
+409                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+409-->[androidx.lifecycle:lifecycle-process:2.8.0] /Users/wohozo/.gradle/caches/8.12/transforms/1580015fa512765aacec72cf9f138b20/transformed/jetified-lifecycle-process-2.8.0/AndroidManifest.xml:30:17-78
+410                android:value="androidx.startup" />
+410-->[androidx.lifecycle:lifecycle-process:2.8.0] /Users/wohozo/.gradle/caches/8.12/transforms/1580015fa512765aacec72cf9f138b20/transformed/jetified-lifecycle-process-2.8.0/AndroidManifest.xml:31:17-49
+411            <meta-data
+411-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:29:13-31:52
+412                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+412-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:30:17-85
+413                android:value="androidx.startup" />
+413-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:31:17-49
+414        </provider>
+415
+416        <uses-library
+416-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] /Users/wohozo/.gradle/caches/8.12/transforms/f7c1e1f38f4215fe7ead875b1f923659/transformed/jetified-ads-adservices-1.0.0-beta05/AndroidManifest.xml:23:9-25:40
+417            android:name="android.ext.adservices"
+417-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] /Users/wohozo/.gradle/caches/8.12/transforms/f7c1e1f38f4215fe7ead875b1f923659/transformed/jetified-ads-adservices-1.0.0-beta05/AndroidManifest.xml:24:13-50
+418            android:required="false" />
+418-->[androidx.privacysandbox.ads:ads-adservices:1.0.0-beta05] /Users/wohozo/.gradle/caches/8.12/transforms/f7c1e1f38f4215fe7ead875b1f923659/transformed/jetified-ads-adservices-1.0.0-beta05/AndroidManifest.xml:25:13-37
+419
+420        <meta-data
+420-->[com.google.android.gms:play-services-basement:18.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/a55c508554432fe61abf55f29b36b0d9/transformed/jetified-play-services-basement-18.3.0/AndroidManifest.xml:21:9-23:69
+421            android:name="com.google.android.gms.version"
+421-->[com.google.android.gms:play-services-basement:18.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/a55c508554432fe61abf55f29b36b0d9/transformed/jetified-play-services-basement-18.3.0/AndroidManifest.xml:22:13-58
+422            android:value="@integer/google_play_services_version" />
+422-->[com.google.android.gms:play-services-basement:18.3.0] /Users/wohozo/.gradle/caches/8.12/transforms/a55c508554432fe61abf55f29b36b0d9/transformed/jetified-play-services-basement-18.3.0/AndroidManifest.xml:23:13-66
+423
+424        <activity
+424-->[androidx.compose.ui:ui-test-manifest:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/335d0c019a2f4dafbd680e5cc14c819a/transformed/jetified-ui-test-manifest-1.6.8/AndroidManifest.xml:23:9-25:39
+425            android:name="androidx.activity.ComponentActivity"
+425-->[androidx.compose.ui:ui-test-manifest:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/335d0c019a2f4dafbd680e5cc14c819a/transformed/jetified-ui-test-manifest-1.6.8/AndroidManifest.xml:24:13-63
+426            android:exported="true" />
+426-->[androidx.compose.ui:ui-test-manifest:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/335d0c019a2f4dafbd680e5cc14c819a/transformed/jetified-ui-test-manifest-1.6.8/AndroidManifest.xml:25:13-36
+427
+428        <receiver
+428-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:34:9-52:20
+429            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+429-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:35:13-76
+430            android:directBootAware="false"
+430-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:36:13-44
+431            android:enabled="true"
+431-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:37:13-35
+432            android:exported="true"
+432-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:38:13-36
+433            android:permission="android.permission.DUMP" >
+433-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:39:13-57
+434            <intent-filter>
+434-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:40:13-42:29
+435                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+435-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:41:17-91
+435-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:41:25-88
+436            </intent-filter>
+437            <intent-filter>
+437-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:43:13-45:29
+438                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+438-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:44:17-85
+438-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:44:25-82
+439            </intent-filter>
+440            <intent-filter>
+440-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:46:13-48:29
+441                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+441-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:47:17-88
+441-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:47:25-85
+442            </intent-filter>
+443            <intent-filter>
+443-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:49:13-51:29
+444                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+444-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:50:17-95
+444-->[androidx.profileinstaller:profileinstaller:1.3.1] /Users/wohozo/.gradle/caches/8.12/transforms/e9aa5d39fc82bc210171ec8ec0fd49b5/transformed/jetified-profileinstaller-1.3.1/AndroidManifest.xml:50:25-92
+445            </intent-filter>
+446        </receiver>
+447
+448        <service
+448-->[com.google.android.datatransport:transport-backend-cct:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/2c567c4ca4295936edbb3733e27736ce/transformed/jetified-transport-backend-cct-3.1.9/AndroidManifest.xml:28:9-34:19
+449            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+449-->[com.google.android.datatransport:transport-backend-cct:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/2c567c4ca4295936edbb3733e27736ce/transformed/jetified-transport-backend-cct-3.1.9/AndroidManifest.xml:29:13-103
+450            android:exported="false" >
+450-->[com.google.android.datatransport:transport-backend-cct:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/2c567c4ca4295936edbb3733e27736ce/transformed/jetified-transport-backend-cct-3.1.9/AndroidManifest.xml:30:13-37
+451            <meta-data
+451-->[com.google.android.datatransport:transport-backend-cct:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/2c567c4ca4295936edbb3733e27736ce/transformed/jetified-transport-backend-cct-3.1.9/AndroidManifest.xml:31:13-33:39
+452                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+452-->[com.google.android.datatransport:transport-backend-cct:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/2c567c4ca4295936edbb3733e27736ce/transformed/jetified-transport-backend-cct-3.1.9/AndroidManifest.xml:32:17-94
+453                android:value="cct" />
+453-->[com.google.android.datatransport:transport-backend-cct:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/2c567c4ca4295936edbb3733e27736ce/transformed/jetified-transport-backend-cct-3.1.9/AndroidManifest.xml:33:17-36
+454        </service>
+455        <service
+455-->[com.google.android.datatransport:transport-runtime:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/740741cea4ae62f937199b5e847a3c9a/transformed/jetified-transport-runtime-3.1.9/AndroidManifest.xml:26:9-30:19
+456            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+456-->[com.google.android.datatransport:transport-runtime:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/740741cea4ae62f937199b5e847a3c9a/transformed/jetified-transport-runtime-3.1.9/AndroidManifest.xml:27:13-117
+457            android:exported="false"
+457-->[com.google.android.datatransport:transport-runtime:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/740741cea4ae62f937199b5e847a3c9a/transformed/jetified-transport-runtime-3.1.9/AndroidManifest.xml:28:13-37
+458            android:permission="android.permission.BIND_JOB_SERVICE" >
+458-->[com.google.android.datatransport:transport-runtime:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/740741cea4ae62f937199b5e847a3c9a/transformed/jetified-transport-runtime-3.1.9/AndroidManifest.xml:29:13-69
+459        </service>
+460
+461        <receiver
+461-->[com.google.android.datatransport:transport-runtime:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/740741cea4ae62f937199b5e847a3c9a/transformed/jetified-transport-runtime-3.1.9/AndroidManifest.xml:32:9-34:40
+462            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+462-->[com.google.android.datatransport:transport-runtime:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/740741cea4ae62f937199b5e847a3c9a/transformed/jetified-transport-runtime-3.1.9/AndroidManifest.xml:33:13-132
+463            android:exported="false" />
+463-->[com.google.android.datatransport:transport-runtime:3.1.9] /Users/wohozo/.gradle/caches/8.12/transforms/740741cea4ae62f937199b5e847a3c9a/transformed/jetified-transport-runtime-3.1.9/AndroidManifest.xml:34:13-37
+464    </application>
+465
+466</manifest>
