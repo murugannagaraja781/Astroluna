@@ -438,11 +438,9 @@ const SessionSchema = new mongoose.Schema({
   fromUserId: String,
   toUserId: String,
   type: String,
-  startTime: Number,
-  startTime: Number,
-  endTime: Number,
   duration: Number,
-  totalEarned: Number // Phase 16: Track session earnings
+  totalEarned: Number, // Phase 16: Track session earnings (Astro share)
+  totalDeducted: Number // Track total client charge
 });
 const Session = mongoose.model('Session', SessionSchema);
 
@@ -1553,6 +1551,7 @@ async function endSessionRecord(sessionId) {
     endTime,
     duration: displayDuration * 1000,
     totalEarned: s.totalEarned || 0,
+    totalDeducted: s.totalDeducted || 0,
     status: 'ended'
   });
 
@@ -1566,19 +1565,25 @@ async function endSessionRecord(sessionId) {
 
   // Phase 3: Early Exit Handling (< 60s)
   if (billableSeconds > 0 && billableSeconds < 60) {
-    console.log(`Session ${sessionId}: Early exit at ${billableSeconds}s. Charging pro-rata.`);
-    await processBillingCharge(sessionId, billableSeconds, 1, 'early_exit');
+    console.log(`Session ${sessionId}: Early exit at ${billableSeconds}s. Charging full 1st minute to Admin.`);
+    await processBillingCharge(sessionId, 60, 1, 'first_60_full');
   }
   // Phase 5: Round-Up Billing (Partial Minute at End)
-  else if (billableSeconds > 60) {
+  else if (billableSeconds >= 60) {
     const lastBilled = s.lastBilledMinute || 1;
     const totalMinutes = Math.ceil(billableSeconds / 60);
 
     if (totalMinutes > lastBilled) {
-      console.log(`Session ${sessionId}: Finalizing billing for partial minutes ${lastBilled + 1} to ${totalMinutes}`);
+      console.log(`Session ${sessionId}: Finalizing billing for minutes ${lastBilled + 1} to ${totalMinutes}`);
 
       for (let i = lastBilled + 1; i <= totalMinutes; i++) {
-        await processBillingCharge(sessionId, 60, i, 'slab');
+        // According to new rules: Intermediate full minutes use Slab.
+        // The last fraction minute uses 100% Admin rule.
+        if (i === totalMinutes && (billableSeconds % 60) !== 0) {
+          await processBillingCharge(sessionId, 60, i, 'fraction');
+        } else {
+          await processBillingCharge(sessionId, 60, i, 'slab');
+        }
       }
     }
   }
@@ -1678,6 +1683,12 @@ async function processBillingCharge(sessionId, durationSeconds, minuteIndex, typ
       reason = `slab_${currentSlab}`;
 
       console.log(`[Billing] Slab: ${currentSlab} | Rate: ${rate} | AstroShare: ${astroShare}`);
+    } else if (type === 'fraction') {
+      // Last partial minute (100% to Admin)
+      amountToCharge = pricePerMin;
+      adminShare = amountToCharge;
+      astroShare = 0;
+      reason = 'fraction_admin';
     } else {
       return;
     }
@@ -3847,9 +3858,11 @@ app.post('/api/payment/callback', async (req, res) => {
         // Credit Wallet
         const user = await User.findOne({ userId: payment.userId });
         if (user) {
-          user.walletBalance += payment.amount;
+          // Rule: 18% GST. If user pays 118, credit 100.
+          const creditAmount = Math.round(payment.amount / 1.18);
+          user.walletBalance += creditAmount;
           await user.save();
-          console.log(`✅ Wallet Credited: ${user.name} +₹${payment.amount} (PhonePe: ${code})`);
+          console.log(`✅ Wallet Credited: ${user.name} +₹${creditAmount} (Paid: ₹${payment.amount}, GST deducted)`);
 
           // Notify Socket if online
           const sId = userSockets.get(user.userId);
@@ -3858,7 +3871,7 @@ app.post('/api/payment/callback', async (req, res) => {
               balance: user.walletBalance,
               totalEarnings: user.totalEarnings
             });
-            io.to(sId).emit('app-notification', { text: `✅ Recharge Successful! +₹${payment.amount}` });
+            io.to(sId).emit('app-notification', { text: `✅ Recharge Successful! +₹${creditAmount} (Excl. 18% GST)` });
           }
         }
       }
