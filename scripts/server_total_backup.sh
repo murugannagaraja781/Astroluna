@@ -4,7 +4,7 @@
 # This script is designed to run on your PRODUCTION SERVER.
 
 # Set the base directory absolutely
-BASE_DIR="/var/www/astroluna.in"
+BASE_DIR="/var/www/Astroluna"
 JS_BACKUP_SCRIPT="$BASE_DIR/scripts/backup.js"
 
 echo "==========================================="

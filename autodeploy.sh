@@ -8,7 +8,7 @@ echo "      Astroluna Auto Deploy"
 echo "=========================================="
 
 # Variables
-APP_DIR="/var/www/astroluna.in"
+APP_DIR="/var/www/Astroluna"
 REPO_URL="https://github.com/murugannagaraja781/Astroluna.git"
 APP_NAME="astroluna"
 

@@ -28,7 +28,7 @@ function formatLongitude(longitude) {
 router.post('/full', async (req, res) => {
     try {
         const {
-            date = DateTime.now().setZone('UTC+5.5').toFormat('yyyy-MM-dd'),
+            date = DateTime.now().setZone('Asia/Kolkata').toFormat('yyyy-MM-dd'),
             time = '12:00',
             lat = 13.0827,
             lng = 80.2707,
