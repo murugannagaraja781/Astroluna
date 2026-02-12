@@ -63,8 +63,8 @@ if [ -d ".git" ]; then
 else
     echo "Cloning repository..."
     cd /var/www
-    sudo rm -rf astroluna.in
-    git clone $REPO_URL astroluna.in
+    sudo rm -rf Astroluna
+    git clone $REPO_URL Astroluna
     cd $APP_DIR
 fi
 
