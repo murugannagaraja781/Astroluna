@@ -343,6 +343,7 @@ fun ChatScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                modifier = Modifier.statusBarsPadding(),
                 title = {
                     Column {
                         Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1)
@@ -360,7 +361,7 @@ fun ChatScreen(
                     TextButton(onClick = onEndChat) { Text("End", color = Color.Red, fontWeight = FontWeight.Bold) }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF1B5E20),
+                    containerColor = Color(0xFF4A148C),
                     titleContentColor = Color.White
                 )
             )
@@ -582,8 +583,12 @@ fun ChatInputBar(
     onViewChart: (() -> Unit)?,
     clientBirthData: JSONObject? = null
 ) {
-    Surface(color = Color.White, shadowElevation = 8.dp) {
-        Column {
+    Surface(
+        color = Color.White,
+        shadowElevation = 8.dp,
+        modifier = Modifier.imePadding()
+    ) {
+        Column(modifier = Modifier.navigationBarsPadding()) {
             if (replyingTo != null) {
                 Row(
                     Modifier.fillMaxWidth().background(Color(0xFFEEEEEE)).padding(8.dp),

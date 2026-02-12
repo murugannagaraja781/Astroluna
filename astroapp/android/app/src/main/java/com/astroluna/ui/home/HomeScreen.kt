@@ -20,6 +20,7 @@ import androidx.compose.material.icons.rounded.Call
 import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.VideoCall
 import androidx.compose.material.icons.rounded.Star
+import androidx.compose.material.icons.rounded.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Translate
@@ -679,27 +680,42 @@ fun HomeTopBar(
             )
         }
 
-        // RIGHT: Wallet (Simple)
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .clickable { onWalletClick() }
-        ) {
-            if (!isGuest) {
-                Text(
-                    text = "₹${balance.toInt()}",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    ),
-                    color = Color.White,
-                    maxLines = 1
-                )
-            } else {
+        // RIGHT: Wallet (Premium Look)
+        if (!isGuest) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(Color.White.copy(alpha = 0.15f))
+                    .border(1.dp, Color.White.copy(alpha = 0.3f), RoundedCornerShape(50))
+                    .clickable { onWalletClick() }
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Rounded.AccountBalanceWallet,
+                        contentDescription = null,
+                        tint = Color(0xFF7FDBFF), // Neon Cyan
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = "₹${balance.toInt()}",
+                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Black),
+                        color = Color.White
+                    )
+                }
+            }
+        } else {
+            Button(
+                onClick = onWalletClick,
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.2f)),
+                shape = RoundedCornerShape(50),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                modifier = Modifier.height(32.dp)
+            ) {
                 Text(
                     text = "Login",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                     color = Color.White
                 )
             }
@@ -781,7 +797,7 @@ fun AstrologerCard(
     )
     val borderColor = when {
         astro.isBusy -> Color.Red
-        astro.isOnline -> PeacockGreen.copy(alpha = alpha)
+        astro.isOnline -> OnlineGreen.copy(alpha = alpha)
         else -> Color.LightGray
     }
 
@@ -791,9 +807,9 @@ fun AstrologerCard(
             .padding(horizontal = 16.dp, vertical = 6.dp)
             // Added SHADOW
             .shadow(
-                elevation = if (astro.isOnline) 8.dp else 2.dp,
+                elevation = if (astro.isOnline) 10.dp else 2.dp,
                 shape = RoundedCornerShape(16.dp),
-                spotColor = if (astro.isOnline) PeacockGreen else Color.Black
+                spotColor = if (astro.isOnline) OnlineGreen else Color.Black
             )
             .clickable {
                 val intent = Intent(context, com.astroluna.ui.profile.AstrologerProfileActivity::class.java).apply {
@@ -812,7 +828,7 @@ fun AstrologerCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Handled by shadow modifier
-        border = androidx.compose.foundation.BorderStroke(if(astro.isOnline) 2.dp else 0.5.dp, borderColor) // Green Border
+        border = androidx.compose.foundation.BorderStroke(if(astro.isOnline) 3.dp else 0.5.dp, borderColor) // Prominent Online Border
     ) {
         // ... (Content remains similar, simplified for replacement)
         Row(

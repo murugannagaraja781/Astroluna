@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
@@ -31,18 +32,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// PREMIUM COLOR TOKENS
-private val EmeraldStart = Color(0xFF0F3D2E)
-private val EmeraldEnd = Color(0xFF145A41)
-private val GoldAccent = Color(0xFFD4AF37)
-private val MysticBg = Color(0xFF0B1410)
-private val MysticTextPrimary = Color(0xFFF5F7F6)
-private val MysticTextSecondary = Color(0xFFA8B3AF)
+// PREMIUM BLUE THEME TOKENS
+private val DeepSpaceNavy = Color(0xFF000B18)
+private val PremiumBlue = Color(0xFF001F3F)
+private val ElectricBlue = Color(0xFF0074D9)
+private val NeonCyan = Color(0xFF7FDBFF)
+private val GlassWhite = Color.White.copy(alpha = 0.1f)
+private val TextPrimary = Color(0xFFF2F4FF)
+private val TextSecondary = Color(0xFFA8B3AF)
 
 // Status Colors
-private val GoodGlow = Color(0xFF22C55E)
-private val ModerateAmber = Color(0xFFF59E0B)
-private val WeakRed = Color(0xFFEF4444)
+private val GoodGlow = Color(0xFF00FF9F) // Neon Green
+private val ModerateAmber = Color(0xFFFFB347)
+private val WeakRed = Color(0xFFFF4B2B)
 
 class RasipalanActivity : ComponentActivity() {
 
@@ -100,52 +102,54 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
                         Text(
                             text = displayTitle,
                             style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = GoldAccent
+                                fontWeight = FontWeight.ExtraBold,
+                                color = NeonCyan,
+                                letterSpacing = 1.sp
                             )
                         )
                         Text(
-                            text = "Elegant Tamil + English Guide",
+                            text = "Daily Spiritual Insights",
                             style = MaterialTheme.typography.labelSmall,
-                            color = GoldAccent.copy(alpha = 0.7f)
+                            color = NeonCyan.copy(alpha = 0.6f)
                         )
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = GoldAccent)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = NeonCyan)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                     containerColor = MysticBg,
-                     titleContentColor = GoldAccent
+                     containerColor = Color.Transparent,
+                     titleContentColor = NeonCyan
                 )
             )
         },
-        containerColor = MysticBg
+        containerColor = DeepSpaceNavy
     ) { padding ->
-        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+        Box(modifier = Modifier.padding(padding).fillMaxSize().background(
+            Brush.verticalGradient(listOf(DeepSpaceNavy, PremiumBlue))
+        )) {
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
-                    color = GoldAccent
+                    color = NeonCyan
                 )
             } else {
                 LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                    contentPadding = PaddingValues(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(dataList) { item ->
                         PremiumRasipalanCard(item)
                     }
 
                     item {
-                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "More Insights",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = GoldAccent,
-                            modifier = Modifier.padding(vertical = 8.dp)
+                            text = "Future Insights",
+                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                            color = NeonCyan,
+                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
                         )
                     }
 
@@ -161,77 +165,88 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
 
 @Composable
 fun PremiumRasipalanCard(item: RasipalanItem) {
+    var expanded by remember { mutableStateOf(false) }
+    val predictionText = item.prediction?.ta ?: ""
+    val hasMore = predictionText.length > 250
+
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        border = BorderStroke(1.dp, GoldAccent.copy(alpha = 0.4f))
+        shape = RoundedCornerShape(12.dp), // Box model as requested
+        colors = CardDefaults.cardColors(containerColor = PremiumBlue.copy(alpha = 0.6f)),
+        border = BorderStroke(1.dp, NeonCyan.copy(alpha = 0.2f))
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(EmeraldStart, EmeraldEnd)
-                    )
-                )
-                .padding(24.dp)
+                .padding(20.dp)
         ) {
-            Column {
-                // Header
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = item.signNameTa ?: item.signNameEn ?: "",
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = MysticTextPrimary
-                        )
-                    )
-                    Text(
-                        text = item.date ?: "",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = GoldAccent
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Short daily message
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Text(
-                    text = item.prediction?.ta ?: "",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        lineHeight = 28.sp,
-                        color = MysticTextPrimary
+                    text = item.signNameTa ?: item.signNameEn ?: "",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        color = NeonCyan
                     )
                 )
+                Text(
+                    text = item.date ?: "",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = TextSecondary
+                )
+            }
 
-                Spacer(modifier = Modifier.height(16.dp))
-                Divider(color = GoldAccent.copy(alpha = 0.3f), thickness = 0.5.dp)
-                Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                // 3 Status Indicators
-                StatusIndicatorRow("தொழில் (Career)", item.details?.career)
-                StatusIndicatorRow("நிதி (Finance)", item.details?.finance)
-                StatusIndicatorRow("ஆரோக்கியம் (Health)", item.details?.health)
+            // Prediction Text with "Read More" logic
+            Text(
+                text = predictionText,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    lineHeight = 24.sp,
+                    color = TextPrimary
+                ),
+                maxLines = if (expanded) Int.MAX_VALUE else 5,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
 
-                Spacer(modifier = Modifier.height(20.dp))
+            if (hasMore) {
+                Text(
+                    text = if (expanded) "Read Less" else "...Read More",
+                    color = ElectricBlue,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .clickable { expanded = !expanded },
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
 
-                // Lucky Section
-                Surface(
-                    color = Color.Black.copy(alpha = 0.2f),
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-                    border = BorderStroke(0.5.dp, GoldAccent.copy(alpha = 0.2f))
+            Spacer(modifier = Modifier.height(16.dp))
+            Divider(color = NeonCyan.copy(alpha = 0.1f), thickness = 1.dp)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Status Indicators
+            StatusIndicatorRow("தொழில் (Career)", item.details?.career)
+            StatusIndicatorRow("நிதி (Finance)", item.details?.finance)
+            StatusIndicatorRow("ஆரோக்கியம் (Health)", item.details?.health)
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Lucky Stats Section (Glass Box)
+            Surface(
+                color = Color.White.copy(alpha = 0.05f),
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(0.5.dp, NeonCyan.copy(alpha = 0.1f))
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceAround
-                    ) {
-                        LuckyStat("அதிர்ஷ்ட எண்", item.lucky?.number ?: "-")
-                        LuckyStat("அதிர்ஷ்ட நிறம்", item.lucky?.color?.ta ?: "-")
-                    }
+                    LuckyStat("அதிர்ஷ்ட எண்", item.lucky?.number ?: "-")
+                    LuckyStat("நிறம்", item.lucky?.color?.ta ?: "-")
                 }
             }
         }
@@ -247,8 +262,8 @@ fun StatusIndicatorRow(label: String, status: String?) {
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MysticTextSecondary
+            style = MaterialTheme.typography.bodySmall,
+            color = TextSecondary
         )
         StatusChip(status ?: "Moderate")
     }
@@ -288,25 +303,25 @@ fun StatusChip(status: String) {
 @Composable
 fun LuckyStat(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MysticTextSecondary)
-        Text(text = value, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = GoldAccent)
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = TextSecondary)
+        Text(text = value, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.ExtraBold), color = NeonCyan)
     }
 }
 
 @Composable
 fun ComingSoonCard(title: String) {
     Card(
-        modifier = Modifier.fillMaxWidth().height(100.dp),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = EmeraldStart.copy(alpha = 0.4f)),
-        border = BorderStroke(0.5.dp, GoldAccent.copy(alpha = 0.2f))
+        modifier = Modifier.fillMaxWidth().height(90.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.03f)),
+        border = BorderStroke(0.5.dp, NeonCyan.copy(alpha = 0.1f))
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.Lock, contentDescription = null, tint = GoldAccent.copy(alpha = 0.5f), modifier = Modifier.size(20.dp))
+                Icon(Icons.Default.Lock, contentDescription = null, tint = NeonCyan.copy(alpha = 0.3f), modifier = Modifier.size(16.dp))
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = title, style = MaterialTheme.typography.titleSmall, color = MysticTextPrimary.copy(alpha = 0.8f))
-                Text(text = "Feature under preparation", style = MaterialTheme.typography.labelSmall, color = MysticTextSecondary.copy(alpha = 0.6f))
+                Text(text = title, style = MaterialTheme.typography.labelLarge, color = TextPrimary.copy(alpha = 0.7f))
+                Text(text = "Unlocking Soon", style = MaterialTheme.typography.labelSmall, color = TextSecondary.copy(alpha = 0.5f))
             }
         }
     }

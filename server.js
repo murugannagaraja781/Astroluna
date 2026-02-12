@@ -377,7 +377,7 @@ const UserSchema = new mongoose.Schema({
   isBanned: { type: Boolean, default: false },
   skills: [String],
   price: { type: Number, default: 20 },
-  walletBalance: { type: Number, default: 369 },
+  walletBalance: { type: Number, default: 108 },
   totalEarnings: { type: Number, default: 0 }, // Phase 16: Lifetime Earnings
   experience: { type: Number, default: 0 },
   isVerified: { type: Boolean, default: false }, // Blue Tick
@@ -559,7 +559,7 @@ async function seedDatabase() {
       userId, name, phone, role,
       skills: role === 'astrologer' ? ['Vedic', 'Prashana'] : [],
       price: 20,
-      walletBalance: 369
+      walletBalance: 108
     });
   };
 

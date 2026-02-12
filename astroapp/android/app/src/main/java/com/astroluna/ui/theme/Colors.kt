@@ -39,22 +39,23 @@ val LunarWhite = Color(0xFFF5F5F5)
 val CharcoalDark = Color(0xFF222222)
 val LuxuryOnSurface = Color(0xFFEAEAEA)
 
-// VIBRANT GREEN THEME (Booking/Wallet)
-val EmeraldGreen = Color(0xFF2ECC71)
-val MintGreen = Color(0xFF58D68D)
-val DarkEmerald = Color(0xFF27AE60)
-val DeepJungle = Color(0xFF1B5E20)
-val MagicMint = Color(0xFF69F0AE)
-val SoftMintBg = Color(0xFFE8F5E9)
+// VIBRANT PURPLE THEME (Booking/Wallet)
+val EmeraldGreen = Color(0xFF9C27B0) // Purple replacement
+val MintGreen = Color(0xFFBA68C8)
+val DarkEmerald = Color(0xFF7B1FA2)
+val DeepJungle = Color(0xFF4A148C)
+val MagicMint = Color(0xFFCE93D8)
+val SoftMintBg = Color(0xFFF3E5F5)
 
 // Specific Colors used in HomeScreen
 val RoyalGold = Color(0xFFFFD700)
 val RoyalMidnightBlue = Color(0xFF0F0B1F) // Matching CosmicPurple bgStart roughly
-val PeacockTeal = Color(0xFF009688)
-val PeacockGreen = Color(0xFF4CAF50)
+val PeacockTeal = Color(0xFF7E57C2) // Deep Lavender
+val PeacockGreen = Color(0xFF673AB7) // Primary Purple (Deep Purple)
 val SoftIvory = Color(0xFFFFF8E1)
 val PriceRed = Color(0xFFF44336)
 val PureWhite = Color(0xFFFFFFFF)
+val OnlineGreen = Color(0xFF4CAF50) // Dedicated Green for Online status
 
 // LEGACY COMPATIBILITY
 val MetallicGold = Color(0xFFD4AF37)

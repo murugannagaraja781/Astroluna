@@ -12,12 +12,12 @@
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
   <style>
     :root {
-      --primary: #047857;
-      --secondary: #6EE7B7;
+      --primary: #6d06a9;
+      --secondary: #6eabe7;
       --bg-body: #F0FDF4;
       --accent-gold: #D4AF37;
       --surface: #FFFFFF;
-      --border: #A7F3D0;
+      --border: #063af5;
     }
 
     * {
@@ -105,7 +105,7 @@
       right: 20px;
       z-index: 10000;
       background: white;
-      border-left: 5px solid #10b981;
+      border-left: 5px solid #6402b0;
       padding: 15px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       border-radius: 8px;
@@ -123,7 +123,7 @@
     }
 
     .admin-notification-popup button.approve {
-      background: #10b981;
+      background: #680298;
       color: white;
     }
 
@@ -308,7 +308,7 @@
       top: 16px;
       right: 16px;
       background: #ECFDF5;
-      color: #059669;
+      color: #5b0079;
       font-weight: 700;
       font-size: 0.85rem;
       padding: 4px 10px;
@@ -376,6 +376,14 @@
 
     .cta-btn.active-video:hover {
       background: #FEF3C7;
+    }
+
+    .inactive-cta {
+      opacity: 0.6;
+      background: #f3f4f6 !important;
+      color: #9ca3af !important;
+      border-color: #e5e7eb !important;
+      cursor: not-allowed !important;
     }
 
     .astro-dash-header {
@@ -676,7 +684,7 @@
     }
 
     .btn-wallet {
-      background: #22C55E;
+      background: #043eb3;
     }
 
     .btn-role {
@@ -1544,7 +1552,7 @@
     }
 
     .btn-wallet {
-      background: #22c55e;
+      background: #10ae4a;
     }
 
     .btn-role {
@@ -4856,20 +4864,20 @@
 
           <!-- Bottom Row: Action Buttons -->
           <div class="card-actions">
-              <div class="cta-btn ${a.isChatOnline ? 'active-chat' : ''}"
-                   onclick="event.stopPropagation(); checkGuestAction('chat', '${a.userId}')">
+              <div class="cta-btn ${a.isChatOnline ? 'active-chat' : 'inactive-cta'}"
+                   onclick="event.stopPropagation(); ${a.isChatOnline ? `checkGuestAction('chat', '${a.userId}')` : ''}">
                   <i class="fas fa-comment-dots"></i>
                   <span>Chat</span>
               </div>
 
-              <div class="cta-btn ${a.isAudioOnline ? 'active-audio' : ''}"
-                   onclick="event.stopPropagation(); checkGuestAction('call', '${a.userId}')">
+              <div class="cta-btn ${a.isAudioOnline ? 'active-audio' : 'inactive-cta'}"
+                   onclick="event.stopPropagation(); ${a.isAudioOnline ? `checkGuestAction('call', '${a.userId}')` : ''}">
                   <i class="fas fa-phone-alt"></i>
                   <span>Call</span>
               </div>
 
-              <div class="cta-btn ${a.isVideoOnline ? 'active-video' : ''}"
-                   onclick="event.stopPropagation(); checkGuestAction('video', '${a.userId}')">
+              <div class="cta-btn ${a.isVideoOnline ? 'active-video' : 'inactive-cta'}"
+                   onclick="event.stopPropagation(); ${a.isVideoOnline ? `checkGuestAction('video', '${a.userId}')` : ''}">
                   <i class="fas fa-video"></i>
                   <span>Video</span>
               </div>

@@ -598,7 +598,7 @@ fun IntakeScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF1B5E20), Color(0xFF2ECC71), Color(0xFF69F0AE))
+                    colors = listOf(Color(0xFF4A148C), Color(0xFF7B1FA2), Color(0xFFAB47BC))
                 )
             )
     ) {
@@ -606,6 +606,7 @@ fun IntakeScreen(
             containerColor = Color.Transparent,
             topBar = {
                 TopAppBar(
+                    modifier = Modifier.statusBarsPadding(),
                     title = {
                         Text(
                             "Consultation Details",
@@ -631,6 +632,8 @@ fun IntakeScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
+                        .navigationBarsPadding()
+                        .imePadding()
                         .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
@@ -1183,16 +1186,16 @@ fun IntakeScreen(
                                 .shadow(
                                     elevation = 20.dp,
                                     shape = RoundedCornerShape(24.dp),
-                                    spotColor = Color(0xFF69F0AE),
-                                    ambientColor = Color(0xFF2ECC71)
+                                    spotColor = Color(0xFFCE93D8),
+                                    ambientColor = Color(0xFF9C27B0)
                                 )
                                 .background(
                                     brush = Brush.verticalGradient(
-                                        colors = listOf(Color(0xFF1B5E20), Color(0xFF2E7D32))
+                                        colors = listOf(Color(0xFF4A148C), Color(0xFF7B1FA2))
                                     ),
                                     shape = RoundedCornerShape(24.dp)
                                 )
-                                .border(1.dp, Color(0xFF69F0AE).copy(alpha = 0.5f), RoundedCornerShape(24.dp))
+                                .border(1.dp, Color(0xFFCE93D8).copy(alpha = 0.5f), RoundedCornerShape(24.dp))
                         ) {
                             Column(
                                 modifier = Modifier.padding(24.dp),
@@ -1202,9 +1205,9 @@ fun IntakeScreen(
                                 Box(
                                     modifier = Modifier
                                         .size(80.dp)
-                                        .shadow(10.dp, CircleShape, spotColor = Color(0xFF69F0AE))
-                                        .background(Color(0xFF2ECC71).copy(alpha = 0.2f), CircleShape)
-                                        .border(2.dp, Color(0xFF69F0AE), CircleShape),
+                                        .shadow(10.dp, CircleShape, spotColor = Color(0xFFCE93D8))
+                                        .background(Color(0xFF9C27B0).copy(alpha = 0.2f), CircleShape)
+                                        .border(2.dp, Color(0xFFCE93D8), CircleShape),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
@@ -1257,9 +1260,9 @@ fun IntakeScreen(
                                             sessionType,
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF69F0AE) // Mint
+                                            color = Color(0xFFCE93D8) // Lavender
                                         )
-                                        Icon(Icons.Default.AutoFixHigh, "", tint = Color(0xFF69F0AE), modifier = Modifier.size(20.dp))
+                                        Icon(Icons.Default.AutoFixHigh, "", tint = Color(0xFFCE93D8), modifier = Modifier.size(20.dp))
                                     }
 
                                     Divider(
@@ -1285,7 +1288,7 @@ fun IntakeScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.size(16.dp),
-                                        color = Color(0xFF69F0AE),
+                                        color = Color(0xFFCE93D8),
                                         strokeWidth = 2.dp
                                     )
                                     Spacer(Modifier.width(8.dp))

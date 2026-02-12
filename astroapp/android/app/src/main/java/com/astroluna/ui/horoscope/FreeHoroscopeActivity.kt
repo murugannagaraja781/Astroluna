@@ -171,13 +171,18 @@ fun FreeHoroscopeScreen(
 
     var isLoading by remember { mutableStateOf(false) }
 
-    // Vibrant Green Theme (Matching IntakeActivity)
+    // Premium Blue Theme (Matching Wallet/Home)
+    val premiumBlue = Color(0xFF001F3F)
+    val deepSpaceNavy = Color(0xFF000B18)
+    val neonCyan = Color(0xFF7FDBFF)
+    val electricBlue = Color(0xFF0074D9)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(DeepJungle, EmeraldGreen, MagicMint)
+                    colors = listOf(deepSpaceNavy, premiumBlue)
                 )
             )
     ) {
@@ -185,11 +190,13 @@ fun FreeHoroscopeScreen(
             containerColor = Color.Transparent,
             topBar = {
                 TopAppBar(
+                    modifier = Modifier.statusBarsPadding(),
                     title = {
                         Text(
                             "Free Horoscope",
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold
+                            color = neonCyan,
+                            fontWeight = FontWeight.ExtraBold,
+                            letterSpacing = 1.sp
                         )
                     },
                     navigationIcon = {
@@ -197,7 +204,7 @@ fun FreeHoroscopeScreen(
                             Icon(
                                 Icons.Default.ArrowBack,
                                 contentDescription = "Back",
-                                tint = Color.White
+                                tint = neonCyan
                             )
                         }
                     },
@@ -212,30 +219,33 @@ fun FreeHoroscopeScreen(
                     .fillMaxSize()
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
+                    .navigationBarsPadding()
+                    .imePadding()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 // Main Form Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f)),
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(24.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "Enter Your Birth Details",
+                            text = "Birth Details",
                             style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = RoyalMidnightBlue
+                            fontWeight = FontWeight.ExtraBold,
+                            color = neonCyan
                         )
                         Text(
                             text = "Fill in the details below to generate your personalized Rasi chart.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = RoyalMidnightBlue.copy(alpha = 0.7f)
+                            color = Color.White.copy(alpha = 0.7f)
                         )
 
                         Spacer(Modifier.height(8.dp))
@@ -244,84 +254,64 @@ fun FreeHoroscopeScreen(
                         OutlinedTextField(
                             value = name,
                             onValueChange = { name = it },
-                            label = { Text("Full Name") },
+                            label = { Text("Full Name", color = Color.White.copy(alpha = 0.6f)) },
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = PeacockGreen,
-                                focusedLabelColor = PeacockGreen,
-                                cursorColor = PeacockGreen,
-                                focusedTextColor = RoyalMidnightBlue,
-                                unfocusedTextColor = RoyalMidnightBlue
+                                focusedBorderColor = neonCyan,
+                                unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+                                focusedTextColor = Color.White,
+                                unfocusedTextColor = Color.White
                             )
                         )
 
                         // Gender
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text("Gender:", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
+                            Text("Gender:", fontWeight = FontWeight.SemiBold, color = Color.White)
                             Spacer(Modifier.width(16.dp))
                             RadioButton(
                                 selected = gender == "Male",
                                 onClick = { gender = "Male" },
-                                colors = RadioButtonDefaults.colors(selectedColor = PeacockGreen)
+                                colors = RadioButtonDefaults.colors(selectedColor = neonCyan, unselectedColor = Color.White.copy(alpha = 0.5f))
                             )
-                            Text("Male", color = RoyalMidnightBlue)
+                            Text("Male", color = Color.White)
                             Spacer(Modifier.width(16.dp))
                             RadioButton(
                                 selected = gender == "Female",
                                 onClick = { gender = "Female" },
-                                colors = RadioButtonDefaults.colors(selectedColor = PeacockGreen)
+                                colors = RadioButtonDefaults.colors(selectedColor = neonCyan, unselectedColor = Color.White.copy(alpha = 0.5f))
                             )
-                            Text("Female", color = RoyalMidnightBlue)
+                            Text("Female", color = Color.White)
                         }
 
                         // Date of Birth Split
-                        Text("Date of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
+                        Text("Date of Birth", fontWeight = FontWeight.SemiBold, color = Color.White)
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            OutlinedTextField(
-                                value = day,
-                                onValueChange = { if (it.length <= 2) day = it },
-                                label = { Text("DD") },
-                                modifier = Modifier.weight(1f),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = PeacockGreen,
-                                    focusedLabelColor = PeacockGreen,
-                                    cursorColor = PeacockGreen
+                            listOf(day to "DD", month to "MM", year to "YYYY").forEach { (valStr, lbl) ->
+                                OutlinedTextField(
+                                    value = if(lbl == "DD") day else if(lbl == "MM") month else year,
+                                    onValueChange = {
+                                        if(lbl == "DD" && it.length <= 2) day = it
+                                        else if(lbl == "MM" && it.length <= 2) month = it
+                                        else if(lbl == "YYYY" && it.length <= 4) year = it
+                                    },
+                                    label = { Text(lbl, color = Color.White.copy(alpha = 0.5f)) },
+                                    modifier = Modifier.weight(if(lbl == "YYYY") 1.5f else 1f),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = neonCyan,
+                                        unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+                                        focusedTextColor = Color.White,
+                                        unfocusedTextColor = Color.White
+                                    )
                                 )
-                            )
-                            OutlinedTextField(
-                                value = month,
-                                onValueChange = { if (it.length <= 2) month = it },
-                                label = { Text("MM") },
-                                modifier = Modifier.weight(1f),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = PeacockGreen,
-                                    focusedLabelColor = PeacockGreen,
-                                    cursorColor = PeacockGreen
-                                )
-                            )
-                            OutlinedTextField(
-                                value = year,
-                                onValueChange = { if (it.length <= 4) year = it },
-                                label = { Text("YYYY") },
-                                modifier = Modifier.weight(1.5f),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = PeacockGreen,
-                                    focusedLabelColor = PeacockGreen,
-                                    cursorColor = PeacockGreen
-                                )
-                            )
+                            }
                         }
 
                         // Time of Birth Split
-                        Text("Time of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
+                        Text("Time of Birth", fontWeight = FontWeight.SemiBold, color = Color.White)
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
@@ -329,28 +319,30 @@ fun FreeHoroscopeScreen(
                             OutlinedTextField(
                                 value = hour,
                                 onValueChange = { if (it.length <= 2) hour = it },
-                                label = { Text("HH") },
+                                label = { Text("HH", color = Color.White.copy(alpha = 0.5f)) },
                                 modifier = Modifier.weight(1f),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = PeacockGreen,
-                                    focusedLabelColor = PeacockGreen,
-                                    cursorColor = PeacockGreen
+                                    focusedBorderColor = neonCyan,
+                                    unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+                                    focusedTextColor = Color.White,
+                                    unfocusedTextColor = Color.White
                                 )
                             )
-                            Text(":", fontWeight = FontWeight.Bold, color = RoyalMidnightBlue, fontSize = 20.sp)
+                            Text(":", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 20.sp)
                             OutlinedTextField(
                                 value = minute,
                                 onValueChange = { if (it.length <= 2) minute = it },
-                                label = { Text("MM") },
+                                label = { Text("MM", color = Color.White.copy(alpha = 0.5f)) },
                                 modifier = Modifier.weight(1f),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = PeacockGreen,
-                                    focusedLabelColor = PeacockGreen,
-                                    cursorColor = PeacockGreen
+                                    focusedBorderColor = neonCyan,
+                                    unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+                                    focusedTextColor = Color.White,
+                                    unfocusedTextColor = Color.White
                                 )
                             )
 
@@ -358,18 +350,18 @@ fun FreeHoroscopeScreen(
                                 modifier = Modifier
                                     .weight(1.5f)
                                     .clip(RoundedCornerShape(12.dp))
-                                    .background(Color(0xFFF0F0F0))
-                                    .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
+                                    .background(Color.White.copy(alpha = 0.1f))
+                                    .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
                             ) {
                                 Text(
                                     "AM",
                                     modifier = Modifier
                                         .weight(1f)
                                         .clickable { amPm = "AM" }
-                                        .background(if (amPm == "AM") PeacockGreen else Color.Transparent)
+                                        .background(if (amPm == "AM") neonCyan else Color.Transparent)
                                         .padding(12.dp),
                                     textAlign = TextAlign.Center,
-                                    color = if (amPm == "AM") Color.White else RoyalMidnightBlue,
+                                    color = if (amPm == "AM") DeepSpaceNavy else Color.White,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Text(
@@ -377,10 +369,10 @@ fun FreeHoroscopeScreen(
                                     modifier = Modifier
                                         .weight(1f)
                                         .clickable { amPm = "PM" }
-                                        .background(if (amPm == "PM") PeacockGreen else Color.Transparent)
+                                        .background(if (amPm == "PM") neonCyan else Color.Transparent)
                                         .padding(12.dp),
                                     textAlign = TextAlign.Center,
-                                    color = if (amPm == "PM") Color.White else RoyalMidnightBlue,
+                                    color = if (amPm == "PM") DeepSpaceNavy else Color.White,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -433,18 +425,18 @@ fun FreeHoroscopeScreen(
                         OutlinedTextField(
                              value = cityName,
                              onValueChange = {},
-                             label = { Text("City") },
+                             label = { Text("City", color = Color.White.copy(alpha = 0.5f)) },
                              readOnly = true,
                              enabled = false,
                              modifier = Modifier
                                  .fillMaxWidth()
                                  .clickable { launchLocationPicker() },
-                             trailingIcon = { Icon(Icons.Default.LocationOn, "Pick", tint = PeacockGreen) },
+                             trailingIcon = { Icon(Icons.Default.LocationOn, "Pick", tint = neonCyan) },
                              shape = RoundedCornerShape(12.dp),
                              colors = OutlinedTextFieldDefaults.colors(
-                                 disabledTextColor = RoyalMidnightBlue,
-                                 disabledBorderColor = Color.Gray,
-                                 disabledLabelColor = RoyalMidnightBlue,
+                                 disabledTextColor = Color.White,
+                                 disabledBorderColor = Color.White.copy(alpha = 0.2f),
+                                 disabledLabelColor = Color.White.copy(alpha = 0.5f),
                                  disabledContainerColor = Color.Transparent
                              )
                         )
@@ -502,12 +494,12 @@ fun FreeHoroscopeScreen(
                                 .fillMaxWidth()
                                 .height(56.dp)
                                 .shadow(
-                                    elevation = 8.dp,
+                                    elevation = 20.dp,
                                     shape = RoundedCornerShape(16.dp),
-                                    spotColor = PeacockGreen
+                                    spotColor = electricBlue
                                 ),
                             shape = RoundedCornerShape(16.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = PeacockGreen),
+                            colors = ButtonDefaults.buttonColors(containerColor = electricBlue),
                             enabled = !isLoading
                         ) {
                             if (isLoading) {
@@ -519,8 +511,8 @@ fun FreeHoroscopeScreen(
                                 Text(
                                     "Generate Rasi Chart",
                                     fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = RoyalMidnightBlue
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = Color.White
                                 )
                             }
                         }

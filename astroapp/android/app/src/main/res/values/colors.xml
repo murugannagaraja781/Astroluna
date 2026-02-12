@@ -8,10 +8,10 @@
     <color name="brand_card_white">#FFFFFF</color>
     <color name="milk_white">#FAF9F6</color>
 
-    <!-- Main Identity - Primary RED (Royal Crimson) -->
-    <color name="peacock_teal">#8E1B1B</color> <!-- Deep Maroon Header -->
-    <color name="peacock_green">#D32F2F</color> <!-- Lighter Red -->
-    <color name="color4">#8E1B1B</color> <!-- Header -->
+    <!-- Main Identity - Primary PURPLE (Amethyst) -->
+    <color name="peacock_teal">#4A148C</color> <!-- Deep Purple Header -->
+    <color name="peacock_green">#7B1FA2</color> <!-- Medium Purple -->
+    <color name="color4">#4A148C</color> <!-- Header -->
     <color name="royal_gold">#C9A227</color> <!-- Keep for accents -->
 
     <!-- MARKETPLACE PALETTE -->
@@ -72,11 +72,11 @@
     <color name="divider_gold">#EEEEEE</color>
     <color name="brand_ripple">#EEEEEE</color>
 
-    <color name="brand_avocado">#1B5E20</color>
-    <color name="brand_gold">#1B5E20</color>
-    <color name="brand_orange">#1B5E20</color>
-    <color name="brand_purple">#1B5E20</color>
-    <color name="brand_emerald_royal">#1B5E20</color>
+    <color name="brand_avocado">#4A148C</color>
+    <color name="brand_gold">#4A148C</color>
+    <color name="brand_orange">#4A148C</color>
+    <color name="brand_purple">#4A148C</color>
+    <color name="brand_emerald_royal">#4A148C</color>
     <color name="brand_emerald_dark">#1B5E20</color>
     <color name="brand_gold_dark">#1B5E20</color>
     <color name="brand_status_online">#00C853</color>
@@ -91,10 +91,10 @@
     <color name="nebula_blue">#000000</color>
     <color name="nebula_purple">#000000</color>
 
-    <!-- Gradient Colors -->
-    <color name="gradient_start">#8E0000</color>
-    <color name="gradient_center">#B71C1C</color>
-    <color name="gradient_end">#D32F2F</color>
+    <!-- Gradient Colors (Purple) -->
+    <color name="gradient_start">#4A148C</color>
+    <color name="gradient_center">#6A1B9A</color>
+    <color name="gradient_end">#7B1FA2</color>
 
     <!-- Default Material colors -->
     <color name="purple_200">#FF8A80</color>

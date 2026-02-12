@@ -411,6 +411,7 @@ fun AstrologerDashboardScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(CosmicAppTheme.headerBrush) // Dynamic Header Gradient
+                    .statusBarsPadding()
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -494,6 +495,7 @@ fun AstrologerDashboardScreen(
                 .fillMaxSize()
                 .background(CosmicAppTheme.backgroundBrush) // Dynamic Background
                 .verticalScroll(scrollState) // ENABLE SCROLLING
+                .navigationBarsPadding()
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {

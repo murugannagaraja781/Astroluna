@@ -1131,7 +1131,7 @@ fun CallScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .padding(top = 24.dp)
+                .statusBarsPadding()
                 .height(110.dp)
                 .shadow(8.dp, RoundedCornerShape(24.dp))
                 .background(Color.White, RoundedCornerShape(24.dp))
@@ -1140,7 +1140,8 @@ fun CallScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 40.dp, start = 32.dp, end = 32.dp),
+                .statusBarsPadding()
+                .padding(top = 16.dp, start = 32.dp, end = 32.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
@@ -1199,6 +1200,7 @@ fun CallScreen(
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
                 .padding(16.dp)
                 .fillMaxWidth()
                 .shadow(16.dp, RoundedCornerShape(32.dp))
