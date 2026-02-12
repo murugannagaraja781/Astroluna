@@ -1541,13 +1541,17 @@ async function endSessionRecord(sessionId) {
   if (!s) return;
 
   const endTime = Date.now();
-  // Phase 1/2: Use tracked billable seconds if available
+  // Use tracked billable seconds, but fallback to wall-clock duration if 0 (for display/history)
+  const wallClockSeconds = Math.floor((endTime - (s.startTime || endTime)) / 1000);
   const billableSeconds = s.elapsedBillableSeconds || 0;
+
+  // For DB recording and user summary, if billable is 0 but they were actually in a session, use wall clock
+  const displayDuration = billableSeconds > 0 ? billableSeconds : wallClockSeconds;
 
   // Update Session in DB
   await Session.updateOne({ sessionId }, {
     endTime,
-    duration: billableSeconds * 1000,
+    duration: displayDuration * 1000,
     totalEarned: s.totalEarned || 0,
     status: 'ended'
   });
@@ -1600,7 +1604,7 @@ async function endSessionRecord(sessionId) {
     summary: {
       deducted: s.totalDeducted || 0,
       earned: s.totalEarned || 0,
-      duration: billableSeconds
+      duration: displayDuration
     }
   };
 

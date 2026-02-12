@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.astroluna.app-mergeDebugResources-77:/values-ms/values-ms.xml",
+            "outputFile": "com.astroluna.app-mergeDebugResources-78:/values-ms/values-ms.xml",
             "map": [
                 {
                     "source": "/Users/wohozo/.gradle/caches/8.12/transforms/c59dfcbc2d8301c469fc301178880ead/transformed/jetified-play-services-base-18.0.1/res/values-ms/values.xml",

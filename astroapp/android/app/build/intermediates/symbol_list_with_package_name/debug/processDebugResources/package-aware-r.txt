@@ -1,4 +1,4 @@
-com.astroluna.app
+com.astroluna
 anim abc_fade_in
 anim abc_fade_out
 anim abc_grow_fade_in_from_bottom
@@ -78,6 +78,9 @@ animator mtrl_fab_hide_motion_spec
 animator mtrl_fab_show_motion_spec
 animator mtrl_fab_transformation_sheet_collapse_spec
 animator mtrl_fab_transformation_sheet_expand_spec
+array com_google_android_gms_fonts_certs
+array com_google_android_gms_fonts_certs_dev
+array com_google_android_gms_fonts_certs_prod
 attr SharedValue
 attr SharedValueId
 attr actionBarDivider
@@ -3303,6 +3306,7 @@ drawable test_level_drawable
 drawable tooltip_frame_dark
 drawable tooltip_frame_light
 drawable wallet_bg
+font outfit
 id ALT
 id BOTTOM_END
 id BOTTOM_START

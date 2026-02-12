@@ -10,10 +10,10 @@ plugins {
 }
 
 android {
-    namespace = "com.astroluna.app"
+    namespace = "com.astroluna"
     compileSdk = 35
     defaultConfig {
-        applicationId = "com.astroluna.app"
+        applicationId = "com.astroluna"
         minSdk = 24
         targetSdk = 35
         versionCode = 2
@@ -128,6 +128,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata")
     implementation("androidx.activity:activity-compose:1.9.0")
 
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.8")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 

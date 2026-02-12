@@ -8,21 +8,29 @@ const BASE_URL = 'https://raw.githubusercontent.com/abinash818/daily-horoscope-d
 const cache = new Map();
 
 /**
- * Fetch daily horoscope data for a specific date
+ * Fetch daily horoscope data for a specific date with a fallback to previous day
  * @param {string} date - ISO date string (YYYY-MM-DD)
+ * @param {boolean} isFallback - internal flag to prevent infinite recursion
  */
-async function fetchDailyHoroscope(date) {
-    const fileName = `horoscope_${date}.json`;
-    const url = `${BASE_URL}/${fileName}`;
-
+async function fetchDailyHoroscope(date, isFallback = false) {
     // Check cache first
     if (cache.has(date)) {
         return cache.get(date);
     }
 
+    const fileName = `horoscope_${date}.json`;
+    const url = `${BASE_URL}/${fileName}`;
+
     try {
         const response = await fetch(url);
+
         if (!response.ok) {
+            // If today's file isn't found and we haven't tried fallback yet, try yesterday
+            if (response.status === 404 && !isFallback) {
+                const yesterday = DateTime.fromISO(date).minus({ days: 1 }).toFormat('yyyy-MM-dd');
+                console.log(`Horoscope for ${date} not found, trying fallback to ${yesterday}`);
+                return await fetchDailyHoroscope(yesterday, true);
+            }
             throw new Error(`Failed to fetch horoscope for ${date}: ${response.statusText}`);
         }
 
@@ -41,20 +49,25 @@ async function fetchDailyHoroscope(date) {
             }
         }
 
-        // Cache the data
-        cache.set(date, data);
+        // Cache the data (only cache successful fetches)
+        if (data) {
+            cache.set(date, data);
 
-        // Strategy: Clear cache for dates older than 2 days to prevent memory leaks
-        if (cache.size > 5) {
-            const keys = Array.from(cache.keys()).sort();
-            while (cache.size > 5) {
-                cache.delete(keys.shift());
+            // Strategy: Clear cache for dates older than 2 days to prevent memory leaks
+            if (cache.size > 5) {
+                const keys = Array.from(cache.keys()).sort();
+                while (cache.size > 5) {
+                    cache.delete(keys.shift());
+                }
             }
         }
 
         return data;
     } catch (error) {
-        console.error('Error fetching horoscope data:', error);
+        // Only log serious errors, not 404s which are handled above
+        if (!isFallback) {
+            console.error('Error fetching horoscope data:', error.message);
+        }
         return null;
     }
 }

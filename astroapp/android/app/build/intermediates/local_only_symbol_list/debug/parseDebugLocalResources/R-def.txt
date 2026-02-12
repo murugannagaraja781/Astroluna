@@ -1,6 +1,9 @@
 R_DEF: Internal format may change without notice
 local
 anim slide_in_up
+array com_google_android_gms_fonts_certs
+array com_google_android_gms_fonts_certs_dev
+array com_google_android_gms_fonts_certs_prod
 color accent
 color action_call
 color action_chat
@@ -167,6 +170,7 @@ drawable rounded_button_red
 drawable status_offline
 drawable status_online
 drawable wallet_bg
+font outfit
 mipmap ic_launcher
 mipmap ic_launcher_round
 string app_name

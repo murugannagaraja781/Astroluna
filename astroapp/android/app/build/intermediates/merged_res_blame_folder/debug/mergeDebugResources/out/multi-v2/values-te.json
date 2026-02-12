@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.astroluna.app-mergeDebugResources-77:/values-te/values-te.xml",
+            "outputFile": "com.astroluna.app-mergeDebugResources-78:/values-te/values-te.xml",
             "map": [
                 {
                     "source": "/Users/wohozo/.gradle/caches/8.12/transforms/7f083e1073bb39ca032145821b4b26a8/transformed/appcompat-1.7.0/res/values-te/values-te.xml",

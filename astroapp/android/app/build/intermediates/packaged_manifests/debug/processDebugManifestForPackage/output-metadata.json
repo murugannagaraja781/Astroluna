@@ -4,7 +4,7 @@
     "type": "PACKAGED_MANIFESTS",
     "kind": "Directory"
   },
-  "applicationId": "com.astroluna.app",
+  "applicationId": "com.astroluna",
   "variantName": "debug",
   "elements": [
     {
