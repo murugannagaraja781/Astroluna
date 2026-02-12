@@ -46,7 +46,7 @@ if [ $? -eq 0 ]; then
     # Trigger Rclone sync (if installed and configured)
     if command -v rclone &> /dev/null; then
         echo "Syncing to Google Drive..."
-        # Change 'gdrive:astro5star_backups' to your rclone remote name and folder
+        # Change 'gdrive:astroluna_backups' to your rclone remote name and folder
         rclone sync "$BACKUP_DIR" gdrive:astroluna_backups
     else
         echo "Rclone not installed. Skipping Google Drive sync."
