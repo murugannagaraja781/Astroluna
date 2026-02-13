@@ -2140,6 +2140,8 @@ io.on('connection', (socket) => {
   socket.on('get-astrologers', async (cb) => {
     try {
       const astros = await User.find({ role: 'astrologer' });
+      // Emit to this socket directly for compatibility
+      socket.emit('astrologer-update', astros);
       if (typeof cb === 'function') cb({ astrologers: astros });
     } catch (e) {
       if (typeof cb === 'function') cb({ astrologers: [] });

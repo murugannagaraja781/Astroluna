@@ -30,7 +30,7 @@ class HomeActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "HomeActivity"
-        private const val SERVER_URL = "https://astroluna.com"
+        private val SERVER_URL = com.astroluna.utils.Constants.SERVER_URL
     }
 
     private lateinit var tokenManager: TokenManager

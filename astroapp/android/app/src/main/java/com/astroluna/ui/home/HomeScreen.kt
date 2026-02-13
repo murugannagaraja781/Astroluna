@@ -478,7 +478,7 @@ fun HomeScreen(
 @Composable
 fun SupportAndPoliciesSection() {
     val context = LocalContext.current
-    val baseUrl = "https://astroluna.com" // Update to your actual domain
+    val baseUrl = "https://astroluna.in" // Update to your actual domain
 
     Column(
         modifier = Modifier
@@ -748,7 +748,7 @@ fun ReferAndEarnSection(code: String) {
                             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                 type = "text/plain"
                                 putExtra(Intent.EXTRA_SUBJECT, "Download Astro Luna")
-                                putExtra(Intent.EXTRA_TEXT, "Hi! Use my referral code $code to join Astro Luna and get a special bonus on your first recharge! Download here: https://astroluna.com")
+                                putExtra(Intent.EXTRA_TEXT, "Hi! Use my referral code $code to join Astro Luna and get a special bonus on your first recharge! Download here: https://astroluna.in")
                             }
                             context.startActivity(Intent.createChooser(shareIntent, "Share Referral Code"))
                         },
@@ -844,11 +844,11 @@ fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
                     when (item) {
                         "Terms & Conditions" -> {
                             onClose()
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.com/terms-condition.html")))
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.in/terms-condition.html")))
                         }
                         "Privacy Policy" -> {
                             onClose()
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.com/privacy-policy.html")))
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.in/privacy-policy.html")))
                         }
                         else -> onItemClick(item)
                     }
@@ -1464,7 +1464,7 @@ fun TopServicesSection() {
                     "Free\nServices" -> {
                         android.app.AlertDialog.Builder(context)
                             .setTitle("Contact Us")
-                            .setMessage("For free services, contact us at: info@astroluna.com")
+                            .setMessage("For free services, contact us at: info@astroluna.in")
                             .setPositiveButton("OK", null)
                             .show()
                     }
