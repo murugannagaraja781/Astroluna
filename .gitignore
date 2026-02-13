@@ -6,3 +6,5 @@ astroapp/android/app/build/outputs/apk/debug/app-debug.apk
 astroapp/android/app/build/outputs/apk/release/app-release.apk
 astroapp/android/app/build/outputs/apk/debug/app-debug.apk
 astroapp/android/app/build/outputs/apk/debug/app-debug.apk
+astroapp/android/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/csc.db.jar
+astroapp/android/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/csc.db.jar

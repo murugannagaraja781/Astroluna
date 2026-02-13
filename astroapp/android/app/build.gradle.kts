@@ -11,13 +11,14 @@ plugins {
 
 android {
     namespace = "com.astroluna"
-    compileSdk = 35
+    compileSdk = 34
     defaultConfig {
-        applicationId = "com.astroluna"
-        minSdk = 24
-        targetSdk = 35
-        versionCode = 2
-        versionName = "5.5.1"
+        applicationId = "com.astroluna.test"
+        minSdk = 21
+        targetSdk = 33
+        versionCode = 6
+        versionName = "5.5.5"
+        multiDexEnabled = true
     }
 
     signingConfigs {
@@ -65,6 +66,10 @@ android {
     buildFeatures {
         viewBinding = true
         compose = true
+    }
+
+    androidResources {
+        noCompress.add("db")
     }
 }
 

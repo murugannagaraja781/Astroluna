@@ -13,7 +13,8 @@
     - RECEIVE_BOOT_COMPLETED: Optional - re-register FCM token after device reboot
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.astroluna">
 
     <!-- Network permissions -->
     <uses-permission android:name="android.permission.INTERNET" />

@@ -4,7 +4,7 @@
     "type": "COMPATIBLE_SCREEN_MANIFEST",
     "kind": "Directory"
   },
-  "applicationId": "com.astroluna",
+  "applicationId": "com.astroluna.test",
   "variantName": "debug",
   "elements": []
 }

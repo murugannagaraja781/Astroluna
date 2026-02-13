@@ -4,18 +4,18 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.astroluna",
+  "applicationId": "com.astroluna.test",
   "variantName": "debug",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 2,
-      "versionName": "5.5.1",
+      "versionCode": 6,
+      "versionName": "5.5.5",
       "outputFile": "app-debug.apk"
     }
   ],
   "elementType": "File",
-  "minSdkVersionForDexing": 24
+  "minSdkVersionForDexing": 21
 }
