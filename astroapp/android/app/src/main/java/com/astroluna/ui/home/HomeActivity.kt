@@ -45,6 +45,7 @@ class HomeActivity : AppCompatActivity() {
     private val _horoscope = MutableStateFlow("Loading Horoscope...")
     private val _astrologers = MutableStateFlow<List<Astrologer>>(emptyList())
     private val _isLoading = MutableStateFlow(true)
+    private val _userSession = MutableStateFlow<com.astroluna.data.model.AuthResponse?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +70,8 @@ class HomeActivity : AppCompatActivity() {
                 val horoscope by _horoscope.collectAsState()
                 val astrologers by _astrologers.collectAsState()
                 val isLoading by _isLoading.collectAsState()
-                val referralCode = remember { tokenManager.getUserSession()?.referralCode ?: "" }
+                val session by _userSession.collectAsState()
+                val referralCode = session?.referralCode ?: ""
 
                 var selectedRasiItem by remember { mutableStateOf<ComposeRasiItem?>(null) }
 
@@ -151,6 +153,7 @@ class HomeActivity : AppCompatActivity() {
         // The original code had a logout button in XML. I will assume it's okay to omit for this "Screen" demo, or I can add it to TopBar later.
 
         // Load data
+        _userSession.value = tokenManager.getUserSession()
         loadWalletBalance()
         loadDailyHoroscope()
         loadAstrologers()
@@ -181,6 +184,7 @@ class HomeActivity : AppCompatActivity() {
                     val user = response.body()!!
                     val balance = user.walletBalance ?: 0.0
                     tokenManager.saveUserSession(user)
+                    _userSession.value = user
                     _walletBalance.value = balance
                 }
             } catch (e: Exception) {
@@ -369,6 +373,7 @@ class HomeActivity : AppCompatActivity() {
             val balance = data.optDouble("balance", 0.0)
             _walletBalance.value = balance
             tokenManager.updateWalletBalance(balance)
+            _userSession.value = tokenManager.getUserSession()
         }
 
         socket?.emit("get-astrologers")

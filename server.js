@@ -671,6 +671,11 @@ app.get('/api/user/:userId', async (req, res) => {
     const user = await User.findOne({ userId });
     if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
 
+    if (!user.referralCode) {
+      user.referralCode = await generateReferralCode(user.name || 'User');
+      await user.save();
+    }
+
     res.json({
       ok: true,
       userId: user.userId,
@@ -678,6 +683,7 @@ app.get('/api/user/:userId', async (req, res) => {
       phone: user.phone,
       role: user.role,
       walletBalance: user.walletBalance,
+      referralCode: user.referralCode,
       isOnline: user.isOnline,
       isAvailable: user.isAvailable,
       isChatOnline: user.isChatOnline || false,
@@ -1222,6 +1228,11 @@ app.post('/api/verify-otp', async (req, res) => {
       user.role = 'superadmin';
       await user.save();
     }
+
+    if (!user.referralCode) {
+      user.referralCode = await generateReferralCode(user.name || 'Admin');
+      await user.save();
+    }
     return res.json({
       ok: true,
       userId: user.userId,
@@ -1230,6 +1241,7 @@ app.post('/api/verify-otp', async (req, res) => {
       phone: user.phone,
       walletBalance: user.walletBalance,
       totalEarnings: user.totalEarnings || 0,
+      referralCode: user.referralCode,
       image: user.image
     });
   }
@@ -1256,6 +1268,11 @@ app.post('/api/verify-otp', async (req, res) => {
       user.ratePerMinute = user.ratePerMinute || 10;
       await user.save();
     }
+
+    if (!user.referralCode) {
+      user.referralCode = await generateReferralCode(user.name || 'Astro');
+      await user.save();
+    }
     return res.json({
       ok: true,
       userId: user.userId,
@@ -1264,6 +1281,7 @@ app.post('/api/verify-otp', async (req, res) => {
       phone: user.phone,
       walletBalance: user.walletBalance,
       totalEarnings: user.totalEarnings || 0,
+      referralCode: user.referralCode,
       image: user.image,
       ratePerMinute: user.ratePerMinute
     });
@@ -1284,6 +1302,11 @@ app.post('/api/verify-otp', async (req, res) => {
       user.role = 'client';
       await user.save();
     }
+
+    if (!user.referralCode) {
+      user.referralCode = await generateReferralCode(user.name || 'Client');
+      await user.save();
+    }
     return res.json({
       ok: true,
       userId: user.userId,
@@ -1292,6 +1315,7 @@ app.post('/api/verify-otp', async (req, res) => {
       phone: user.phone,
       walletBalance: user.walletBalance,
       totalEarnings: user.totalEarnings || 0,
+      referralCode: user.referralCode,
       image: user.image
     });
   }
@@ -1354,6 +1378,12 @@ app.post('/api/verify-otp', async (req, res) => {
         referredBy: referredByUserId,
         walletBalance: referredByUserId ? 108 + 21 : 108 // Extra 21 for being referred
       });
+    } else {
+      // Existing user: ensure they have a referral code
+      if (!user.referralCode) {
+        user.referralCode = await generateReferralCode(user.name || 'User');
+        await user.save();
+      }
     }
 
     // Ensure role is respected (if changed by admin)
@@ -1364,7 +1394,8 @@ app.post('/api/verify-otp', async (req, res) => {
       role: user.role,
       phone: user.phone,
       walletBalance: user.walletBalance,
-      totalEarnings: user.totalEarnings || 0, // Ensure this is sent
+      totalEarnings: user.totalEarnings || 0,
+      referralCode: user.referralCode,
       image: user.image
     });
   } catch (e) {

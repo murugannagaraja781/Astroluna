@@ -125,7 +125,7 @@ public abstract interface ApiInterface {
     java.lang.String sessionId, @org.jetbrains.annotations.NotNull()
     kotlin.coroutines.Continuation<? super retrofit2.Response<com.google.gson.JsonObject>> $completion);
     
-    @retrofit2.http.GET(value = "https://astroluna.com/api/horoscope/rasi-palan")
+    @retrofit2.http.GET(value = "api/horoscope/rasi-palan")
     @org.jetbrains.annotations.Nullable()
     public abstract java.lang.Object getRasipalan(@org.jetbrains.annotations.NotNull()
     kotlin.coroutines.Continuation<? super retrofit2.Response<java.util.List<com.astroluna.data.model.RasipalanItem>>> $completion);
