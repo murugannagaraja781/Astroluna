@@ -7,6 +7,17 @@
     <title>Payment Gateway - AstroLuna</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        :root {
+            --brand-purple: #5c0874;
+            --brand-light: #7a1f95;
+            --accent-gold: #f59e0b;
+            --secondary-bg: #1a0222;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
@@ -14,116 +25,123 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: 'Raleway', sans-serif;
+            background: radial-gradient(circle at top, var(--brand-light) 0%, var(--secondary-bg) 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            color: var(--text-main);
         }
 
         .payment-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 400px;
-            padding: 30px;
+            padding: 35px;
         }
 
         .payment-header {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .wallet-icon {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-light) 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 15px;
-            font-size: 1.8rem;
-            color: #047857;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: var(--accent-gold);
+            box-shadow: 0 0 20px rgba(92, 8, 116, 0.3);
         }
 
         .payment-header h2 {
-            color: #1F2937;
-            font-size: 1.4rem;
+            color: var(--accent-gold);
+            font-size: 1.6rem;
             font-weight: 700;
         }
 
         .payment-header p {
-            color: #6B7280;
-            font-size: 0.9rem;
-            margin-top: 8px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 10px;
         }
 
         .user-info {
-            background: #F3F4F6;
-            padding: 15px;
-            border-radius: 12px;
-            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
             text-align: center;
+            border: 1px solid var(--glass-border);
         }
 
         .user-info .name {
             font-weight: 600;
-            color: #1F2937;
-            font-size: 1.1rem;
+            color: var(--text-main);
+            font-size: 1.2rem;
         }
 
         .user-info .expires {
-            font-size: 0.8rem;
-            color: #6B7280;
+            font-size: 0.85rem;
+            color: var(--accent-gold);
             margin-top: 5px;
         }
 
         .amount-display {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 35px;
         }
 
         .amount-display .label {
-            font-size: 0.9rem;
-            color: #6B7280;
-            margin-bottom: 5px;
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
         }
 
         .amount-display .amount {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #047857;
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--text-main);
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
         }
 
         .pay-btn {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            padding: 18px;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #d97706 100%);
             border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 1.1rem;
+            border-radius: 50px;
+            color: #000;
+            font-size: 1.2rem;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(4, 120, 87, 0.3);
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.4);
         }
 
         .pay-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(4, 120, 87, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6);
         }
 
         .pay-btn:disabled {
-            background: #9CA3AF;
+            background: #4B5563;
+            color: #9CA3AF;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
@@ -131,49 +149,24 @@
 
         .security-note {
             text-align: center;
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: #9CA3AF;
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
         .security-note i {
             margin-right: 5px;
-            color: #047857;
+            color: var(--accent-gold);
         }
 
-        /* Error State */
-        .error-container {
-            text-align: center;
-            padding: 40px 20px;
-        }
-
+        /* Error state */
         .error-icon {
             font-size: 4rem;
             color: #EF4444;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
-        .error-container h2 {
-            color: #DC2626;
-            margin-bottom: 10px;
-        }
-
-        .error-container p {
-            color: #6B7280;
-        }
-
-        .retry-btn {
-            margin-top: 20px;
-            padding: 12px 30px;
-            background: #6B7280;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        /* Loading Overlay */
+        /* Loading */
         .loading-overlay {
             display: none;
             position: fixed;
@@ -181,7 +174,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--secondary-bg);
             z-index: 9999;
             justify-content: center;
             align-items: center;
@@ -193,10 +186,10 @@
         }
 
         .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #E5E7EB;
-            border-top-color: #047857;
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--glass-border);
+            border-top-color: var(--accent-gold);
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -207,33 +200,12 @@
             }
         }
 
-        .loading-text {
-            margin-top: 20px;
-            font-size: 1rem;
-            color: #374151;
-            font-weight: 500;
-        }
-
-        /* Status Messages */
-        .status-message {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .status-message.success {
-            display: block;
-            background: #ECFDF5;
-            border: 1px solid #10B981;
-            color: #047857;
-        }
-
-        .status-message.error {
-            display: block;
-            background: #FEF2F2;
-            border: 1px solid #EF4444;
-            color: #DC2626;
+        .footer-info {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
         }
     </style>
 </head>
@@ -278,7 +250,12 @@
 
         <!-- Security Note -->
         <div class="security-note">
-            <i class="fas fa-shield-alt"></i> 100% Secure Payment via PhonePe
+            <i class="fas fa-shield-alt"></i> 100% Secure via PhonePe
+        </div>
+
+        <div class="footer-info">
+            Contact: kalpanajomr@gmail.com | 904785439<br>
+            &copy; 2024 TAMIL ARGO INTERNATIONAL
         </div>
     </div>
 

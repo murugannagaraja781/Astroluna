@@ -582,10 +582,10 @@
     }
 
     .astro-card:hover {
-      transform: translateY(-4px);
-      background: rgba(122, 31, 149, 0.05);
-      border-color: var(--brand-light);
-      box-shadow: 0 10px 30px rgba(92, 8, 116, 0.4);
+      transform: translateY(-8px) scale(1.02);
+      background: rgba(122, 31, 149, 0.1);
+      border-color: var(--accent-gold);
+      box-shadow: 0 15px 40px rgba(92, 8, 116, 0.6);
     }
 
     .astro-card:hover::before {
@@ -2169,6 +2169,29 @@
       color: white;
       border-color: var(--brand-light);
     }
+
+    /* Astrologer List Grid */
+    #astroList {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 768px) {
+      #astroList {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      }
+    }
+
+    /* Hide Hero from Mobile Dashboard as requested */
+    #section-home .premium-hero {
+      display: none;
+    }
+
+    /* Refine spacing for the rest of mobile view */
+    #section-home {
+      padding-top: 20px;
+    }
   </style>
 </head>
 
@@ -2194,15 +2217,19 @@
     </nav>
 
     <header class="web-hero" id="hero">
-      <div class="badge">வானொலி சீரமைப்பு செயலில் உள்ளது</div>
+      <div class="badge">நட்சத்திரங்கள் வழிகாட்டும் நேரம்</div>
       <h1>உங்கள் அண்டவெளி வரைபடத்தைக் கண்டறியுங்கள்</h1>
-      <p>உயர் செயல்திறன் கொண்டவர்களுக்கான முதன்மை ஜோதிட தளம். நட்சத்திரங்களின் ஞானத்தை வான்வெளி துல்லியத்துடன் மற்றும்
-        பண்டைய அறிவாற்றலுடன் திறக்கவும்.</p>
+      <p>நவீன யுகத்திற்கான முதன்மை ஜோதிட தளம். நட்சத்திரங்களின் ஞானத்தை துல்லியமான கணிப்புகளுடன் மற்றும்
+        பண்டைய அறிவாற்றலுடன் இணைக்கிறோம்.</p>
       <div class="web-hero-ctas">
         <a href="#" class="main-cta"
-          onclick="document.querySelector('.mobile-view').style.display='block'; showLogin();">அட்டவணையைத் தொடங்கு</a>
-        <a href="#" class="sec-cta"><i class="fas fa-video"></i> வீடியோ அழைப்பு</a>
-        <a href="#" class="sec-cta"><i class="fas fa-phone-alt"></i> ஆடியோ அழைப்பு</a>
+          onclick="document.querySelector('.mobile-view').style.display='block'; showLogin();">ஆலோசனையைத் தொடங்கு</a>
+        <a href="#" class="sec-cta"
+          onclick="document.querySelector('.mobile-view').style.display='block'; showLogin();"><i
+            class="fas fa-video"></i> வீடியோ அழைப்பு</a>
+        <a href="#" class="sec-cta"
+          onclick="document.querySelector('.mobile-view').style.display='block'; showLogin();"><i
+            class="fas fa-phone-alt"></i> ஆ디오 அழைப்பு</a>
       </div>
     </header>
 
@@ -2229,9 +2256,9 @@
 
     <section class="web-testimonial-section" id="testimonials">
       <div style="position: relative; z-index: 1;">
-        <h2>உள்உணர்வு கொண்ட நிர்வாகிகளுக்காக உருவாக்கப்பட்டது</h2>
-        <p>நவீன அறிவியல் மற்றும் ஆழமான ஞானத்தின் சந்திப்பு. நட்சத்திரங்களை உங்கள் ஆலோசகர்களாக கொண்டு உங்கள்
-          சாம்ராஜ்யத்தை நிர்வகிக்கவும்.</p>
+        <h2>ஆன்மீகத் தேடுபவர்களுக்காக பிரத்யேகமாக உருவாக்கப்பட்டது</h2>
+        <p>நவீன அறிவியல் மற்றும் ஆழமான ஆன்மீக ஞானத்தின் சங்கமம். நட்சத்திரங்களை உங்கள் வழிகாட்டிகளாகக் கொண்டு உங்கள்
+          வாழ்க்கைப் பாதையைத் தெளிவுபடுத்துங்கள்.</p>
         <div class="web-avatars">
           <img src="https://ui-avatars.com/api/?name=A1&background=random" class="web-avatar">
           <img src="https://ui-avatars.com/api/?name=A2&background=random" class="web-avatar">
@@ -2281,10 +2308,20 @@
       <div class="footer-col">
         <h4>ஆவணக்காப்பகம்</h4>
         <ul>
-          <li><a href="#">அறிவுத் தளம்</a></li>
-          <li><a href="#">வரலாறு</a></li>
-          <li><a href="#">தனியுரிமைக் கொள்கை</a></li>
-          <li><a href="#">விதிமுறைகள்</a></li>
+          <li><a href="terms-condition.html">விதிமுறைகள்</a></li>
+          <li><a href="privacy-policy.html">தனியுரிமைக் கொள்கை</a></li>
+          <li><a href="refund-cancellation-policy.html">ரீஃபண்ட் கொள்கை</a></li>
+          <li><a href="return-policy.html">திரும்பப் பெறுதல்</a></li>
+          <li><a href="shipping-policy.html">ஷிப்பிங் கொள்கை</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>தொடர்புக்கு</h4>
+        <ul>
+          <li><a href="mailto:kalpanajomr@gmail.com"><i class="fas fa-envelope"></i> kalpanajomr@gmail.com</a></li>
+          <li><a href="tel:904785439"><i class="fas fa-phone-alt"></i> 904785439</a></li>
+          <li><a href="delete-account.html"><i class="fas fa-user-slash"></i> கணக்கை நீக்குக</a></li>
+          <li><a href="callacceptreject.html"><i class="fas fa-phone-slash"></i> அழைப்பு மேலாண்மை</a></li>
         </ul>
       </div>
     </footer>
@@ -2328,18 +2365,22 @@
 
     <div class="app-footer">
       <div class="footer-links">
-        <a href="https://astroluna.in/terms-condition" target="_blank">Terms</a>
+        <a href="terms-condition.html">Terms</a>
         <span class="sep">|</span>
-        <a href="https://astroluna.in/privacy-policy" target="_blank">Privacy</a>
+        <a href="privacy-policy.html">Privacy</a>
         <span class="sep">|</span>
-        <a href="https://astroluna.in/refund-cancellation-policy" target="_blank">Refunds</a>
+        <a href="refund-cancellation-policy.html">Refunds</a>
         <span class="sep">|</span>
-        <a href="https://astroluna.in/shipping-policy" target="_blank">Shipping</a>
+        <a href="delete-account.html">Account</a>
         <span class="sep">|</span>
-        <a href="https://astroluna.in/return-policy" target="_blank">Returns</a>
+        <a href="callacceptreject.html">Manage</a>
       </div>
-      <div class="footer-copy">&copy; 2024 TAMIL ARGO INTERNATIONAL</div>
+      <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">
+        Contact: kalpanajomr@gmail.com | 904785439
+      </div>
     </div>
+    <div class="footer-copy">&copy; 2024 TAMIL ARGO INTERNATIONAL</div>
+  </div>
   </div>
 
   <style>
@@ -2406,20 +2447,35 @@
     <div class="content-area">
       <!-- Section: Home -->
       <div id="section-home">
-        <!-- Hero Section -->
-        <div class="premium-hero">
-          <div class="hero-zodiac"></div>
-          <div class="hero-content">
-            <h1>Discover Your Cosmic Blueprint</h1>
-            <p>Connect with chosen experts for profound astrological insights.</p>
-            <div class="hero-actions">
-              <button class="cosmic-btn" onclick="navSwitch('call')"
-                style="width: auto; padding: 12px 24px; font-size: 0.9rem;">Start Consultation</button>
-              <button class="ghost-btn"
-                onclick="document.getElementById('dailyHoroscopeSection').scrollIntoView({behavior:'smooth'})">View
-                Daily Forecast</button>
+        <!-- Hero Section Removed for Mobile App Look as per request -->
+
+        <!-- Premium Services Grid -->
+        <div style="padding: 0 24px; margin-bottom: 24px;">
+          <h3 style="color:var(--accent-gold); font-size:1.1rem; margin-bottom:15px; font-family:var(--font-heading);">
+            எங்கள் சேவைகள்</h3>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+            <div class="service-item-card" onclick="navSwitch('chat')">
+              <img src="https://cdn-icons-png.flaticon.com/128/3122/3122155.png" alt="Chat">
+              <span>அரட்டை</span>
+            </div>
+            <div class="service-item-card" onclick="navSwitch('call')">
+              <img src="https://cdn-icons-png.flaticon.com/128/3059/3059502.png" alt="Call">
+              <span>அழைப்பு</span>
+            </div>
+            <div class="service-item-card" onclick="checkGuestAction(porutham)">
+              <img src="https://cdn-icons-png.flaticon.com/128/9141/9141153.png" alt="Match">
+              <span>பொருத்தம்</span>
+            </div>
+            <div class="service-item-card" onclick="checkGuestAction('horoscope')">
+              <img src="https://cdn-icons-png.flaticon.com/128/1592/1592209.png" alt="Reports">
+              <span>ஜாதகம்</span>
             </div>
           </div>
+        </div>
+
+        <div style="padding: 0 24px;">
+          <h3 style="color:var(--accent-gold); font-size:1.1rem; margin-bottom:15px; font-family:var(--font-heading);">
+            சிறந்த ஜோதிடர்கள்</h3>
         </div>
 
         <style>
@@ -4319,7 +4375,69 @@
     }
   </style>
 
-  <!-- Screen: Profile -->
+  <!-- Screen: Astrologer Profile Detail (Missing Component) -->
+  <div id="screen-astro-detail" class="modal-overlay hidden">
+    <div class="premium-modal detail-modal">
+      <div class="modal-header">
+        <span id="detailAstroName">Astrologer Profile</span>
+        <button onclick="document.getElementById('screen-astro-detail').classList.add('hidden')" class="close-btn"><i
+            class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" style="padding:0;">
+        <div class="detail-banner"
+          style="height:120px; background:linear-gradient(135deg, var(--brand-purple), var(--brand-light));"></div>
+        <div style="text-align:center; margin-top:-50px; padding:0 20px 20px;">
+          <img id="detailAstroImg" src=""
+            style="width:100px; height:100px; border-radius:50%; border:4px solid var(--secondary-bg); object-fit:cover; margin-bottom:12px; box-shadow:0 10px 20px rgba(0,0,0,0.3);">
+          <h2 id="detailAstroTitle" style="color:var(--accent-gold); margin:0;">Name</h2>
+          <div id="detailAstroSkills" style="color:var(--text-muted); font-size:0.9rem; margin-top:5px;">Skills</div>
+
+          <div
+            style="display:flex; justify-content:center; gap:20px; margin-top:20px; border-top:1px solid var(--glass-border); padding-top:20px;">
+            <div style="text-align:center;">
+              <div id="detailOrderCount" style="font-weight:bold; color:var(--text-main);">0+</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Orders</div>
+            </div>
+            <div style="text-align:center;">
+              <div id="detailExperience" style="font-weight:bold; color:var(--text-main);">5 Yrs</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Exp</div>
+            </div>
+            <div style="text-align:center;">
+              <div id="detailRating" style="font-weight:bold; color:var(--text-main);">4.9 ★</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Rating</div>
+            </div>
+          </div>
+
+          <p id="detailAstroDesc"
+            style="margin-top:20px; font-size:0.9rem; text-align:left; color:var(--text-muted); line-height:1.6;">
+            நிபுணத்துவ ஜோதிடர், பல வருட அனுபவம் கொண்டவர். வேத ஜோதிடம், கைரேகை மற்றும் எண் கணிதத்தில் வல்லுநர்.
+            ஆயிரக்கணக்கானவர்களின் வாழ்க்கைப் பாதைக்கு வழிகாட்டியுள்ளார்.
+          </p>
+
+          <div style="margin-top:25px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
+            <button id="detailChatBtn" class="cosmic-btn" style="padding:12px; font-size:0.85rem;"><i
+                class="fas fa-comment"></i> Chat</button>
+            <button id="detailCallBtn" class="cosmic-btn"
+              style="padding:12px; background:#10b981; font-size:0.85rem;"><i class="fas fa-phone"></i> Call</button>
+            <button id="detailVideoBtn" class="cosmic-btn"
+              style="padding:12px; background:#3b82f6; font-size:0.85rem;"><i class="fas fa-video"></i> Video</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .detail-modal {
+      width: 90% !important;
+      max-width: 450px !important;
+      height: auto !important;
+      max-height: 85vh !important;
+      overflow-y: auto;
+      border-radius: 30px !important;
+    }
+  </style>
+
   <div id="screen-profile" class="modal-overlay hidden">
     <div class="premium-modal" style="height: auto; max-height: 90vh;">
       <div class="modal-header">
@@ -5212,7 +5330,34 @@
         requestSession(args[0], 'audio');
       } else if (actionType === 'video') {
         requestSession(args[0], 'video');
+      } else if (actionType === 'horoscope') {
+        document.getElementById('dailyHoroscopeSection').scrollIntoView({ behavior: 'smooth' });
       }
+    }
+
+    function openAstroProfile(a) {
+      document.getElementById('detailAstroName').innerText = a.name;
+      document.getElementById('detailAstroTitle').innerText = a.name;
+      document.getElementById('detailAstroImg').src = a.image || 'https://ui-avatars.com/api/?name=' + a.name + '&background=random';
+      document.getElementById('detailAstroSkills').innerText = a.skills ? a.skills.join(', ') : 'Vedic, Prashana';
+      document.getElementById('detailOrderCount').innerText = (a.orderCount || 0) + '+';
+      document.getElementById('detailExperience').innerText = (a.experience || 5) + ' Yrs';
+
+      // Update buttons mapping
+      document.getElementById('detailChatBtn').onclick = () => {
+        document.getElementById('screen-astro-detail').classList.add('hidden');
+        checkGuestAction('chat', a.userId);
+      };
+      document.getElementById('detailCallBtn').onclick = () => {
+        document.getElementById('screen-astro-detail').classList.add('hidden');
+        checkGuestAction('call', a.userId);
+      };
+      document.getElementById('detailVideoBtn').onclick = () => {
+        document.getElementById('screen-astro-detail').classList.add('hidden');
+        checkGuestAction('video', a.userId);
+      };
+
+      document.getElementById('screen-astro-detail').classList.remove('hidden');
     }
 
     // Login Handlers
@@ -5472,9 +5617,12 @@
     }
 
     function navSwitch(tab) {
-      if ((tab === 'chat' || tab === 'profile') && state.me && state.me.role === 'guest') {
-        showLogin();
-        return;
+      if (state.me && state.me.role === 'guest') {
+        // Force login for everything except Home (unless user tries to interact)
+        if (tab !== 'home') {
+          showLogin();
+          return;
+        }
       }
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
       const btn = document.getElementById('nav-' + tab);
@@ -5669,7 +5817,7 @@
 
                   <div class="rating-row">
                       <span class="star-rating">★ 4.9</span>
-                      <span style="color:#6B7280; font-size:0.75rem;">(${orderCount} + orders)</span>
+                      <span style="color:var(--accent-gold); font-size:0.75rem; font-weight:600;">(${orderCount}+ தீர்வுகள்)</span>
                   </div>
               </div>
 
