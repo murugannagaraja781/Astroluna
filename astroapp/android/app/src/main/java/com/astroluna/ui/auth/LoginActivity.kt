@@ -175,7 +175,7 @@ fun LoginScreen() {
                 )
 
                 Text(
-                    text = "Astro5Star க்கு மீண்டும் வரவேற்கிறோம்",
+                    text = "astroluna க்கு மீண்டும் வரவேற்கிறோம்",
                     fontSize = 14.sp,
                     color = Color.White.copy(alpha = 0.75f),
                     textAlign = TextAlign.Center,

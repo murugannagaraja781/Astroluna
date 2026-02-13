@@ -182,7 +182,7 @@ class FCMService : FirebaseMessagingService() {
                 }
                 else -> {
                     // Handle generic data messages or unknown types by showing a simple notification
-                    val title = data["title"] ?: message.notification?.title ?: "Astro5Star"
+                    val title = data["title"] ?: message.notification?.title ?: "astroluna"
                     val body = data["body"] ?: message.notification?.body ?: "New Message"
                     showGenericNotification(title, body)
                 }
@@ -194,7 +194,7 @@ class FCMService : FirebaseMessagingService() {
             Log.d(TAG, "Message Notification Body: ${it.body}")
             // If we haven't processed it as data already (data payload usually takes precedence for functionality)
             if (message.data.isEmpty()) {
-                 showGenericNotification(it.title ?: "Astro5Star", it.body ?: "New Notification")
+                 showGenericNotification(it.title ?: "astroluna", it.body ?: "New Notification")
             }
         }
     }

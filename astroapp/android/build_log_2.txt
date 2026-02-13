@@ -42,9 +42,9 @@ w: Kapt currently doesn't support language version 2.0+. Falling back to 1.9.
 > Task :app:kaptDebugKotlin
 
 > Task :app:compileDebugKotlin FAILED
-e: file:///Users/wohozo/Documents/astro5start/astroapp/android/app/src/main/java/com.astroluna.app/ui/call/CallActivity.kt:33:28 Unresolved reference 'foundation'.
+e: file:///Users/wohozo/Documents/astrolunat/astroapp/android/app/src/main/java/com.astroluna.app/ui/call/CallActivity.kt:33:28 Unresolved reference 'foundation'.
 
-[Incubating] Problems report is available at: file:///Users/wohozo/Documents/astro5start/astroapp/android/build/reports/problems/problems-report.html
+[Incubating] Problems report is available at: file:///Users/wohozo/Documents/astrolunat/astroapp/android/build/reports/problems/problems-report.html
 
 FAILURE: Build failed with an exception.
 

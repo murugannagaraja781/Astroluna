@@ -132,7 +132,7 @@ class WalletActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val request = Request.Builder()
-                    .url("https://astro5star.com/api/payment/history/$userId")
+                    .url("https://astroluna.com/api/payment/history/$userId")
                     .get()
                     .build()
 

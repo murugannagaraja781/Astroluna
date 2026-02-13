@@ -129,7 +129,7 @@ class CallForegroundService : Service() {
             val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
             wakeLock = powerManager.newWakeLock(
                 PowerManager.PARTIAL_WAKE_LOCK,
-                "Astro5Star:CallWakeLock"
+                "astroluna:CallWakeLock"
             ).apply {
                 setReferenceCounted(false)
                 acquire(2 * 60 * 60 * 1000L) // 2 hours max
@@ -145,7 +145,7 @@ class CallForegroundService : Service() {
                 WifiManager.WIFI_MODE_FULL_HIGH_PERF
             }
 
-            wifiLock = wifiManager.createWifiLock(lockType, "Astro5Star:CallWifiLock").apply {
+            wifiLock = wifiManager.createWifiLock(lockType, "astroluna:CallWifiLock").apply {
                 setReferenceCounted(false)
                 acquire()
             }

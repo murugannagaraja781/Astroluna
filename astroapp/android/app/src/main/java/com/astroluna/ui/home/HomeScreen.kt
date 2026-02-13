@@ -482,7 +482,7 @@ fun HomeScreen(
 @Composable
 fun SupportAndPoliciesSection() {
     val context = LocalContext.current
-    val baseUrl = "https://astro5star.com" // Update to your actual domain
+    val baseUrl = "https://astroluna.com" // Update to your actual domain
 
     Column(
         modifier = Modifier
@@ -609,11 +609,11 @@ fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
                     when (item) {
                         "Terms & Conditions" -> {
                             onClose()
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astro5star.com/terms-condition.html")))
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.com/terms-condition.html")))
                         }
                         "Privacy Policy" -> {
                             onClose()
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astro5star.com/privacy-policy.html")))
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.com/privacy-policy.html")))
                         }
                         else -> onItemClick(item)
                     }
@@ -1229,7 +1229,7 @@ fun TopServicesSection() {
                     "Free\nServices" -> {
                         android.app.AlertDialog.Builder(context)
                             .setTitle("Contact Us")
-                            .setMessage("For free services, contact us at: info@astro5star.com")
+                            .setMessage("For free services, contact us at: info@astroluna.com")
                             .setPositiveButton("OK", null)
                             .show()
                     }

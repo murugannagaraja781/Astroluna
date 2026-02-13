@@ -12,6 +12,6 @@ interface NominatimApi {
         @Query("addressdetails") addressDetails: Int = 1,
         @Query("countrycodes") countryCodes: String = "in",
         @Query("limit") limit: Int = 10,
-        @Header("User-Agent") userAgent: String = "Astro5StarApp"
+        @Header("User-Agent") userAgent: String = "astrolunaApp"
     ): List<NominatimResult>
 }

@@ -160,11 +160,11 @@ class CallActivity : ComponentActivity() {
 
     private val iceServers = listOf(
         PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer(),
-        PeerConnection.IceServer.builder("turn:turn.astro5star.com:3478?transport=udp")
+        PeerConnection.IceServer.builder("turn:turn.astroluna.com:3478?transport=udp")
             .setUsername("webrtcuser").setPassword("strongpassword123").createIceServer(),
-        PeerConnection.IceServer.builder("turn:turn.astro5star.com:3478?transport=tcp")
+        PeerConnection.IceServer.builder("turn:turn.astroluna.com:3478?transport=tcp")
             .setUsername("webrtcuser").setPassword("strongpassword123").createIceServer(),
-        PeerConnection.IceServer.builder("turns:turn.astro5star.com:5349")
+        PeerConnection.IceServer.builder("turns:turn.astroluna.com:5349")
             .setUsername("webrtcuser").setPassword("strongpassword123").createIceServer()
     )
 
@@ -285,7 +285,7 @@ class CallActivity : ComponentActivity() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 // PROXIMITY_SCREEN_OFF_WAKE_LOCK is the standard way to turn off screen during calls
                 if (powerManager.isWakeLockLevelSupported(android.os.PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK)) {
-                    proximityWakeLock = powerManager.newWakeLock(android.os.PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "Astro5Star:ProximityLock")
+                    proximityWakeLock = powerManager.newWakeLock(android.os.PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK, "astroluna:ProximityLock")
                 }
             }
             sensorManager = getSystemService(android.content.Context.SENSOR_SERVICE) as android.hardware.SensorManager
@@ -334,7 +334,7 @@ class CallActivity : ComponentActivity() {
                 try {
                     val client = okhttp3.OkHttpClient()
                     val request = okhttp3.Request.Builder()
-                        .url("https://astro5star.com/api/user/${partnerId}")
+                        .url("https://astroluna.com/api/user/${partnerId}")
                         .build()
                     val response = client.newCall(request).execute()
                     if (response.isSuccessful) {

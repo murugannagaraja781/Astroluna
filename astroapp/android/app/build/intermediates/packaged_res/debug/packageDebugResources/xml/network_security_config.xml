@@ -13,7 +13,7 @@
     <!-- Allow cleartext traffic to our server -->
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">139.59.0.107</domain>
-        <domain includeSubdomains="true">astro5star.com</domain>
+        <domain includeSubdomains="true">astroluna.com</domain>
     </domain-config>
 
     <!-- Also allow localhost for testing -->

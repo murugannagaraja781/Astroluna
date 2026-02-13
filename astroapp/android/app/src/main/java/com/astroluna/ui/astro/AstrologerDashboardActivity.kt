@@ -238,7 +238,7 @@ suspend fun updateServiceStatus(userId: String, service: String, enabled: Boolea
             }.toString()
         )
         val request = okhttp3.Request.Builder()
-            .url("https://astro5star.com/api/astrologer/service-toggle")
+            .url("https://astroluna.com/api/astrologer/service-toggle")
             .post(body)
             .build()
         client.newCall(request).execute()
@@ -292,7 +292,7 @@ fun AstrologerDashboardScreen(
             try {
                 val client = okhttp3.OkHttpClient()
                 val request = okhttp3.Request.Builder()
-                    .url("https://astro5star.com/api/user/${sessionId}")
+                    .url("https://astroluna.com/api/user/${sessionId}")
                     .build()
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
@@ -780,7 +780,7 @@ fun AstrologerDashboardScreen(
             ) {
                  Text("Terms | Refunds | Shipping | Returns", fontSize = 11.sp, color = colors.textSecondary)
             }
-            Text("© 2024 Astro5Star", fontSize = 10.sp, color = colors.textSecondary, modifier = Modifier.align(Alignment.CenterHorizontally))
+            Text("© 2024 astroluna", fontSize = 10.sp, color = colors.textSecondary, modifier = Modifier.align(Alignment.CenterHorizontally))
 
             // Extra spacing for safe area
             Spacer(modifier = Modifier.height(32.dp))
