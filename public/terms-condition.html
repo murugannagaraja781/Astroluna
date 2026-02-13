@@ -111,6 +111,44 @@
             color: var(--accent-gold);
         }
 
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px 18px;
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-gold);
+        }
+
+        .footer-login-btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 30px;
+            background: linear-gradient(135deg, var(--brand-purple), var(--brand-light));
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(92, 8, 116, 0.3);
+        }
+
+        .footer-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(92, 8, 116, 0.4);
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 30px 20px;
