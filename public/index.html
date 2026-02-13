@@ -5988,9 +5988,16 @@
         if (window.fetchTransactionHistory) window.fetchTransactionHistory();
       }
 
-      // SHOW GLOBAL FOOTER (Client Nav)
+      // SHOW GLOBAL FOOTER (Client Nav) - hide if guest
       const globalFooter = document.querySelector('.doc-bottom-nav');
-      if (globalFooter) globalFooter.style.display = 'flex';
+      if (globalFooter) {
+        globalFooter.style.display = (user.role === 'guest') ? 'none' : 'flex';
+      }
+
+      const appFooter = document.querySelector('.app-footer');
+      if (appFooter) {
+        appFooter.style.display = (user.role === 'guest') ? 'none' : 'block';
+      }
 
       const anav = document.querySelector('.admin-nav');
       if (anav) anav.style.display = 'none';
