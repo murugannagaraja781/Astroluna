@@ -153,15 +153,29 @@
 
       .mobile-view {
         display: none;
-        max-width: 1200px;
+        max-width: 520px;
         margin: 0 auto;
-        box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 80px rgba(92, 8, 116, 0.2), 0 0 200px rgba(0, 0, 0, 0.4);
         position: relative;
-        height: 100vh;
+        min-height: 100vh;
+        border-left: 1px solid var(--glass-border);
+        border-right: 1px solid var(--glass-border);
       }
 
       body {
         overflow-y: auto;
+      }
+
+      /* Desktop: center the bottom nav within the app frame */
+      .doc-bottom-nav {
+        max-width: 520px;
+        left: 50% !important;
+        transform: translateX(-50%);
+      }
+
+      /* Desktop: drawer overlay full screen */
+      .drawer-overlay {
+        position: fixed;
       }
     }
 
@@ -570,7 +584,7 @@
     }
 
     .dashboard-container {
-      height: 100%;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       max-width: 1280px;
