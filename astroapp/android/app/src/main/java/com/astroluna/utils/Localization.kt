@@ -3,7 +3,7 @@ package com.astroluna.utils
 object Localization {
     // English Strings
     private val english = mapOf(
-        "home_title" to "Astro 5 Star",
+        "home_title" to "Astro Luna",
         "home" to "Home",
         "profile" to "Profile",
         "settings" to "Settings",

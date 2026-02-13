@@ -152,12 +152,32 @@
       }
 
       .mobile-view {
-        display: none !important;
+        display: none;
+        max-width: 1200px;
+        margin: 0 auto;
+        box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
       }
 
       body {
         overflow-y: auto;
       }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-up {
+      animation: fadeInUp 0.8s ease-out forwards;
+      opacity: 0;
     }
 
     .web-navbar {
@@ -191,6 +211,42 @@
 
     .web-nav-links a:hover {
       color: var(--accent-gold);
+    }
+
+    .nav-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background: var(--secondary-bg);
+      min-width: 180px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+      border-radius: 12px;
+      z-index: 1001;
+      border: 1px solid var(--glass-border);
+      padding: 8px 0;
+      top: 100%;
+      left: 0;
+    }
+
+    .dropdown-content a {
+      color: var(--text-muted);
+      padding: 10px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 0.85rem;
+    }
+
+    .dropdown-content a:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--accent-gold);
+    }
+
+    .nav-dropdown:hover .dropdown-content {
+      display: block;
     }
 
     .web-nav-btns {
@@ -2151,6 +2207,25 @@
       }
     }
 
+    .zodiac-item {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .zodiac-item:hover {
+      transform: translateY(-10px) scale(1.05);
+      background: rgba(122, 31, 149, 0.2) !important;
+      border-color: var(--accent-gold) !important;
+      box-shadow: 0 15px 30px rgba(92, 8, 116, 0.4);
+    }
+
+    .zodiac-item div:first-child {
+      transition: transform 0.3s ease;
+    }
+
+    .zodiac-item:hover div:first-child {
+      transform: rotate(15deg) scale(1.2);
+    }
+
     .chip-btn {
       background: var(--glass);
       border: 1px solid var(--glass-border);
@@ -2192,6 +2267,17 @@
     #section-home {
       padding-top: 20px;
     }
+
+    /* Fix overflow for services grid on small mobile */
+    @media (max-width: 480px) {
+      .service-grid-container {
+        grid-template-columns: 1fr 1fr !important;
+      }
+
+      .service-item-card {
+        min-width: unset !important;
+      }
+    }
   </style>
 </head>
 
@@ -2203,184 +2289,300 @@
         style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--accent-gold); font-weight: 700; letter-spacing: 2px;">
         ASTROLUNA</div>
       <div class="web-nav-links">
-        <a href="#hero">முகப்பு</a>
-        <a href="#features">ஜாதகம்</a>
-        <a href="#testimonials">ஜோதிடர்கள்</a>
-        <a href="#footer">கட்டணம்</a>
+        <a href="#hero">Home</a>
+        <a href="#web-astrologers">Astrologers</a>
+        <a href="#web-horoscope">Horoscope</a>
+        <a href="#web-about">About</a>
+        <a href="#web-pricing">Pricing</a>
+        <div class="nav-dropdown">
+          <a href="#">Policies <i class="fas fa-chevron-down" style="font-size:0.7rem; margin-left:5px;"></i></a>
+          <div class="dropdown-content">
+            <a href="terms-condition.html">Terms & Conditions</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+            <a href="refund-cancellation-policy.html">Refund Policy</a>
+            <a href="return-policy.html">Return Policy</a>
+          </div>
+        </div>
       </div>
       <div class="web-nav-btns">
-        <button class="btn-login-outline"
-          onclick="document.querySelector('.mobile-view').style.display='block'; window.scrollTo(0,0); showLogin();">உள்நுழைக</button>
-        <button class="btn-join"
-          onclick="document.querySelector('.mobile-view').style.display='block'; window.scrollTo(0,0); showLogin();">இணைந்திருங்கள்</button>
+        <button class="btn-login-outline" onclick="switchToApp('login')">Login</button>
+        <button class="btn-join" onclick="switchToApp('login')">Join Now</button>
       </div>
     </nav>
 
-    <header class="web-hero" id="hero">
-      <div class="badge">நட்சத்திரங்கள் வழிகாட்டும் நேரம்</div>
-      <h1>உங்கள் அண்டவெளி வரைபடத்தைக் கண்டறியுங்கள்</h1>
-      <p>நவீன யுகத்திற்கான முதன்மை ஜோதிட தளம். நட்சத்திரங்களின் ஞானத்தை துல்லியமான கணிப்புகளுடன் மற்றும்
-        பண்டைய அறிவாற்றலுடன் இணைக்கிறோம்.</p>
+    <header class="web-hero animate-up" id="hero" style="animation-delay: 0.1s;">
+      <div class="badge">Guided by Stars</div>
+      <h1>Discover Your Cosmic Blueprint</h1>
+      <p>The premier astrology platform for the modern age. We combine celestial wisdom with precision insights and
+        ancient knowledge.</p>
       <div class="web-hero-ctas">
-        <a href="#" class="main-cta"
-          onclick="document.querySelector('.mobile-view').style.display='block'; showLogin();">ஆலோசனையைத் தொடங்கு</a>
-        <a href="#" class="sec-cta"
-          onclick="document.querySelector('.mobile-view').style.display='block'; showLogin();"><i
-            class="fas fa-video"></i> வீடியோ அழைப்பு</a>
-        <a href="#" class="sec-cta"
-          onclick="document.querySelector('.mobile-view').style.display='block'; showLogin();"><i
-            class="fas fa-phone-alt"></i> ஆ디오 அழைப்பு</a>
+        <a href="#" class="main-cta" onclick="switchToApp('home')">Start Consultation</a>
+        <a href="#" class="sec-cta" onclick="switchToApp('login')"><i class="fas fa-video"></i> Video Call</a>
+        <a href="#" class="sec-cta" onclick="switchToApp('login')"><i class="fas fa-phone-alt"></i> Audio Call</a>
       </div>
     </header>
 
-    <section class="web-features" id="features">
-      <div class="web-feature-card">
-        <div class="icon-box"><i class="fas fa-star-and-crescent"></i></div>
-        <h3>பிறப்பு ஜாதக அறிவு</h3>
-        <p>எங்கள் துல்லியமான பிறப்பு வரைபடத் தொகுப்பு இயந்திரங்கள் மூலம் உங்கள் ஆன்மாவின் ஆழமான கட்டமைப்பை
-          வெளிப்படுத்துங்கள்.</p>
+    <section class="web-horoscope-preview animate-up" id="web-horoscope"
+      style="padding: 100px 80px; background: rgba(92, 8, 116, 0.05); animation-delay: 0.3s;">
+      <div style="text-align: center; margin-bottom: 50px;">
+        <h2 style="color: var(--accent-gold); font-size: 2.2rem; font-family: var(--font-heading);">Daily Horoscope</h2>
+        <p style="color: var(--text-muted);">Select your zodiac sign to see your cosmic energy for today.</p>
       </div>
-      <div class="web-feature-card">
-        <div class="icon-box"><i class="fas fa-compass"></i></div>
-        <h3>கோள் மாற்றங்கள்</h3>
-        <p>முக்கியமான நேரத்திற்காக உங்கள் தனிப்பட்ட அதிர்வுகளுக்கு எதிராக வரைபடமாக்கப்பட்ட நிகழ்நேர கிரக இயக்க
-          கண்காணிப்பு.</p>
+      <div id="webHoroscopeGrid"
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; max-width: 1000px; margin: 0 auto;">
+        <!-- Zodiac symbols here, clicking one takes to app/horoscope -->
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♈</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Aries</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♉</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Taurus</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♊</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Gemini</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♋</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Cancer</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♌</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Leo</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♍</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Virgo</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♎</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Libra</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♏</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Scorpio</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♐</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Sagittarius</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♑</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Capricorn</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♒</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Aquarius</div>
+        </div>
+        <div class="zodiac-item" onclick="switchToApp('home')"
+          style="text-align:center; cursor:pointer; padding:15px; background:var(--glass); border-radius:15px; border:1px solid var(--glass-border);">
+          <div style="font-size:2rem; margin-bottom:10px;">♓</div>
+          <div style="font-size:0.8rem; font-weight:bold;">Pisces</div>
+        </div>
       </div>
-      <div class="web-feature-card">
-        <div class="icon-box"><i class="fas fa-moon"></i></div>
-        <h3>சந்திர சுழற்சிகள்</h3>
-        <p>அதிகபட்ச வெளிப்பாட்டிற்காக சந்திரனின் சக்தியோடு உங்கள் வாழ்க்கை மற்றும் தொழில்முறை திட்டங்களை ஒத்திசைக்கவும்.
-        </p>
+    </section>
+
+    <section class="web-astro-section animate-up" id="web-astrologers"
+      style="padding: 100px 80px; background: #0B0F1A; animation-delay: 0.5s;">
+      <div style="text-align: center; margin-bottom: 50px;">
+        <h2 style="color: var(--accent-gold); font-size: 2.2rem; font-family: var(--font-heading);">Consult with Our
+          Expert Astrologers</h2>
+        <p style="color: var(--text-muted); max-width: 600px; margin: 20px auto;">Connect with certified experts for
+          career, love, finance, and life guidance.</p>
+      </div>
+      <div id="webAstroList" class="web-astro-grid"
+        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px;">
+        <!-- Populated by JS -->
       </div>
     </section>
 
     <section class="web-testimonial-section" id="testimonials">
       <div style="position: relative; z-index: 1;">
-        <h2>ஆன்மீகத் தேடுபவர்களுக்காக பிரத்யேகமாக உருவாக்கப்பட்டது</h2>
-        <p>நவீன அறிவியல் மற்றும் ஆழமான ஆன்மீக ஞானத்தின் சங்கமம். நட்சத்திரங்களை உங்கள் வழிகாட்டிகளாகக் கொண்டு உங்கள்
-          வாழ்க்கைப் பாதையைத் தெளிவுபடுத்துங்கள்.</p>
+        <h2>Built for Modern Seekers</h2>
+        <p>Where modern science meets profound spiritual wisdom. Manage your life’s hierarchy with the stars as your
+          advisors.</p>
         <div class="web-avatars">
           <img src="https://ui-avatars.com/api/?name=A1&background=random" class="web-avatar">
           <img src="https://ui-avatars.com/api/?name=A2&background=random" class="web-avatar">
           <img src="https://ui-avatars.com/api/?name=A3&background=random" class="web-avatar">
           <img src="https://ui-avatars.com/api/?name=A4&background=random" class="web-avatar">
         </div>
-        <div style="color: var(--accent-gold); font-weight: 700; margin-top: 10px;">50,000+ பயனர்கள் இணைந்துள்ளனர்</div>
-      </div>
-    </section>
-
-    <footer class="web-footer" id="footer">
-      <div class="footer-col">
-        <div class="logo"
-          style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--accent-gold); margin-bottom: 20px;">
-          ASTROLUNA</div>
-        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">2024 முதல் நவீன உலகின் இருளில் பாதையை
-          ஒளிரச் செய்கிறது. பண்டைய ஞானம், நவீன இடைமுகம்.</p>
-        <div style="display: flex; gap: 15px; margin-top: 25px;">
-          <div
-            style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); cursor: pointer;">
-            <i class="fab fa-instagram"></i>
+        <section class="web-about-pricing animate-up" id="web-about" style="padding: 100px 80px; background: #0B0F1A;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: center;">
+            <div>
+              <h2
+                style="color: var(--accent-gold); font-size: 2.2rem; font-family: var(--font-heading); margin-bottom: 25px;">
+                Why Astroluna?</h2>
+              <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 20px;">
+                Astroluna bridges the gap between ancient celestial wisdom and modern digital precision. Our platform
+                connects you with verified experts who help navigate life's complexities through the lens of the stars.
+              </p>
+              <div style="display: flex; gap: 20px; margin-top: 30px;">
+                <div
+                  style="background: var(--glass); padding: 20px; border-radius: 15px; border: 1px solid var(--glass-border); flex: 1;">
+                  <h4 style="color: var(--accent-gold); margin-bottom: 10px;">Safe & Secure</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted);">100% confidential consultations via encrypted
+                    connections.</p>
+                </div>
+                <div
+                  style="background: var(--glass); padding: 20px; border-radius: 15px; border: 1px solid var(--glass-border); flex: 1;">
+                  <h4 style="color: var(--accent-gold); margin-bottom: 10px;">Expert Verified</h4>
+                  <p style="font-size: 0.8rem; color: var(--text-muted);">Every astrologer goes through a rigorous
+                    certification check.</p>
+                </div>
+              </div>
+            </div>
+            <div id="web-pricing"
+              style="background: linear-gradient(135deg, rgba(92, 8, 116, 0.2), rgba(11, 15, 26, 0.5)); padding: 40px; border-radius: 30px; border: 1px solid var(--accent-gold);">
+              <h3 style="color: var(--accent-gold); font-size: 1.8rem; text-align: center; margin-bottom: 30px;">Simple
+                Pricing</h3>
+              <div style="text-align: center; margin-bottom: 30px;">
+                <div style="font-size: 3rem; font-weight: 800; color: white;">₹5<span
+                    style="font-size: 1rem; color: var(--text-muted);">/min onwards</span></div>
+              </div>
+              <ul style="list-style: none; padding: 0; color: var(--text-muted); margin-bottom: 30px;">
+                <li style="margin-bottom: 12px;"><i class="fas fa-check"
+                    style="color: var(--accent-gold); margin-right: 10px;"></i> Audio & Video Consultations</li>
+                <li style="margin-bottom: 12px;"><i class="fas fa-check"
+                    style="color: var(--accent-gold); margin-right: 10px;"></i> Detailed Digital Birth Charts</li>
+                <li style="margin-bottom: 12px;"><i class="fas fa-check"
+                    style="color: var(--accent-gold); margin-right: 10px;"></i> Instant Chat Responses</li>
+                <li style="margin-bottom: 12px;"><i class="fas fa-check"
+                    style="color: var(--accent-gold); margin-right: 10px;"></i> Secure Wallet System</li>
+              </ul>
+              <button class="cosmic-btn" onclick="switchToApp('login')" style="width: 100%;">Get Started Now</button>
+            </div>
           </div>
-          <div
-            style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); cursor: pointer;">
-            <i class="fab fa-twitter"></i>
+        </section>
+
+        <section class="web-testimonial-section animate-up" id="testimonials" style="animation-delay: 0.4s;">
+
+          <footer class="web-footer" id="footer">
+            <div class="footer-col">
+              <div class="logo"
+                style="font-family: var(--font-heading); font-size: 1.5rem; color: var(--accent-gold); margin-bottom: 20px;">
+                ASTROLUNA</div>
+              <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6;">Illuminating the path through
+                the
+                shadows of the modern world since 2024. Ancient wisdom, modern interface.</p>
+              <div style="display: flex; gap: 15px; margin-top: 25px;">
+                <div
+                  style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); cursor: pointer;">
+                  <i class="fab fa-instagram"></i>
+                </div>
+                <div
+                  style="width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; color: var(--accent-gold); cursor: pointer;">
+                  <i class="fab fa-twitter"></i>
+                </div>
+              </div>
+            </div>
+            <div class="footer-col">
+              <h4>Platform</h4>
+              <ul>
+                <li><a href="#web-horoscope">Daily Horoscope</a></li>
+                <li><a href="#" onclick="switchToApp('home')">Transit Calendar</a></li>
+                <li><a href="#" onclick="switchToApp('home')">Location Astrology</a></li>
+                <li><a href="#" onclick="switchToApp('home')">Matchmaking</a></li>
+              </ul>
+            </div>
+            <div class="footer-col">
+              <h4>Company</h4>
+              <ul>
+                <li><a href="#web-about">About Us</a></li>
+                <li><a href="privacy-policy.html">Ethical Guidelines</a></li>
+                <li><a href="#" onclick="switchToApp('login')">Partners</a></li>
+                <li><a href="#" onclick="switchToApp('login')">Careers</a></li>
+              </ul>
+            </div>
+            <div class="footer-col">
+              <h4>Support</h4>
+              <ul>
+                <li><a href="terms-condition.html">Terms & Conditions</a></li>
+                <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                <li><a href="refund-cancellation-policy.html">Refund Policy</a></li>
+                <li><a href="return-policy.html">Return Policy</a></li>
+              </ul>
+            </div>
+            <div class="footer-col">
+              <h4>Contact</h4>
+              <ul>
+                <li><a href="mailto:kalpanajomr@gmail.com"><i class="fas fa-envelope"></i> kalpanajomr@gmail.com</a>
+                </li>
+                <li><a href="tel:904785439"><i class="fas fa-phone-alt"></i> 904785439</a></li>
+                <li><a href="delete-account.html"><i class="fas fa-user-slash"></i> Delete Account</a></li>
+                <li><a href="callacceptreject.html"><i class="fas fa-phone-slash"></i> Call Management</a></li>
+              </ul>
+            </div>
+          </footer>
+          <div class="web-footer-bottom">
+            &copy; 2024 TAMIL ARGO INTERNATIONAL. All Rights Reserved. Stars guide you.
           </div>
-        </div>
       </div>
-      <div class="footer-col">
-        <h4>தளம்</h4>
-        <ul>
-          <li><a href="#">தினசரி ராசிபலன்</a></li>
-          <li><a href="#">கோள் மாற்ற காலண்டர்</a></li>
-          <li><a href="#">இடம்சாற்ற ஜோதிடம்</a></li>
-          <li><a href="#">பொருத்தங்கள்</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>குழு</h4>
-        <ul>
-          <li><a href="#">எங்களைப் பற்றி</a></li>
-          <li><a href="#">அறநெறி வழிகாட்டல்கள்</a></li>
-          <li><a href="#">கூட்டாளிகள்</a></li>
-          <li><a href="#">வேலைவாய்ப்புகள்</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>ஆவணக்காப்பகம்</h4>
-        <ul>
-          <li><a href="terms-condition.html">விதிமுறைகள்</a></li>
-          <li><a href="privacy-policy.html">தனியுரிமைக் கொள்கை</a></li>
-          <li><a href="refund-cancellation-policy.html">ரீஃபண்ட் கொள்கை</a></li>
-          <li><a href="return-policy.html">திரும்பப் பெறுதல்</a></li>
-          <li><a href="shipping-policy.html">ஷிப்பிங் கொள்கை</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>தொடர்புக்கு</h4>
-        <ul>
-          <li><a href="mailto:kalpanajomr@gmail.com"><i class="fas fa-envelope"></i> kalpanajomr@gmail.com</a></li>
-          <li><a href="tel:904785439"><i class="fas fa-phone-alt"></i> 904785439</a></li>
-          <li><a href="delete-account.html"><i class="fas fa-user-slash"></i> கணக்கை நீக்குக</a></li>
-          <li><a href="callacceptreject.html"><i class="fas fa-phone-slash"></i> அழைப்பு மேலாண்மை</a></li>
-        </ul>
-      </div>
-    </footer>
-    <div class="web-footer-bottom">
-      &copy; 2024 TAMIL ARGO INTERNATIONAL. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை. நட்சத்திரங்கள் வழிகாட்டும்.
-    </div>
-  </div>
 
-  <!-- Mobile View (App Interface) -->
-  <div class="mobile-view">
+      <!-- Mobile View (App Interface) -->
+      <div class="mobile-view">
 
-    <!-- Screen: Login -->
-    <div id="screen-login">
-      <div class="form-box">
-        <div class="logo-circle"
-          style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-light) 100%); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 1.8rem; box-shadow: 0 0 25px rgba(92, 8, 116, 0.5); border: 2px solid var(--glass-border);">
-          <i class="fas fa-moon"></i>
-        </div>
-        <h2>✨ Astro Luna</h2>
-        <p>Enter the cosmic gateway</p>
-        <div id="step-phone">
-          <div style="position: relative;">
-            <span
-              style="position: absolute; left: 15px; top: 14px; color: var(--text-muted); font-size: 0.9rem;">+91</span>
-            <input id="inputPhone" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="10" class="cosmic-input"
-              style="padding-left: 50px;" placeholder="Mobile Number" value=""
-              oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+        <!-- Screen: Login -->
+        <div id="screen-login">
+          <div class="form-box">
+            <div class="logo-circle"
+              style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-light) 100%); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 1.8rem; box-shadow: 0 0 25px rgba(92, 8, 116, 0.5); border: 2px solid var(--glass-border);">
+              <i class="fas fa-moon"></i>
+            </div>
+            <h2>✨ Astro Luna</h2>
+            <p>Enter the cosmic gateway</p>
+            <div id="step-phone">
+              <div style="position: relative;">
+                <span
+                  style="position: absolute; left: 15px; top: 14px; color: var(--text-muted); font-size: 0.9rem;">+91</span>
+                <input id="inputPhone" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                  class="cosmic-input" style="padding-left: 50px;" placeholder="Mobile Number" value=""
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+              </div>
+              <button id="btnSendOtp" class="cosmic-btn">Get OTP <i class="fas fa-arrow-right"
+                  style="margin-left: 8px;"></i></button>
+            </div>
+            <div id="step-otp" class="hidden">
+              <input id="inputOtp" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" class="cosmic-input"
+                style="text-align: center; letter-spacing: 12px; font-size: 1.5rem;" placeholder="----" value=""
+                oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+              <button id="btnVerifyOtp" class="cosmic-btn">Verify Access</button>
+            </div>
           </div>
-          <button id="btnSendOtp" class="cosmic-btn">Get OTP <i class="fas fa-arrow-right"
-              style="margin-left: 8px;"></i></button>
-        </div>
-        <div id="step-otp" class="hidden">
-          <input id="inputOtp" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" class="cosmic-input"
-            style="text-align: center; letter-spacing: 12px; font-size: 1.5rem;" placeholder="----" value=""
-            oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-          <button id="btnVerifyOtp" class="cosmic-btn">Verify Access</button>
-        </div>
-      </div>
 
-    </div>
+        </div>
 
-    <div class="app-footer">
-      <div class="footer-links">
-        <a href="terms-condition.html">Terms</a>
-        <span class="sep">|</span>
-        <a href="privacy-policy.html">Privacy</a>
-        <span class="sep">|</span>
-        <a href="refund-cancellation-policy.html">Refunds</a>
-        <span class="sep">|</span>
-        <a href="delete-account.html">Account</a>
-        <span class="sep">|</span>
-        <a href="callacceptreject.html">Manage</a>
+        <div class="app-footer">
+          <div class="footer-links">
+            <a href="terms-condition.html">Terms</a>
+            <span class="sep">|</span>
+            <a href="privacy-policy.html">Privacy</a>
+            <span class="sep">|</span>
+            <a href="refund-cancellation-policy.html">Refunds</a>
+            <span class="sep">|</span>
+            <a href="delete-account.html">Account</a>
+            <span class="sep">|</span>
+            <a href="callacceptreject.html">Manage</a>
+          </div>
+          <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">
+            Contact: kalpanajomr@gmail.com | 904785439
+          </div>
+          <div class="footer-copy" style="margin-top: 10px; font-size: 0.65rem; opacity: 0.6;">&copy; 2024 TAMIL ARGO
+            INTERNATIONAL</div>
+        </div>
       </div>
-      <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">
-        Contact: kalpanajomr@gmail.com | 904785439
-      </div>
-    </div>
-    <div class="footer-copy">&copy; 2024 TAMIL ARGO INTERNATIONAL</div>
-  </div>
   </div>
 
   <style>
@@ -2452,30 +2654,30 @@
         <!-- Premium Services Grid -->
         <div style="padding: 0 24px; margin-bottom: 24px;">
           <h3 style="color:var(--accent-gold); font-size:1.1rem; margin-bottom:15px; font-family:var(--font-heading);">
-            எங்கள் சேவைகள்</h3>
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+            Our Services</h3>
+          <div class="service-grid-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
             <div class="service-item-card" onclick="navSwitch('chat')">
               <img src="https://cdn-icons-png.flaticon.com/128/3122/3122155.png" alt="Chat">
-              <span>அரட்டை</span>
+              <span>Chat</span>
             </div>
             <div class="service-item-card" onclick="navSwitch('call')">
               <img src="https://cdn-icons-png.flaticon.com/128/3059/3059502.png" alt="Call">
-              <span>அழைப்பு</span>
+              <span>Call</span>
             </div>
             <div class="service-item-card" onclick="checkGuestAction(porutham)">
               <img src="https://cdn-icons-png.flaticon.com/128/9141/9141153.png" alt="Match">
-              <span>பொருத்தம்</span>
+              <span>Match</span>
             </div>
             <div class="service-item-card" onclick="checkGuestAction('horoscope')">
               <img src="https://cdn-icons-png.flaticon.com/128/1592/1592209.png" alt="Reports">
-              <span>ஜாதகம்</span>
+              <span>Horoscope</span>
             </div>
           </div>
         </div>
 
         <div style="padding: 0 24px;">
           <h3 style="color:var(--accent-gold); font-size:1.1rem; margin-bottom:15px; font-family:var(--font-heading);">
-            சிறந்த ஜோதிடர்கள்</h3>
+            Top Astrologers</h3>
         </div>
 
         <style>
@@ -2607,7 +2809,7 @@
         <div id="dailyHoroscopeSection" style="margin-bottom: 24px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <h3 style="margin:0; font-size:1.1rem; color: var(--accent-gold); font-family: var(--font-heading);">
-              ராசிபலன்</h3>
+              Daily Horoscope</h3>
             <span id="horoscopeDate"
               style="font-size:0.75rem; color: var(--text-muted); background: var(--brand-purple); padding:4px 12px; border-radius:30px; border: 1px solid var(--glass-border);">Today</span>
           </div>
@@ -3016,7 +3218,6 @@
       <div class="premium-earnings-card">
         <div class="e-header">
           <div class="e-title">Lifetime Revenue</div>
-          <button id="btnAstroWithdraw" onclick="astroRequestWithdrawal()" class="withdraw-badge">Withdraw</button>
         </div>
         <div class="e-main" id="astroEarningsContainer" style="display:none;">
           <span class="symbol">₹</span><span id="astroLifetimeDisplay">0.00</span>
@@ -3026,6 +3227,7 @@
           <button id="btnShowEarnings" onclick="toggleEarnings()" class="eye-btn"><i class="fas fa-eye"></i></button>
         </div>
       </div>
+      <div id="astroPendingWithdrawals" style="display:none;"></div>
 
       <style>
         .premium-earnings-card {
@@ -5302,9 +5504,34 @@
     }
 
     function showLogin() {
+      // Automatic transition for desktop users
+      const webView = document.querySelector('.web-view');
+      if (webView && webView.style.display !== 'none') {
+        enterApp();
+      }
+      hideAllScreens();
       sLogin.classList.remove('hidden');
-      // Add a close button to login screen if not present, to return to guest mode?
-      // For now, standard behavior is fine. User asked to "ask login".
+    }
+
+    function switchToApp(screen) {
+      enterApp();
+      if (screen === 'login') showLogin();
+      else if (screen === 'home') loadClientDash(state.me || { role: 'guest' });
+    }
+
+    function enterApp() {
+      const webView = document.querySelector('.web-view');
+      const mobileView = document.querySelector('.mobile-view');
+
+      if (webView) webView.style.display = 'none';
+      if (mobileView) mobileView.style.display = 'block';
+
+      // Ensure app sections are visible on web
+      document.querySelectorAll('.dashboard-container, .modal-overlay').forEach(el => {
+        // Keep hidden state unless it's the intended screen
+      });
+
+      window.scrollTo(0, 0);
     }
 
     function hideAllScreens() {
@@ -5429,6 +5656,8 @@
     state.astroList = [];
 
     function loadClientDash(user) {
+      if (document.querySelector('.web-view')) document.querySelector('.web-view').style.display = 'none';
+      if (document.querySelector('.mobile-view')) document.querySelector('.mobile-view').style.display = 'block';
       hideAllScreens();
       sClient.classList.remove('hidden');
 
@@ -5757,7 +5986,10 @@
 
     function renderAstroList(list) {
       const container = document.getElementById('astroList');
-      container.innerHTML = '';
+      const webContainer = document.getElementById('webAstroList');
+
+      if (container) container.innerHTML = '';
+      if (webContainer) webContainer.innerHTML = '';
 
       const astrologers = list || [];
 
@@ -5845,7 +6077,17 @@
               </div>
           </div>
         `;
-        container.appendChild(div);
+        if (container) container.appendChild(div);
+        if (webContainer) {
+          const webDiv = div.cloneNode(true);
+          webDiv.onclick = div.onclick;
+          const btns = webDiv.querySelectorAll('.cta-btn');
+          btns.forEach((btn, idx) => {
+            const originalBtn = div.querySelectorAll('.cta-btn')[idx];
+            btn.onclick = originalBtn.onclick;
+          });
+          webContainer.appendChild(webDiv);
+        }
       });
     }
 
@@ -9428,6 +9670,34 @@
       // const modal = document.getElementById('sessionSummaryModal');
       // ...
     }
+
+    window.openMatchmaking = function () {
+      switchToApp('home');
+      if (state.me && state.me.role === 'guest') {
+        showLogin();
+      } else {
+        document.getElementById('screen-porutham').classList.remove('hidden');
+      }
+    };
+
+    window.openTransits = function () {
+      switchToApp('home');
+      if (state.me && state.me.role === 'guest') {
+        showLogin();
+      } else {
+        // Re-use chart modal for transits
+        const modal = document.getElementById('universalChartModal');
+        const panel = document.getElementById('dashboardChartPanel');
+        if (modal) {
+          modal.classList.remove('hidden');
+          // Could call a specific transit function if available
+          if (window.loadDashboardChart) loadDashboardChart();
+        }
+      }
+    };
+
+    // Initialize for Landing Page
+    fetchAstrologers();
   </script>
 
   <!-- Session Summary Modal -->

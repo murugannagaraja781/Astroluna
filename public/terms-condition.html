@@ -4,90 +4,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms & Conditions - astroluna</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Terms & Conditions - Astro Luna</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #047857;
-            --bg: #F0FDF4;
-            --text: #1F2937;
+            --brand-purple: #5C0874;
+            --brand-light: #7A1F95;
+            --accent-gold: #D4AF37;
+            --primary-bg: #0B0F1A;
+            --secondary-bg: #161B2E;
+            --text-main: #FFFFFF;
+            --text-muted: #9CA3AF;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         body {
             font-family: 'Outfit', sans-serif;
-            background: var(--bg);
+            background-color: var(--primary-bg);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(92, 8, 116, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(122, 31, 149, 0.1) 0%, transparent 40%);
             margin: 0;
-            padding: 20px;
-            color: var(--text);
+            padding: 40px 20px;
+            color: var(--text-main);
             line-height: 1.6;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            background: var(--secondary-bg);
+            padding: 50px;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .header-nav {
+            margin-bottom: 40px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-gold);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: transform 0.2s;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
         }
 
         h1 {
-            color: var(--primary);
-            text-align: center;
+            color: var(--accent-gold);
+            font-size: 2.5rem;
             margin-bottom: 30px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: -0.5px;
         }
 
         h2 {
-            color: var(--primary);
-            font-size: 1.2rem;
-            margin-top: 25px;
-            border-bottom: 2px solid #E5E7EB;
-            padding-bottom: 10px;
+            color: var(--accent-gold);
+            font-size: 1.3rem;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        p {
+            color: var(--text-muted);
+            margin-bottom: 20px;
         }
 
         ol {
             padding-left: 20px;
+            color: var(--text-muted);
         }
 
         li {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
+        }
+
+        li strong {
+            color: var(--text-main);
         }
 
         .footer {
             text-align: center;
-            margin-top: 40px;
-            font-size: 0.8rem;
-            color: #6B7280;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid var(--glass-border);
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
-        strong {
-            color: var(--primary);
+        .footer strong {
+            color: var(--accent-gold);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>🌙 Terms & Conditions</h1>
-        <p>By accessing and using astroluna services, you agree to the following terms:</p>
+        <div class="header-nav">
+            <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        </div>
 
-        <ol>
-            <li><strong>No Guarantees</strong> – Astrology is a guiding tool. We do not guarantee specific outcomes from
-                any consultation or report.</li>
-            <li><strong>User Responsibility</strong> – All consultations are accessed at the user’s own discretion and
-                risk.</li>
-            <li><strong>Refunds</strong> – Refunds are discretionary and depend on service quality audits.</li>
-            <li><strong>Intellectual Property</strong> – All content, logos, and materials on astroluna are owned by us
-                and cannot be copied without permission.</li>
-            <li><strong>Service Availability</strong> – We reserve the right to modify, suspend, or discontinue any
-                service without prior notice.</li>
-            <li><strong>Disputes</strong> – Any disputes are subject to applicable laws and jurisdiction.</li>
-        </ol>
+        <h1>Terms & Conditions</h1>
+        <p>Welcome to Astro Luna. By accessing our platform, you agree to abide by these terms. Our mission is to
+            provide celestial clarity through verified expertise and modern technology.</p>
+
+        <section>
+            <h2><i class="fas fa-scroll"></i> 1. Nature of Services</h2>
+            <p>Astrology is a tool for spiritual guidance and self-discovery. While we connect you with experienced
+                experts, all consultations are for personal insight and should not replace professional medical, legal,
+                or financial advice.</p>
+        </section>
+
+        <section>
+            <h2><i class="fas fa-user-shield"></i> 2. User Accounts</h2>
+            <p>To access certain features, you must register using a valid mobile number. You are responsible for
+                maintaining the confidentiality of your account and for all activities that occur under your session.
+            </p>
+        </section>
+
+        <section>
+            <h2><i class="fas fa-wallet"></i> 3. Payments & Wallet</h2>
+            <p>Our platform uses a secure wallet system. Funds added to the wallet are used to pay for consultations
+                based on the astrologer's per-minute rate. All transactions are processed through encrypted payment
+                gateways.</p>
+        </section>
+
+        <section>
+            <h2><i class="fas fa-handshake-slash"></i> 4. Professional Conduct</h2>
+            <p>Users must treat astrologers with respect. Harassment, abusive language, or inappropriate requests will
+                lead to immediate account suspension without refund.</p>
+        </section>
+
+        <section>
+            <h2><i class="fas fa-balance-scale"></i> 5. Liability</h2>
+            <p>Astro Luna is not liable for any decisions made based on astrological consultations. Users take full
+                responsibility for their actions following a session.</p>
+        </section>
 
         <div class="footer">
-            &copy; 2024 TAMIL ARGO INTERNATIONAL. All rights reserved.<br>
-            Contact: kalpanajomr@gmail.com | 904785439
+            <p>&copy; 2024 <strong>TAMIL ARGO INTERNATIONAL</strong>. All rights reserved.</p>
+            <p>Contact: kalpanajomr@gmail.com | 904785439</p>
         </div>
     </div>
 </body>
