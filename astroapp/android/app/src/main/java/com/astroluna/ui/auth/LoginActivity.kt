@@ -168,7 +168,7 @@ fun LoginScreen() {
                 )
 
                 Text(
-                    text = "உள்நுழைய",
+                    text = "Login",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -176,7 +176,7 @@ fun LoginScreen() {
                 )
 
                 Text(
-                    text = "astroluna க்கு மீண்டும் வரவேற்கிறோம்",
+                    text = "Welcome back to Astroluna",
                     fontSize = 14.sp,
                     color = Color.White.copy(alpha = 0.75f),
                     textAlign = TextAlign.Center,
@@ -192,7 +192,7 @@ fun LoginScreen() {
                             showError = false
                         }
                     },
-                    label = { Text("மொபைல் எண்ணை உள்ளிடவும்", color = Color.White.copy(alpha = 0.8f)) },
+                    label = { Text("Enter Mobile Number", color = Color.White.copy(alpha = 0.8f)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 18.dp),
@@ -202,7 +202,7 @@ fun LoginScreen() {
                     supportingText = {
                         val count = min(phoneNumber.length, 10)
                         val helper = if (showError && phoneNumber.length != 10) {
-                            "10 இலக்க எண் தேவை"
+                            "10 digit number required"
                         } else {
                             "$count/10"
                         }
@@ -224,7 +224,7 @@ fun LoginScreen() {
                 OutlinedTextField(
                     value = referralCode,
                     onValueChange = { referralCode = it.uppercase().take(8) },
-                    label = { Text("பரிந்துரை குறியீடு (விருப்பமானது)", color = Color.White.copy(alpha = 0.7f)) },
+                    label = { Text("Referral Code (Optional)", color = Color.White.copy(alpha = 0.7f)) },
                     placeholder = { Text("REFERRAL CODE", color = Color.White.copy(alpha = 0.3f)) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -283,7 +283,7 @@ fun LoginScreen() {
                     if (isLoading) {
                         Text("Sending...")
                     } else {
-                        Text("OTP பெறவும்", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                        Text("Get OTP", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }

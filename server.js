@@ -19,7 +19,7 @@ const { fetchDailyHoroscope } = require("./utils/rasiEng/horoscopeData");
 const PHONEPE_MERCHANT_ID = process.env.PHONEPE_MERCHANT_ID;
 const PHONEPE_SALT_KEY = process.env.PHONEPE_SALT_KEY;
 const PHONEPE_SALT_INDEX = process.env.PHONEPE_SALT_INDEX;
-const PHONEPE_HOST_URL = process.env.PHONEPE_HOST_URL;
+const PHONEPE_HOST_URL = process.env.PHONEPE_HOST_URL || "https://api-preprod.phonepe.com/apis/pg-sandbox";
 
 
 // Polyfill for fetch (Node.js 18+ has it built-in)
@@ -2025,6 +2025,16 @@ app.post('/api/city-timezone', async (req, res) => {
   }
 });
 
+// --- Presence Helpers ---
+async function broadcastAstroUpdate() {
+  try {
+    const astros = await User.find({ role: 'astrologer' });
+    if (io) io.emit('astrologer-update', astros);
+  } catch (e) {
+    console.error('Error broadcasting astro updates:', e);
+  }
+}
+
 // ===== Socket.IO =====
 io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id);
@@ -2124,12 +2134,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  async function broadcastAstroUpdate() {
-    try {
-      const astros = await User.find({ role: 'astrologer' });
-      io.emit('astrologer-update', astros);
-    } catch (e) { }
-  }
+
 
   // --- Get Astrologers List ---
   socket.on('get-astrologers', async (cb) => {
