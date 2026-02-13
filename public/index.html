@@ -6681,23 +6681,9 @@
       setupToggle('toggleVideo', 'video');
 
       // Initialize Card UI positions based on current state
-      ['chat', 'audio', 'video'].forEach(type => {
-        const id = type === 'audio' ? 'toggleCall' : 'toggle' + type.charAt(0).toUpperCase() + type.slice(1);
-        const el = document.getElementById(id);
-        const card = el ? el.closest('.status-card') : null;
-        if (el && card) {
-          const isAct = (type === 'chat' && user.isChatOnline) ||
-            (type === 'audio' && user.isAudioOnline) ||
-            (type === 'video' && user.isVideoOnline);
-          if (isAct) {
-            el.classList.add('active');
-            card.classList.add('active');
-          } else {
-            el.classList.remove('active');
-            card.classList.remove('active');
-          }
-        }
-      });
+      updateToggleUI('toggleChat', user.isChatOnline);
+      updateToggleUI('toggleCall', user.isAudioOnline);
+      updateToggleUI('toggleVideo', user.isVideoOnline);
 
       const anav = document.querySelector('.admin-nav');
       if (anav) anav.style.display = 'none';
@@ -6722,7 +6708,8 @@
       if (pCall) pCall.innerText = rate;
       if (pVideo) pVideo.innerText = rate;
 
-      // Status Toggles
+      // Status Toggles - Re-syncing if needed
+      // (Redundant but safe now)
       updateToggleUI('toggleChat', user.isChatOnline);
       updateToggleUI('toggleCall', user.isAudioOnline);
       updateToggleUI('toggleVideo', user.isVideoOnline);
@@ -6764,6 +6751,19 @@
       });
     }
 
+    function updateToggleUI(id, isOnline) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const card = el.closest('.status-card');
+      if (isOnline) {
+        el.classList.add('active');
+        if (card) card.classList.add('active');
+      } else {
+        el.classList.remove('active');
+        if (card) card.classList.remove('active');
+      }
+    }
+
     function setupToggle(id, type) {
       const el = document.getElementById(id);
       if (!el) return;
@@ -6771,11 +6771,7 @@
       el.onclick = () => {
         el.classList.toggle('active');
         const isOnline = el.classList.contains('active');
-        const card = el.closest('.status-card');
-        if (card) {
-          if (isOnline) card.classList.add('active');
-          else card.classList.remove('active');
-        }
+        updateToggleUI(id, isOnline); // Use the helper
 
         socket.emit('toggle-status', { online: isOnline, type: type });
 
