@@ -2639,13 +2639,120 @@
       font-size: 0.7rem;
       color: #9CA3AF;
     }
+
+    /* Side Drawer Styles */
+    .drawer-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 9998;
+      backdrop-filter: blur(3px);
+    }
+
+    .drawer-overlay.open {
+      display: block;
+    }
+
+    .side-drawer {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 270px;
+      height: 100%;
+      background: linear-gradient(180deg, #1a1028 0%, #0B0F1A 100%);
+      z-index: 9999;
+      transition: left 0.3s ease;
+      overflow-y: auto;
+      box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .side-drawer.open {
+      left: 0;
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(92, 8, 116, 0.15);
+    }
+
+    .drawer-menu {
+      padding: 12px 0;
+    }
+
+    .drawer-menu a {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 22px;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .drawer-menu a:hover,
+    .drawer-menu a:active {
+      background: rgba(92, 8, 116, 0.2);
+      color: var(--accent-gold);
+    }
+
+    .drawer-menu a i {
+      width: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--accent-gold);
+      opacity: 0.7;
+    }
+
+    .drawer-divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.06);
+      margin: 8px 18px;
+    }
+
+    .drawer-section-title {
+      padding: 8px 22px 4px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    .drawer-login-btn {
+      background: linear-gradient(135deg, var(--brand-purple), var(--brand-light)) !important;
+      margin: 8px 18px !important;
+      border-radius: 12px !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+      justify-content: center !important;
+    }
+
+    .drawer-login-btn i {
+      color: #fff !important;
+      opacity: 1 !important;
+    }
   </style>
 
   <!-- Screen: Client Dashboard -->
   <div id="screen-client" class="dashboard-container hidden">
     <div class="app-header">
-      <div style="font-weight: bold; font-size: 1.2rem; cursor: pointer;" onclick="window.location.href='index.html'">
-        Astro Luna</div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <i class="fas fa-bars" style="font-size: 1.2rem; cursor: pointer; color: var(--accent-gold);"
+          onclick="toggleDrawer()"></i>
+        <div style="font-weight: bold; font-size: 1.2rem; cursor: pointer;" onclick="window.location.href='index.html'">
+          Astro Luna</div>
+      </div>
       <div style="display: flex; align-items: center; gap: 8px;">
         <span id="walletContainer" onclick="refreshWallet()"
           style="cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Tap to refresh">
@@ -2657,6 +2764,43 @@
         <i class="fas fa-sign-out-alt" style="cursor: pointer;" onclick="clearSession()"></i>
       </div>
     </div>
+
+    <!-- Side Drawer -->
+    <div id="drawerOverlay" class="drawer-overlay" onclick="toggleDrawer()"></div>
+    <div id="sideDrawer" class="side-drawer">
+      <div class="drawer-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div
+            style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--brand-purple), var(--brand-light)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 1rem;">
+            <i class="fas fa-moon"></i>
+          </div>
+          <div>
+            <div style="font-weight: 700; font-size: 1.1rem; color: #fff;">Astro Luna</div>
+            <div style="font-size: 0.7rem; color: var(--text-muted);">Guided by Stars</div>
+          </div>
+        </div>
+        <i class="fas fa-times" style="font-size: 1.2rem; cursor: pointer; color: var(--text-muted);"
+          onclick="toggleDrawer()"></i>
+      </div>
+      <div class="drawer-menu">
+        <a href="#" onclick="drawerNav('home')"><i class="fas fa-home"></i> Home</a>
+        <a href="#" onclick="drawerNav('astrologers')"><i class="fas fa-star"></i> Astrologers</a>
+        <a href="#" onclick="drawerNav('horoscope')"><i class="fas fa-sun"></i> Horoscope</a>
+        <a href="#" onclick="drawerNav('call')"><i class="fas fa-phone-alt"></i> Call</a>
+        <a href="#" onclick="drawerNav('chat')"><i class="fas fa-comments"></i> Chat</a>
+        <a href="#" onclick="drawerNav('history')"><i class="fas fa-history"></i> History</a>
+        <div class="drawer-divider"></div>
+        <div class="drawer-section-title">Policies</div>
+        <a href="terms-condition.html"><i class="fas fa-file-contract"></i> Terms & Conditions</a>
+        <a href="privacy-policy.html"><i class="fas fa-shield-alt"></i> Privacy Policy</a>
+        <a href="refund-cancellation-policy.html"><i class="fas fa-undo"></i> Refund Policy</a>
+        <a href="return-policy.html"><i class="fas fa-exchange-alt"></i> Return Policy</a>
+        <div class="drawer-divider"></div>
+        <a href="#" onclick="drawerNav('login')" class="drawer-login-btn"><i class="fas fa-sign-in-alt"></i> Login /
+          Join Now</a>
+      </div>
+    </div>
+
     <div class="content-area">
       <!-- Section: Home -->
       <div id="section-home">
@@ -5579,6 +5723,43 @@
       });
 
       window.scrollTo(0, 0);
+    }
+
+    function toggleDrawer() {
+      const drawer = document.getElementById('sideDrawer');
+      const overlay = document.getElementById('drawerOverlay');
+      if (drawer && overlay) {
+        drawer.classList.toggle('open');
+        overlay.classList.toggle('open');
+      }
+    }
+
+    function drawerNav(action) {
+      toggleDrawer(); // Close drawer first
+      if (action === 'login') {
+        showLogin();
+      } else if (action === 'home') {
+        navSwitch('home');
+      } else if (action === 'astrologers') {
+        navSwitch('home');
+        setTimeout(() => {
+          const astroList = document.getElementById('astroList');
+          if (astroList) astroList.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } else if (action === 'horoscope') {
+        navSwitch('home');
+        setTimeout(() => {
+          const horoSection = document.getElementById('dailyHoroscopeSection');
+          if (horoSection) horoSection.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      } else if (action === 'call') {
+        navSwitch('call');
+      } else if (action === 'chat') {
+        navSwitch('chat');
+      } else if (action === 'history') {
+        navSwitch('history');
+      }
+      return false;
     }
 
     function returnToHome() {
