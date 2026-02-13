@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Gateway - Astro 5 Star</title>
+    <title>Payment Gateway - AstroLuna</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * {
@@ -442,7 +442,7 @@
                     window.AndroidBridge.onPaymentComplete('success');
                 } else {
                     // Fallback for browser testing
-                    window.location.href = "astro5://payment-success";
+                    window.location.href = "astroluna://payment-success";
                 }
 
             } else if (status === 'fail' || status === 'failure' || status === 'failed') {
@@ -453,7 +453,7 @@
                     window.AndroidBridge.onPaymentComplete('failed');
                 } else {
                     // Fallback for browser testing
-                    window.location.href = "astro5://payment-failed";
+                    window.location.href = "astroluna://payment-failed";
                 }
             }
         }

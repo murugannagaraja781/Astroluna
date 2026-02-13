@@ -168,7 +168,7 @@
 
                 <data
                     android:host="payment-success"
-                    android:scheme="astro5" />
+                    android:scheme="astroluna" />
             </intent-filter>
         </activity>
         <activity android:name="com.astroluna.ui.auth.LoginActivity" />
@@ -213,7 +213,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="astro5" />
+                <data android:scheme="astroluna" />
             </intent-filter>
         </activity>
 

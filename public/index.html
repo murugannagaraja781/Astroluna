@@ -2289,7 +2289,7 @@
       </div>
     </footer>
     <div class="web-footer-bottom">
-      &copy; 2024 ASTROLUNA CELESTIAL TECHNOLOGIES. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை. நட்சத்திரங்கள் வழிகாட்டும்.
+      &copy; 2024 TAMIL ARGO INTERNATIONAL. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை. நட்சத்திரங்கள் வழிகாட்டும்.
     </div>
   </div>
 
@@ -2338,7 +2338,7 @@
         <span class="sep">|</span>
         <a href="https://astroluna.in/return-policy" target="_blank">Returns</a>
       </div>
-      <div class="footer-copy">&copy; 2024 astroluna</div>
+      <div class="footer-copy">&copy; 2024 TAMIL ARGO INTERNATIONAL</div>
     </div>
   </div>
 
@@ -5403,9 +5403,9 @@
       if (banners.length === 0) {
         // Fallback or Empty State
         wrapper.innerHTML = `
-          <div class="home-slide" style="background-image: url('https://via.placeholder.com/600x300/1e3a8a/FFFFFF?text=Welcome+to+Astro5');">
+          <div class="home-slide" style="background-image: url('https://via.placeholder.com/600x300/1e3a8a/FFFFFF?text=Welcome+to+astroluna');">
             <div class="slide-content">
-               <div class="slide-title">Welcome to Astro5</div>
+               <div class="slide-title">Welcome to astroluna</div>
                <div class="slide-subtitle">Connect with top astrologers instantly.</div>
             </div>
           </div>
@@ -8661,10 +8661,10 @@
           .then(r => r.json());
 
         if (res.success && res.data) {
-          // Normalize to match the display function's expectations if needed
+          // Normalize and ensure we don't display 'undefined'
           const normalized = {
-            date: res.data.date,
-            horoscope_data: res.data.forecast_ta, // Main forecast in Tamil
+            date: res.data.date || 'இன்று',
+            horoscope_data: res.data.forecast_ta || (fallbackHoroscopeData[signObj.api] ? fallbackHoroscopeData[signObj.api].horoscope_data : 'தகவல் இல்லை'),
             details: res.data
           };
           horoscopeCache[cacheKey] = normalized;

@@ -318,7 +318,7 @@
 169-->/Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:60:13-42
 170                    android:host="payment-success"
 170-->/Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:120:21-51
-171                    android:scheme="astro5" />
+171                    android:scheme="astroluna" />
 171-->/Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:60:19-39
 172            </intent-filter>
 173        </activity>
@@ -411,7 +411,7 @@
 214-->/Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:117:17-77
 214-->/Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:117:27-75
 215
-216                <data android:scheme="astro5" />
+216                <data android:scheme="astroluna" />
 216-->/Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:60:13-42
 216-->/Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:60:19-39
 217            </intent-filter>
