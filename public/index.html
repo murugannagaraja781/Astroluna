@@ -2288,7 +2288,8 @@
   <div class="web-view">
     <nav class="web-navbar">
       <div class="logo"
-        style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--accent-gold); font-weight: 700; letter-spacing: 2px;">
+        style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--accent-gold); font-weight: 700; letter-spacing: 2px; cursor: pointer;"
+        onclick="window.location.href='index.html'">
         ASTROLUNA</div>
       <div class="web-nav-links">
         <a href="#hero">Home</a>
@@ -2636,7 +2637,8 @@
   <!-- Screen: Client Dashboard -->
   <div id="screen-client" class="dashboard-container hidden">
     <div class="app-header">
-      <div style="font-weight: bold; font-size: 1.2rem;">Astro Luna</div>
+      <div style="font-weight: bold; font-size: 1.2rem; cursor: pointer;" onclick="window.location.href='index.html'">
+        Astro Luna</div>
       <div style="display: flex; align-items: center; gap: 8px;">
         <span id="walletContainer" onclick="refreshWallet()"
           style="cursor: pointer; display: flex; align-items: center; gap: 4px;" title="Tap to refresh">
@@ -5515,19 +5517,19 @@
     }
 
     function showLogin() {
-      // Automatic transition for desktop users
-      const webView = document.querySelector('.web-view');
-      if (webView && webView.style.display !== 'none') {
-        enterApp();
-      }
+      // Always ensure we're in app mode (switch from web landing to app)
+      enterApp();
       hideAllScreens();
       sLogin.classList.remove('hidden');
     }
 
     function switchToApp(screen) {
       enterApp();
-      if (screen === 'login') showLogin();
-      else if (screen === 'home') loadClientDash(state.me || { role: 'guest' });
+      if (screen === 'login') {
+        showLogin();
+      } else if (screen === 'home') {
+        loadClientDash(state.me || { name: 'Guest', userId: 'guest', role: 'guest', walletBalance: 0 });
+      }
     }
 
     function enterApp() {
