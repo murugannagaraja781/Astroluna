@@ -2284,6 +2284,25 @@
 </head>
 
 <body>
+  <!-- Splash Loading Screen -->
+  <div id="splashLoader"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0B0F1A; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease;">
+    <div
+      style="font-family: 'Cinzel Decorative', serif; font-size: 2rem; color: #D4AF37; font-weight: 700; letter-spacing: 3px; margin-bottom: 20px;">
+      ASTROLUNA</div>
+    <div style="font-size: 0.8rem; color: #9CA3AF; margin-bottom: 30px;">Guided by Stars</div>
+    <div
+      style="width: 40px; height: 40px; border: 3px solid rgba(212,175,55,0.2); border-top-color: #D4AF37; border-radius: 50%; animation: splashSpin 0.8s linear infinite;">
+    </div>
+    <style>
+      @keyframes splashSpin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </div>
+
   <!-- Web View (Desktop Landing Page) -->
   <div class="web-view">
     <nav class="web-navbar">
@@ -2832,26 +2851,34 @@
           </div>
         </div>
 
-        <!-- Premium Services Grid (Hidden as requested) -->
-        <div style="padding: 0 24px; margin-bottom: 24px; display: none;">
-          <h3 style="color:var(--accent-gold); font-size:1.1rem; margin-bottom:15px; font-family:var(--font-heading);">
-            Our Services</h3>
-          <div class="service-grid-container" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
-            <div class="service-item-card" onclick="navSwitch('chat')">
-              <img src="https://cdn-icons-png.flaticon.com/128/3122/3122155.png" alt="Chat">
-              <span>Chat</span>
-            </div>
-            <div class="service-item-card" onclick="navSwitch('call')">
-              <img src="https://cdn-icons-png.flaticon.com/128/3059/3059502.png" alt="Call">
-              <span>Call</span>
+        <!-- Quick Actions Grid -->
+        <div style="padding: 0 20px; margin-bottom: 24px;">
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+            <div class="service-item-card"
+              onclick="checkGuestAction(function(){ document.getElementById('universalChartModal').classList.remove('hidden'); })">
+              <div
+                style="width:44px; height:44px; background: linear-gradient(135deg, #7c3aed, #5b21b6); border-radius: 14px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                🔮</div>
+              <span>Chart</span>
             </div>
             <div class="service-item-card" onclick="checkGuestAction(porutham)">
-              <img src="https://cdn-icons-png.flaticon.com/128/9141/9141153.png" alt="Match">
+              <div
+                style="width:44px; height:44px; background: linear-gradient(135deg, #ec4899, #be185d); border-radius: 14px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                💞</div>
               <span>Match</span>
             </div>
-            <div class="service-item-card" onclick="checkGuestAction('horoscope')">
-              <img src="https://cdn-icons-png.flaticon.com/128/1592/1592209.png" alt="Reports">
-              <span>Horoscope</span>
+            <div class="service-item-card"
+              onclick="checkGuestAction(function(){ document.getElementById('clientAcademyModal').classList.remove('hidden'); loadClientAcademy && loadClientAcademy(); })">
+              <div
+                style="width:44px; height:44px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 14px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                🎓</div>
+              <span>Academy</span>
+            </div>
+            <div class="service-item-card" onclick="checkGuestAction(function(){ showProfile(); })">
+              <div
+                style="width:44px; height:44px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 14px; display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                👤</div>
+              <span>Profile</span>
             </div>
           </div>
         </div>
@@ -3176,15 +3203,19 @@
         <div style="margin-bottom: 20px;">
           <div
             style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding: 0 5px;">
-            <h3 style="margin:0; font-size:1.1rem; color:#1F2937;">Recent Transactions</h3>
+            <h3 style="margin:0; font-size:1.1rem; color: var(--accent-gold); font-family: var(--font-heading);">Recent
+              Transactions</h3>
             <button onclick="fetchTransactionHistory()"
-              style="background:none; border:none; color:#F59E0B; font-weight:600; cursor:pointer;">
+              style="background:none; border:none; color: var(--accent-gold); font-weight:600; cursor:pointer;">
               <i class="fas fa-sync-alt"></i> Refresh
             </button>
           </div>
           <div id="transactionList" style="display:flex; flex-direction:column; gap:10px;">
-            <!-- Transactions will result here -->
-            <div style="text-align:center; padding:20px; color:#6B7280; font-size:0.9rem;">Loading...</div>
+            <!-- Transactions will render here -->
+            <div style="text-align:center; padding:30px; color: var(--text-muted); font-size:0.9rem;">
+              <i class="fas fa-receipt" style="font-size: 2rem; opacity: 0.3; display: block; margin-bottom: 10px;"></i>
+              Loading transactions...
+            </div>
           </div>
         </div>
 
@@ -3274,24 +3305,7 @@
     </div>
   </div>
 
-  <!-- Screen: Client Academy Modal -->
-  <div id="clientAcademyModal" class="modal-overlay hidden"
-    style="align-items: center; justify-content: center; z-index: 10000;">
-    <div
-      style="background:#F3F4F6; width:100%; height:90vh; border-top-left-radius:25px; border-top-right-radius:25px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 -5px 20px rgba(0,0,0,0.2); max-width:500px;">
-      <div
-        style="padding:20px; background:white; font-weight:700; font-size:1.2rem; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e5e5e5; color:#1F2937;">
-        <span>🎓 Astro Academy</span>
-        <button onclick="document.getElementById('clientAcademyModal').classList.add('hidden')"
-          style="background:none; border:none; font-size:1.4rem; color:#6B7280; cursor:pointer;"><i
-            class="fas fa-times"></i></button>
-      </div>
-      <div id="clientAcademyList"
-        style="flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:15px;">
-        <!-- Videos will be rendered here -->
-      </div>
-    </div>
-  </div>
+  <!-- (Duplicate Academy Modal removed) -->
 
   <!-- Mobile Footer -->
   <div class="doc-bottom-nav">
@@ -5647,10 +5661,22 @@
         // Auto Login
         console.log('Restoring session for:', session.name);
         state.me = session;
+
+        // Show the dashboard immediately from cached session (no blank page)
+        sLogin.classList.add('hidden');
+        if (session.role === 'astrologer') loadAstroDash(session);
+        else if (session.role === 'superadmin') loadAdminDash(session);
+        else {
+          loadClientDash(session);
+        }
+        hideSplash();
+
+        // Then refresh data from server in background
         socket.emit('register', { name: session.name, phone: session.phone, userId: session.userId }, (ack) => {
           if (ack.ok) {
             // Merge fresh data from server (wallet, earnings, etc.)
             state.me = { ...session, ...ack };
+            if (session.intakeDetails) state.me.intakeDetails = session.intakeDetails;
             saveSession(state.me); // Update localStorage with fresh data
 
             // Send FCM token to server for push notifications
@@ -5660,12 +5686,12 @@
               console.log('[FCM] Token sent to server (session restore)');
             }
 
-            sLogin.classList.add('hidden');
-            if (state.me.role === 'astrologer') loadAstroDash(state.me);
-            else if (state.me.role === 'superadmin') loadAdminDash(state.me);
-            else {
-              if (session.intakeDetails) state.me.intakeDetails = session.intakeDetails;
-              loadClientDash(state.me);
+            // Update wallet display with fresh data
+            if (state.me.walletBalance !== undefined) {
+              const cw = document.getElementById('clientWallet');
+              if (cw) cw.innerText = Number(state.me.walletBalance || 0).toFixed(0);
+              const db = document.getElementById('dashWalletBalance');
+              if (db) db.innerText = Number(state.me.walletBalance || 0).toFixed(2);
             }
           } else {
             // If register fails (e.g. user deleted), clear session
@@ -5690,6 +5716,15 @@
         document.querySelector('.mobile-view').style.display = 'none';
       } else {
         loadClientDash(guestUser);
+      }
+      hideSplash();
+    }
+
+    function hideSplash() {
+      const splash = document.getElementById('splashLoader');
+      if (splash) {
+        splash.style.opacity = '0';
+        setTimeout(() => splash.remove(), 400);
       }
     }
 
