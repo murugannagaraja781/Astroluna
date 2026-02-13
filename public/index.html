@@ -2565,6 +2565,12 @@
             oninput="this.value = this.value.replace(/[^0-9]/g, '')">
           <button id="btnVerifyOtp" class="cosmic-btn">Verify Access</button>
         </div>
+        <div style="margin-top: 20px;">
+          <a href="#" onclick="returnToHome(); return false;"
+            style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem; transition: color 0.2s;">
+            <i class="fas fa-arrow-left" style="margin-right: 6px;"></i>Return to Home
+          </a>
+        </div>
       </div>
 
     </div>
@@ -5546,6 +5552,23 @@
       });
 
       window.scrollTo(0, 0);
+    }
+
+    function returnToHome() {
+      const isDesktop = window.innerWidth >= 1024;
+      const webView = document.querySelector('.web-view');
+      const mobileView = document.querySelector('.mobile-view');
+
+      if (isDesktop && webView) {
+        // On desktop, go back to web landing page
+        if (mobileView) mobileView.style.display = 'none';
+        webView.style.display = 'block';
+        window.scrollTo(0, 0);
+      } else {
+        // On mobile, go to guest home dashboard
+        hideAllScreens();
+        loadClientDash(state.me || { name: 'Guest', userId: 'guest', role: 'guest', walletBalance: 0 });
+      }
     }
 
     function hideAllScreens() {
