@@ -27,6 +27,25 @@ if (!global.fetch) {
   global.fetch = require('node-fetch');
 }
 
+// ===== Referral Helpers =====
+async function generateReferralCode(userName) {
+  const prefix = userName.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'A');
+  const random = crypto.randomBytes(2).toString('hex').toUpperCase();
+  const code = `${prefix}${random}`;
+
+  // Ensure uniqueness
+  const exists = await User.findOne({ referralCode: code });
+  if (exists) return generateReferralCode(userName); // Recurse
+  return code;
+}
+
+// Use a shared secret for L1 referral bonus
+const REFERRAL_BONUS_AMOUNT = 51; // Rs. 51 join bonus for referrer
+const COMMISSION_L1 = 0.02; // 2%
+const COMMISSION_L2 = 0.02; // 2%
+const COMMISSION_L3 = 0.01; // 1%
+const CASHBACK_CLIENT = 0.02; // 2% for referred client
+
 // FCM v1 API with Service Account
 const { GoogleAuth } = require('google-auth-library');
 const fs = require('fs');
@@ -409,7 +428,11 @@ const UserSchema = new mongoose.Schema({
   isBusy: { type: Boolean, default: false }, // Currently in session
   availabilityExpiresAt: Date, // Safety timeout
   fcmToken: String, // Push Notification Token
-  lastSeen: { type: Date, default: Date.now }
+  lastSeen: { type: Date, default: Date.now },
+
+  // Referral System Fields
+  referredBy: { type: String, default: null }, // userId of the referrer
+  referralCode: { type: String, unique: true, sparse: true } // unique code for sharing
 });
 
 const CallRequestSchema = new mongoose.Schema({
@@ -665,6 +688,49 @@ app.get('/api/user/:userId', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ ok: false, error: 'Internal Error' });
+  }
+});
+
+// --- Get Referral Stats Dashboard Data ---
+app.get('/api/referral/stats/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Level 1 Users
+    const l1Users = await User.find({ referredBy: userId }).select('userId name createdAt').lean();
+    const l1Ids = l1Users.map(u => u.userId);
+
+    // Level 2 Users
+    const l2Users = await User.find({ referredBy: { $in: l1Ids } }).select('userId name createdAt').lean();
+    const l2Ids = l2Users.map(u => u.userId);
+
+    // Level 3 Users
+    const l3Users = await User.find({ referredBy: { $in: l2Ids } }).select('userId name createdAt').lean();
+
+    // Calculate Earnings from Ledger for this specific user's referral activities
+    // We can filter reasoning by 'referral' or just check where this user's wallet was credited
+    // To be precise, we'd need a separate 'ReferralEarning' schema or track it in BillingLedger.
+    // Given the current structure, we'll estimate total earnings from User totalEarnings if they are primarily a recruiter,
+    // or we'd ideally have tagged ledger entries.
+
+    // For now, let's return the counts and the list for the dashboard
+    res.json({
+      ok: true,
+      stats: {
+        level1Count: l1Users.length,
+        level2Count: l2Users.length,
+        level3Count: l3Users.length,
+        totalReferrals: l1Users.length + l2Users.length + l3Users.length
+      },
+      referrals: {
+        l1: l1Users,
+        l2: l2Users,
+        l3: l3Users
+      }
+    });
+
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
   }
 });
 
@@ -1248,10 +1314,45 @@ app.post('/api/verify-otp', async (req, res) => {
     if (!user) {
       // Create new client
       const userId = crypto.randomUUID();
-      // Secure Name Generation (No phone parts)
-      const randomSuffix = crypto.randomBytes(2).toString('hex'); // 4 chars e.g. 'a1b2'
+      const randomSuffix = crypto.randomBytes(2).toString('hex');
+      const name = `User_${randomSuffix}`;
+
+      const referralCode = await generateReferralCode(name);
+
+      // Check for incoming referral code
+      let referredByUserId = null;
+      if (req.body.referralCode) {
+        const referrer = await User.findOne({ referralCode: req.body.referralCode.toUpperCase() });
+        if (referrer) {
+          referredByUserId = referrer.userId;
+
+          // Credit referral bonus to referrer
+          referrer.walletBalance += REFERRAL_BONUS_AMOUNT;
+          await referrer.save();
+
+          console.log(`[Referral] User ${name} referred by ${referrer.name}. Bonus Rs.${REFERRAL_BONUS_AMOUNT} given.`);
+
+          // Add a ledger entry for the bonus
+          await BillingLedger.create({
+            billingId: crypto.randomUUID(),
+            sessionId: 'referral_bonus_' + userId,
+            minuteIndex: 0,
+            chargedToClient: 0,
+            creditedToAstrologer: 0,
+            adminAmount: -REFERRAL_BONUS_AMOUNT,
+            reason: 'referral'
+          });
+        }
+      }
+
       user = await User.create({
-        userId, phone, name: `User_${randomSuffix}`, role: 'client'
+        userId,
+        phone,
+        name,
+        role: 'client',
+        referralCode,
+        referredBy: referredByUserId,
+        walletBalance: referredByUserId ? 108 + 21 : 108 // Extra 21 for being referred
       });
     }
 
@@ -1703,6 +1804,58 @@ async function processBillingCharge(sessionId, durationSeconds, minuteIndex, typ
         astro.walletBalance += astroShare;
         astro.totalEarnings = (astro.totalEarnings || 0) + astroShare; // Phase 16
         await astro.save();
+      }
+
+      // --- Multi-Level Referral Logic ---
+      if (client.referredBy) {
+        // 1. Client Cashback (2%)
+        const clientCashback = amountToCharge * CASHBACK_CLIENT;
+        client.walletBalance += clientCashback;
+        await client.save();
+        adminShare -= clientCashback;
+
+        // 2. Level 1 Referrer (2%)
+        const l1 = await User.findOne({ userId: client.referredBy });
+        if (l1) {
+          const l1Com = amountToCharge * COMMISSION_L1;
+          l1.walletBalance += l1Com;
+          await l1.save();
+          adminShare -= l1Com;
+
+          // Notify L1
+          const l1Socket = userSockets.get(l1.userId);
+          if (l1Socket) io.to(l1Socket).emit('wallet-update', { balance: l1.walletBalance });
+
+          // 3. Level 2 Referrer (2%)
+          if (l1.referredBy) {
+            const l2 = await User.findOne({ userId: l1.referredBy });
+            if (l2) {
+              const l2Com = amountToCharge * COMMISSION_L2;
+              l2.walletBalance += l2Com;
+              await l2.save();
+              adminShare -= l2Com;
+
+              // Notify L2
+              const l2Socket = userSockets.get(l2.userId);
+              if (l2Socket) io.to(l2Socket).emit('wallet-update', { balance: l2.walletBalance });
+
+              // 4. Level 3 Referrer (1%)
+              if (l2.referredBy) {
+                const l3 = await User.findOne({ userId: l2.referredBy });
+                if (l3) {
+                  const l3Com = amountToCharge * COMMISSION_L3;
+                  l3.walletBalance += l3Com;
+                  await l3.save();
+                  adminShare -= l3Com;
+
+                  // Notify L3
+                  const l3Socket = userSockets.get(l3.userId);
+                  if (l3Socket) io.to(l3Socket).emit('wallet-update', { balance: l3.walletBalance });
+                }
+              }
+            }
+          }
+        }
       }
 
       // Admin Share is just recorded in Ledger, or we could credit a SuperAdmin wallet.

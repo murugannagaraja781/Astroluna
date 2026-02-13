@@ -40,18 +40,19 @@ class OtpVerificationActivity : AppCompatActivity() {
             finish()
             return
         }
+        val referralCode = intent.getStringExtra("referral_code")
 
         setContent {
             CosmicAppTheme {
                 OtpScreen(
                     phone = phone,
-                    onVerifyOtp = { otp -> verifyOtp(phone, otp) }
+                    onVerifyOtp = { otp -> verifyOtp(phone, otp, referralCode) }
                 )
             }
         }
     }
 
-    private fun verifyOtp(phone: String, otp: String) {
+    private fun verifyOtp(phone: String, otp: String, referralCode: String? = null) {
         if (otp.length != 4) {
             Toast.makeText(this, "Enter 4 digit OTP", Toast.LENGTH_SHORT).show()
             return
@@ -87,7 +88,7 @@ class OtpVerificationActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            val result = repository.verifyOtp(phone, otp)
+            val result = repository.verifyOtp(phone, otp, referralCode)
             if (result.isSuccess) {
                 val user = result.getOrThrow()
                 tokenManager.saveUserSession(user)

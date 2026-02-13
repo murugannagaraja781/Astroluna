@@ -69,6 +69,7 @@ class HomeActivity : AppCompatActivity() {
                 val horoscope by _horoscope.collectAsState()
                 val astrologers by _astrologers.collectAsState()
                 val isLoading by _isLoading.collectAsState()
+                val referralCode = remember { tokenManager.getUserSession()?.referralCode ?: "" }
 
                 var selectedRasiItem by remember { mutableStateOf<ComposeRasiItem?>(null) }
 
@@ -77,6 +78,7 @@ class HomeActivity : AppCompatActivity() {
 
                 HomeScreen(
                     walletBalance = balance,
+                    referralCode = referralCode,
                     horoscope = horoscope,
                     astrologers = astrologers,
                     isLoading = isLoading,

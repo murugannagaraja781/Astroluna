@@ -459,6 +459,19 @@
       externalAnnotations="annotations.zip"
       proguardRules="proguard.txt"/>
   <library
+      name="androidx.compose.ui:ui-text-google-fonts:1.6.8@aar"
+      jars="/Users/wohozo/.gradle/caches/8.12/transforms/69150735fb6a2cd6819a21d0c7b244c1/transformed/jetified-ui-text-google-fonts-1.6.8/jars/classes.jar"
+      resolved="androidx.compose.ui:ui-text-google-fonts:1.6.8"
+      folder="/Users/wohozo/.gradle/caches/8.12/transforms/69150735fb6a2cd6819a21d0c7b244c1/transformed/jetified-ui-text-google-fonts-1.6.8"
+      manifest="AndroidManifest.xml"
+      resFolder="res"
+      assetsFolder="assets"
+      lintJar="lint.jar"
+      publicResources="public.txt"
+      symbolFile="R.txt"
+      externalAnnotations="annotations.zip"
+      proguardRules="proguard.txt"/>
+  <library
       name="androidx.compose.ui:ui-tooling-preview-android:1.6.8@aar"
       jars="/Users/wohozo/.gradle/caches/8.12/transforms/4fa3d303960670b84ace910c99a35761/transformed/jetified-ui-tooling-preview-release/jars/classes.jar"
       resolved="androidx.compose.ui:ui-tooling-preview-android:1.6.8"

@@ -1,382 +1,386 @@
 [
     {
-        "merged": "com.astroluna.app-release-75:/drawable_circle_bg.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/circle_bg.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_11.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_11.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "com.astroluna.app-main-76:/mipmap-xxxhdpi/ic_launcher_round.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_taurus_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_taurus_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/mipmap-hdpi_ic_launcher.png.flat",
-        "source": "com.astroluna.app-main-76:/mipmap-hdpi/ic_launcher.png"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_rounded_sheet_top.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_rounded_sheet_top.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_rounded_button_red.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/rounded_button_red.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_leo_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_leo_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_6.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_6.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_gemini_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_gemini_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_free_kundali.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_free_kundali.png"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_gradient_header_dark.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_gradient_header_dark.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_gemini_premium_copy.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_gemini_premium_copy.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_chart.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_chart.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_logo_mayil.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/logo_mayil.png"
+        "merged": "com.astroluna.app-release-76:/drawable_app_logo.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/app_logo.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_2.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_2.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_8.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_8.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_app_logo.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/app_logo.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_cancer_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_cancer_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_libra_premium_copy.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_libra_premium_copy.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_double_check.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_double_check.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_logo_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/logo_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_1.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_1.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_status_online.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_status_online.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_taurus_premium_copy.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_taurus_premium_copy.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_app_icon_final.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/app_icon_final.png"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_input_rounded.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_input_rounded.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_circle_button_accept.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/circle_button_accept.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_star_filled.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_star_filled.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_wallet_bg.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/wallet_bg.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_banner_offer_1.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/banner_offer_1.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_ring_green.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_ring_green.xml"
+        "merged": "com.astroluna.app-release-76:/mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "com.astroluna.app-main-77:/mipmap-xxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_10.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_10.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_12.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_12.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_btn_chat_bg.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/btn_chat_bg.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_check.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_check.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_chart.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_chart.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_7.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_7.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_rounded_button_bg.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/rounded_button_bg.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_btn_rounded_action_orange.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/btn_rounded_action_orange.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_9.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_9.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_cancer_premium_copy.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_cancer_premium_copy.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_gemini_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_gemini_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_pisces_premium_copy.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_pisces_premium_copy.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "com.astroluna.app-main-76:/mipmap-mdpi/ic_launcher_round.png"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_status_online.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_status_online.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_banner_offer_3.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/banner_offer_3.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_person_placeholder.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_person_placeholder.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_virgo_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_virgo_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_3.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_3.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_btn_rounded_action.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/btn_rounded_action.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_daily_horoscope.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_daily_horoscope.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_banner_offer_2.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/banner_offer_2.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_aries_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_aries_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/anim_slide_in_up.xml.flat",
-        "source": "com.astroluna.app-main-76:/anim/slide_in_up.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_btn_chat_bg.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/btn_chat_bg.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "com.astroluna.app-main-76:/mipmap-xxhdpi/ic_launcher.png"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_chat_bubble_sent.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_chat_bubble_sent.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_leo_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_leo_premium.png"
+        "merged": "com.astroluna.app-release-76:/xml_file_paths.xml.flat",
+        "source": "com.astroluna.app-main-77:/xml/file_paths.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_status_online.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/status_online.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_circle_bg.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/circle_bg.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_circle_soft.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_circle_soft.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_6.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_6.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_free_services.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_free_services.png"
+        "merged": "com.astroluna.app-release-76:/drawable_btn_rounded_action.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/btn_rounded_action.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_call_white.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_call_white.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_double_check_blue.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_double_check_blue.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/xml_file_paths.xml.flat",
-        "source": "com.astroluna.app-main-76:/xml/file_paths.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_match.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_match.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_back.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_back.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_free_kundali.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_free_kundali.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_5.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_5.png"
+        "merged": "com.astroluna.app-release-76:/mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "com.astroluna.app-main-77:/mipmap-xxxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_btn_video_bg.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/btn_video_bg.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_circle_avatar_placeholder.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/circle_avatar_placeholder.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_circle_avatar_placeholder.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/circle_avatar_placeholder.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_9.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_9.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_status_offline.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/status_offline.xml"
+        "merged": "com.astroluna.app-release-76:/anim_slide_in_up.xml.flat",
+        "source": "com.astroluna.app-main-77:/anim/slide_in_up.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "com.astroluna.app-main-76:/mipmap-hdpi/ic_launcher_round.png"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_button_primary.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_button_primary.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_pisces_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_pisces_premium.png"
+        "merged": "com.astroluna.app-release-76:/mipmap-hdpi_ic_launcher.png.flat",
+        "source": "com.astroluna.app-main-77:/mipmap-hdpi/ic_launcher.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_gradient_header_dark.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_gradient_header_dark.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_pisces_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_pisces_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_cancer_premium_copy.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_cancer_premium_copy.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_video_white.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_video_white.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_1.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_1.png"
+        "merged": "com.astroluna.app-release-76:/xml_network_security_config.xml.flat",
+        "source": "com.astroluna.app-main-77:/xml/network_security_config.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_button_primary.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_button_primary.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_banner_offer_3.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/banner_offer_3.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_rounded_sheet_top.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_rounded_sheet_top.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_5.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_5.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_match.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_match.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_gemini_premium_copy.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_gemini_premium_copy.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_8.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_8.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_call_white.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_call_white.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/mipmap-mdpi_ic_launcher.png.flat",
-        "source": "com.astroluna.app-main-76:/mipmap-mdpi/ic_launcher.png"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_circle_soft.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_circle_soft.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_card_premium.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_card_premium.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_libra_premium_copy.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_libra_premium_copy.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_scorpio_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_scorpio_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_ring_green.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_ring_green.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_star_filled.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_star_filled.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_capricorn_premium_copy.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_capricorn_premium_copy.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_banner_offer_1.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/banner_offer_1.png"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_button_secondary.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_button_secondary.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_aries_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_aries_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_logo_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/logo_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_sagittarius_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_sagittarius_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_edit.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_edit.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_person_placeholder.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_person_placeholder.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_banner_offer_4.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/banner_offer_4.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_pisces_premium_copy.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_pisces_premium_copy.png"
+        "merged": "com.astroluna.app-release-76:/drawable_circle_button_reject.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/circle_button_reject.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_academy.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_academy.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_back.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_back.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_4.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_4.png"
+        "merged": "com.astroluna.app-release-76:/mipmap-mdpi_ic_launcher.png.flat",
+        "source": "com.astroluna.app-main-77:/mipmap-mdpi/ic_launcher.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_input_rounded.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_input_rounded.xml"
+        "merged": "com.astroluna.app-release-76:/mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "com.astroluna.app-main-77:/mipmap-xxhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "com.astroluna.app-main-76:/mipmap-xhdpi/ic_launcher_round.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_aquarius_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_aquarius_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_video_white.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_video_white.xml"
+        "merged": "com.astroluna.app-release-76:/mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "com.astroluna.app-main-77:/mipmap-xxxhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "com.astroluna.app-main-76:/mipmap-xhdpi/ic_launcher.png"
+        "merged": "com.astroluna.app-release-76:/mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "com.astroluna.app-main-77:/mipmap-hdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_aquarius_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_aquarius_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_4.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_4.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_12.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_12.png"
+        "merged": "com.astroluna.app-release-76:/drawable_status_online.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/status_online.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_btn_audio_bg.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/btn_audio_bg.xml"
+        "merged": "com.astroluna.app-release-76:/mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "com.astroluna.app-main-77:/mipmap-xhdpi/ic_launcher.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_circle_button_reject.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/circle_button_reject.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_free_services.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_free_services.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_taurus_premium_copy.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_taurus_premium_copy.png"
+        "merged": "com.astroluna.app-release-76:/drawable_btn_rounded_action_red.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/btn_rounded_action_red.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_edit.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_edit.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_capricorn_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_capricorn_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_7.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_7.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_academy.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_academy.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_cancer_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_cancer_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_banner_offer_2.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/banner_offer_2.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "com.astroluna.app-main-76:/mipmap-xxxhdpi/ic_launcher.png"
+        "merged": "com.astroluna.app-release-76:/drawable_status_offline.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/status_offline.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_btn_rounded_action_green.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/btn_rounded_action_green.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_btn_audio_bg.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/btn_audio_bg.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_check.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_check.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_rounded_button_red.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/rounded_button_red.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_double_check_blue.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_double_check_blue.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_circle_button_accept.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/circle_button_accept.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_circle_bg_light_green.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/circle_bg_light_green.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_sagittarius_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_sagittarius_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "com.astroluna.app-main-76:/mipmap-xxhdpi/ic_launcher_round.png"
+        "merged": "com.astroluna.app-release-76:/mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "com.astroluna.app-main-77:/mipmap-xhdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_11.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_11.png"
+        "merged": "com.astroluna.app-release-76:/drawable_rounded_button_bg.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/rounded_button_bg.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_chat_bubble_sent.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_chat_bubble_sent.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_chat_bubble_received.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_chat_bubble_received.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_button_secondary.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_button_secondary.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_scorpio_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_scorpio_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_capricorn_premium_copy.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_capricorn_premium_copy.png"
+        "merged": "com.astroluna.app-release-76:/mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "com.astroluna.app-main-77:/mipmap-mdpi/ic_launcher_round.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_capricorn_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_capricorn_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_logo_mayil.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/logo_mayil.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_libra_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_libra_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_virgo_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_virgo_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_double_check.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_double_check.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_10.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_10.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_btn_rounded_action_orange.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/btn_rounded_action_orange.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_btn_video_bg.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/btn_video_bg.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_daily_horoscope.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_daily_horoscope.png"
+        "merged": "com.astroluna.app-release-76:/drawable_circle_bg_light_green.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/circle_bg_light_green.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_banner_offer_4.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/banner_offer_4.png"
+        "merged": "com.astroluna.app-release-76:/drawable_btn_rounded_action_green.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/btn_rounded_action_green.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_gradient_header.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_gradient_header.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_libra_premium.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_libra_premium.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_taurus_premium.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_taurus_premium.png"
+        "merged": "com.astroluna.app-release-76:/drawable_app_icon_final.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/app_icon_final.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_btn_rounded_action_red.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/btn_rounded_action_red.xml"
+        "merged": "com.astroluna.app-release-76:/font_outfit.xml.flat",
+        "source": "com.astroluna.app-main-77:/font/outfit.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/xml_network_security_config.xml.flat",
-        "source": "com.astroluna.app-main-76:/xml/network_security_config.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_gradient_header.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_gradient_header.xml"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_ic_rasi_3.png.flat",
-        "source": "com.astroluna.app-main-76:/drawable/ic_rasi_3.png"
+        "merged": "com.astroluna.app-release-76:/drawable_ic_rasi_2.png.flat",
+        "source": "com.astroluna.app-main-77:/drawable/ic_rasi_2.png"
     },
     {
-        "merged": "com.astroluna.app-release-75:/drawable_bg_chat_bubble_received.xml.flat",
-        "source": "com.astroluna.app-main-76:/drawable/bg_chat_bubble_received.xml"
+        "merged": "com.astroluna.app-release-76:/drawable_bg_card_premium.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/bg_card_premium.xml"
+    },
+    {
+        "merged": "com.astroluna.app-release-76:/drawable_wallet_bg.xml.flat",
+        "source": "com.astroluna.app-main-77:/drawable/wallet_bg.xml"
     }
 ]

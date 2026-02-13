@@ -71,4 +71,6 @@ interface ApiInterface {
 
     @POST("api/horoscope/generate-chart")
     suspend fun generateRasiChart(@Body request: com.google.gson.JsonObject): Response<com.google.gson.JsonObject>
+    @retrofit2.http.GET("api/referral/stats/{userId}")
+    suspend fun getReferralStats(@retrofit2.http.Path("userId") userId: String): Response<com.astroluna.data.model.ReferralStatsResponse>
 }

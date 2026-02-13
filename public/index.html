@@ -3399,166 +3399,300 @@
 
   <!-- Screen: Astrologer Dashboard -->
   <div id="screen-astro" class="dashboard-container hidden">
-    <div class="app-header">
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <img src="" id="astroAvatar" style="width: 35px; height: 35px; border-radius: 50%;">
-        <div>
-          <div style="font-weight: bold;" id="astroName">Astrologer</div>
-          <div style="font-size: 0.7rem; color: #666;">ID: <span id="astroId">...</span></div>
+    <!-- Premium Header -->
+    <div class="astro-profile-banner">
+      <img src="" id="astroAvatar" class="astro-banner-img">
+      <div class="astro-banner-info">
+        <h2 id="astroName">Astrologer Name</h2>
+        <p>Expert Astrologer • ID: <span id="astroId">...</span></p>
+        <div id="astroStatusIndicator" style="margin-top: 8px; display: flex; align-items: center; gap: 6px;">
+          <div class="status-badge" style="position: static; width: 10px; height: 10px;"></div>
+          <span style="font-size: 0.7rem; color: rgba(255,255,255,0.8); font-weight: 600;">System Active</span>
         </div>
       </div>
-      <div>
-        <i class="fas fa-bell"></i>
-        <i class="fas fa-sign-out-alt" style="margin-left: 10px; cursor: pointer;" onclick="clearSession()"></i>
+      <div style="position: absolute; top: 20px; right: 20px; color: rgba(255,255,255,0.6);">
+        <i class="fas fa-sign-out-alt" style="font-size: 1.2rem; cursor: pointer;" onclick="clearSession()"></i>
       </div>
     </div>
 
-    <div class="content-area">
-      <!-- Toggles -->
-      <div class="toggle-row">
-        <div class="toggle-item">
-          <span>Chat </span>
-          <div class="toggle-switch" id="toggleChat"></div>
+    <div class="content-area" style="padding-top: 0;">
+      <!-- Service Controls -->
+      <div class="service-status-grid">
+        <div class="status-card" id="cardToggleChat">
+          <i class="fas fa-comment-dots"></i>
+          <span>Chat</span>
+          <div class="toggle-switch" id="toggleChat" style="margin: 0 auto;"></div>
         </div>
-        <div class="toggle-item">
-          <span>Call </span>
-          <div class="toggle-switch" id="toggleCall"></div>
+        <div class="status-card" id="cardToggleCall">
+          <i class="fas fa-phone-alt"></i>
+          <span>Audio</span>
+          <div class="toggle-switch" id="toggleCall" style="margin: 0 auto;"></div>
         </div>
-        <div class="toggle-item">
-          <span>Video Call </span>
-          <div class="toggle-switch" id="toggleVideo"></div>
+        <div class="status-card" id="cardToggleVideo">
+          <i class="fas fa-video"></i>
+          <span>Video</span>
+          <div class="toggle-switch" id="toggleVideo" style="margin: 0 auto;"></div>
         </div>
       </div>
 
-      <div class="emergency-banner">
-        <div style="font-weight: bold; margin-bottom: 5px;">Online for Emergency!</div>
-        <div style="font-size: 0.8rem; opacity: 0.9;">Boost your earnings with emergency sessions.</div>
+      <!-- Emergency Alert -->
+      <div class="emergency-banner" style="display: flex; align-items: center; gap: 15px;">
+        <i class="fas fa-bolt" style="font-size: 1.5rem; color: #F59E0B;"></i>
+        <div>
+          <div style="font-weight: bold; margin-bottom: 2px;">Peak Hours Alert</div>
+          <div style="font-size: 0.75rem; opacity: 0.8;">High traffic detected. Stay online to maximize sessions.</div>
+        </div>
       </div>
 
+      <!-- Enhanced Earnings Card -->
       <div class="premium-earnings-card">
         <div class="e-header">
           <div class="e-title">Lifetime Revenue</div>
+          <button id="btnShowEarnings" onclick="toggleEarnings()" class="eye-btn"
+            style="background: rgba(255,255,255,0.15);">
+            <i class="fas fa-eye"></i>
+          </button>
         </div>
         <div class="e-main" id="astroEarningsContainer" style="display:none;">
           <span class="symbol">₹</span><span id="astroLifetimeDisplay">0.00</span>
         </div>
         <div class="e-footer">
-          <span>Withdrawable: <b style="color:var(--accent-gold);">₹<span id="astroWalletDisplay">0.00</span></b></span>
-          <button id="btnShowEarnings" onclick="toggleEarnings()" class="eye-btn"><i class="fas fa-eye"></i></button>
+          <div>
+            <div style="opacity: 0.7; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 2px;">Withdrawable
+            </div>
+            <div style="font-weight: 700; font-size: 1.1rem;">₹<span id="astroWalletDisplay">0.00</span></div>
+          </div>
+          <button class="withdraw-btn">Withdraw</button>
         </div>
       </div>
+
       <div id="astroPendingWithdrawals" style="display:none;"></div>
 
-      <style>
-        .premium-earnings-card {
-          background: linear-gradient(135deg, #059669 0%, #064E3B 100%);
-          border-radius: 24px;
-          padding: 24px;
-          color: white;
-          margin-bottom: 24px;
-          box-shadow: 0 15px 30px rgba(5, 150, 105, 0.2);
-        }
+      <!-- Quick Actions -->
+      <h3 style="font-size: 1rem; margin-bottom: 16px; font-family: 'Cinzel', serif;">Business Management</h3>
+      <div class="quick-actions-grid">
+        <div class="action-item" onclick="drawerNav('history')">
+          <div class="action-icon"><i class="fas fa-history"></i></div>
+          <span style="font-size: 0.8rem; font-weight: 600;">Consultations</span>
+        </div>
+        <div class="action-item">
+          <div class="action-icon"><i class="fas fa-star"></i></div>
+          <span style="font-size: 0.8rem; font-weight: 600;">My Reviews</span>
+        </div>
+        <div class="action-item">
+          <div class="action-icon"><i class="fas fa-calendar-alt"></i></div>
+          <span style="font-size: 0.8rem; font-weight: 600;">Schedule</span>
+        </div>
+        <div class="action-item" onclick="toggleDrawer()">
+          <div class="action-icon"><i class="fas fa-cog"></i></div>
+          <span style="font-size: 0.8rem; font-weight: 600;">Settings</span>
+        </div>
+      </div>
+    </div>
 
-        .e-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 12px;
-        }
+    <style>
+      .astro-dash-container {
+        padding: 10px;
+      }
 
-        .e-title {
-          font-size: 0.85rem;
-          opacity: 0.8;
-          font-weight: 500;
-        }
+      .astro-profile-banner {
+        background: linear-gradient(135deg, var(--brand-purple) 0%, #4c1d95 100%);
+        border-radius: 24px;
+        padding: 24px;
+        margin-bottom: 24px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
 
-        .withdraw-badge {
-          background: white;
-          color: #059669;
-          border: none;
-          padding: 6px 14px;
-          border-radius: 20px;
-          font-weight: 700;
-          font-size: 0.75rem;
-          cursor: pointer;
-          transition: var(--transition);
-        }
+      .astro-profile-banner::after {
+        content: '✦';
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.05);
+      }
 
-        .withdraw-badge:hover {
-          transform: scale(1.05);
-        }
+      .astro-banner-img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 3px solid var(--accent-gold);
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+        object-fit: cover;
+      }
 
-        .e-main {
-          font-size: 2.8rem;
-          font-weight: 800;
-          font-family: var(--font-heading);
-          margin-bottom: 16px;
-        }
+      .astro-banner-info h2 {
+        font-size: 1.4rem;
+        margin-bottom: 4px;
+        color: white;
+      }
 
-        .e-main .symbol {
-          font-size: 1.8rem;
-          color: rgba(255, 255, 255, 0.6);
-          margin-right: 4px;
-        }
+      .astro-banner-info p {
+        font-size: 0.8rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
 
-        .e-footer {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 0.9rem;
-          padding-top: 12px;
-          border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
+      .service-status-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+      }
 
-        .eye-btn {
-          background: rgba(255, 255, 255, 0.1);
-          border: none;
-          color: white;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          cursor: pointer;
-        }
+      .status-card {
+        background: var(--secondary-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 15px 10px;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+      }
 
-        .grid-menu {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 16px;
-          margin-top: 24px;
-        }
+      .status-card.active {
+        border-color: var(--accent-gold);
+        background: rgba(212, 175, 55, 0.05);
+        box-shadow: 0 10px 20px rgba(245, 158, 11, 0.1);
+      }
 
-        .grid-item {
-          background: var(--secondary-bg);
-          border: 1px solid var(--glass-border);
-          border-radius: 20px;
-          padding: 20px;
-          text-align: center;
-          transition: var(--transition);
-          cursor: pointer;
-        }
+      .status-card i {
+        font-size: 1.2rem;
+        margin-bottom: 8px;
+        display: block;
+        color: var(--text-muted);
+      }
 
-        .grid-item:hover {
-          border-color: var(--accent-gold);
-          transform: translateY(-3px);
-        }
+      .status-card.active i {
+        color: var(--accent-gold);
+      }
 
-        .grid-icon {
-          width: 40px;
-          height: 40px;
-          background: var(--glass);
-          border-radius: 12px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto 10px;
-          color: var(--accent-gold);
-          font-size: 1.2rem;
-        }
-      </style>
-      <!-- <div class="grid-item" onclick="showChartHelper()" style="cursor: pointer;">
+      .status-card span {
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: block;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .premium-earnings-card {
+        background: linear-gradient(135deg, #059669 0%, #064E3B 100%);
+        border-radius: 24px;
+        padding: 24px;
+        color: white;
+        margin-bottom: 24px;
+        box-shadow: 0 15px 30px rgba(5, 150, 105, 0.2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .premium-earnings-card::before {
+        content: '';
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+        top: -100px;
+        right: -100px;
+      }
+
+      .e-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .e-title {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.8;
+        font-weight: 600;
+      }
+
+      .e-main {
+        font-size: 2.2rem;
+        font-weight: 800;
+        font-family: 'Outfit', sans-serif;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+      }
+
+      .e-main .symbol {
+        font-size: 1.2rem;
+        opacity: 0.7;
+      }
+
+      .e-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .withdraw-btn {
+        background: white;
+        color: #059669;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        cursor: pointer;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      .action-item {
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        padding: 20px;
+        border-radius: 20px;
+        text-align: center;
+        transition: var(--transition);
+      }
+
+      .action-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--accent-gold);
+        transform: translateY(-3px);
+      }
+
+      .action-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(122, 31, 149, 0.2);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 12px;
+        color: var(--accent-gold);
+        font-size: 1.2rem;
+      }
+    </style>
+    <!-- <div class="grid-item" onclick="showChartHelper()" style="cursor: pointer;">
           <div class="grid-icon"><i class="fas fa-chart-pie"></i></div> Birth Chart
         </div> -->
-    </div>
+  </div>
   </div>
   </div>
 
@@ -6429,6 +6563,25 @@
       setupToggle('toggleCall', 'audio');
       setupToggle('toggleVideo', 'video');
 
+      // Initialize Card UI positions based on current state
+      ['chat', 'audio', 'video'].forEach(type => {
+        const id = type === 'audio' ? 'toggleCall' : 'toggle' + type.charAt(0).toUpperCase() + type.slice(1);
+        const el = document.getElementById(id);
+        const card = el ? el.closest('.status-card') : null;
+        if (el && card) {
+          const isAct = (type === 'chat' && user.isChatOnline) ||
+            (type === 'audio' && user.isAudioOnline) ||
+            (type === 'video' && user.isVideoOnline);
+          if (isAct) {
+            el.classList.add('active');
+            card.classList.add('active');
+          } else {
+            el.classList.remove('active');
+            card.classList.remove('active');
+          }
+        }
+      });
+
       const anav = document.querySelector('.admin-nav');
       if (anav) anav.style.display = 'none';
       const afoot = document.querySelector('.admin-footer');
@@ -6501,14 +6654,19 @@
       el.onclick = () => {
         el.classList.toggle('active');
         const isOnline = el.classList.contains('active');
+        const card = el.closest('.status-card');
+        if (card) {
+          if (isOnline) card.classList.add('active');
+          else card.classList.remove('active');
+        }
+
         socket.emit('toggle-status', { online: isOnline, type: type });
 
-        // Save status to localStorage for persistence across reconnects
+        // Save status to localStorage for persistence
         const savedStatus = JSON.parse(localStorage.getItem('astroStatus') || '{}');
         savedStatus[type] = isOnline;
         savedStatus.timestamp = Date.now();
         localStorage.setItem('astroStatus', JSON.stringify(savedStatus));
-        console.log('[Status] Saved to localStorage:', savedStatus);
       };
     }
 

@@ -61,6 +61,7 @@ fun LoginScreen() {
     val scope = rememberCoroutineScope()
 
     var phoneNumber by remember { mutableStateOf("") }
+    var referralCode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
 
@@ -220,6 +221,26 @@ fun LoginScreen() {
                     )
                 )
 
+                OutlinedTextField(
+                    value = referralCode,
+                    onValueChange = { referralCode = it.uppercase().take(8) },
+                    label = { Text("பரிந்துரை குறியீடு (விருப்பமானது)", color = Color.White.copy(alpha = 0.7f)) },
+                    placeholder = { Text("REFERRAL CODE", color = Color.White.copy(alpha = 0.3f)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 28.dp),
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedBorderColor = Color.White.copy(alpha = 0.7f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.35f),
+                        focusedContainerColor = Color.White.copy(alpha = 0.08f),
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.06f),
+                        cursorColor = Color.White
+                    )
+                )
+
                 Button(
                     onClick = {
                         if (phoneNumber.length != 10) {
@@ -233,6 +254,7 @@ fun LoginScreen() {
                                 if (result.isSuccess) {
                                     val intent = Intent(context, OtpVerificationActivity::class.java)
                                     intent.putExtra("phone", phoneNumber.trim())
+                                    intent.putExtra("referral_code", referralCode.trim())
                                     context.startActivity(intent)
                                     (context as? AppCompatActivity)?.finish()
                                 } else {

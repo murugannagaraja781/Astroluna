@@ -21,6 +21,8 @@ import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.VideoCall
 import androidx.compose.material.icons.rounded.Star
 import androidx.compose.material.icons.rounded.AccountBalanceWallet
+import androidx.compose.material.icons.rounded.Group
+import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Translate
@@ -248,6 +250,7 @@ fun PremiumCard(
 @Composable
 fun HomeScreen(
     walletBalance: Double,
+    referralCode: String = "",
     horoscope: String,
     astrologers: List<Astrologer>,
     isLoading: Boolean,
@@ -258,7 +261,7 @@ fun HomeScreen(
     onLogoutClick: () -> Unit,
     onDrawerItemClick: (String) -> Unit = {},
     onServiceClick: (String) -> Unit = {},
-    isGuest: Boolean = false // New Param
+    isGuest: Boolean = false
 ) {
     val context = LocalContext.current
     val listState = rememberLazyListState()
@@ -384,94 +387,87 @@ fun HomeScreen(
                 Box(modifier = Modifier.fillMaxSize().background(CosmicAppTheme.backgroundBrush))
                 StarField()
 
-                // Content Layer
-                LazyColumn(
-                    state = listState,
-                    contentPadding = PaddingValues(bottom = 16.dp),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Transparent) // Let gradient show through
-                ) {
-                    // 0. Top Services Row (Reference UI)
-                    if (selectedTab == 0) {
-                        item { TopServicesSection() }
-                    }
-
-                    // 1. Daily Horoscope Card (Only on Home)
-                    if (selectedTab == 0) {
-                        item { DailyHoroscopeCard(horoscope) }
-                    }
-
-                    // 2. Banner (Only on Home)
-                    if (selectedTab == 0) {
-                        item { BannerSection(banners) }
-                    }
-
-                    // 3. Rasi Grid Section (Only on Home)
-                    if (selectedTab == 0) {
-                        item {
-                            Text(
-                                text = Localization.get("horoscope", isTamil),
-                                style = MaterialTheme.typography.titleLarge,
-                                color = CosmicAppTheme.colors.accent,
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                            )
+                if (selectedTab == 5) {
+                    ReferralDashboard(
+                        referralCode = referralCode,
+                        isTamil = isTamil
+                    )
+                } else {
+                    // Content Layer
+                    LazyColumn(
+                        state = listState,
+                        contentPadding = PaddingValues(bottom = 16.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Transparent) // Let gradient show through
+                    ) {
+                        // ... existing items ...
+                        if (selectedTab == 0) {
+                            item { TopServicesSection() }
                         }
-                        item { RasiGridSection(onRasiClick) }
-                    }
-
-                    // 4. Customer Stories (Marketplace)
-                    item { CustomerStoriesSection() }
-
-                    // 5. Astrologers Title
-                    item {
-                        val title = when(selectedTab) {
-                            1 -> Localization.get("chat_services", isTamil) // Chat
-                            2 -> Localization.get("video_call", isTamil) // Video
-                            3 -> Localization.get("audio_call", isTamil) // Call
-                            else -> Localization.get("premium_consultation", isTamil) // Home
-                        }
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = CosmicAppTheme.colors.accent,
-                            modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp)
-                        )
-                    }
-
-                    // 5. Filter Bar (Only for Listing Tabs)
-                    if (selectedTab != 0) {
-                        item {
-                            FilterBar(
-                                filters = listOf("All", "Love", "Career", "Finance", "Marriage", "Health", "Education"),
-                                selectedFilter = selectedFilter,
-                                onFilterSelected = { selectedFilter = it }
-                            )
-                        }
-                    }
-
-                    // 6. Loading Indicator or List
-                    if (isLoading) {
-                        item {
-                            Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                                CircularProgressIndicator(color = PeacockGreen)
+                        if (selectedTab == 0) {
+                            item { DailyHoroscopeCard(horoscope) }
+                            if (!isGuest && referralCode.isNotEmpty()) {
+                                item { ReferAndEarnSection(referralCode) }
                             }
                         }
-                    } else {
-                        items(filteredAstros) { astro -> // Use Filtered List
-                            // Pass selectedTab to control button visibility
-                            AstrologerCard(
-                                astro = astro,
-                                onChatClick = { selectedAstro -> checkBalanceAndProceed { onChatClick(selectedAstro) } },
-                                onCallClick = { selectedAstro, type -> checkBalanceAndProceed { onCallClick(selectedAstro, type) } },
-                                selectedTab = selectedTab
+                        if (selectedTab == 0) {
+                            item { BannerSection(banners) }
+                        }
+                        if (selectedTab == 0) {
+                            item {
+                                Text(
+                                    text = Localization.get("horoscope", isTamil),
+                                    style = MaterialTheme.typography.titleLarge,
+                                    color = CosmicAppTheme.colors.accent,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                )
+                            }
+                            item { RasiGridSection(onRasiClick) }
+                        }
+                        item { CustomerStoriesSection() }
+                        item {
+                            val title = when(selectedTab) {
+                                1 -> Localization.get("chat_services", isTamil)
+                                2 -> Localization.get("video_call", isTamil)
+                                3 -> Localization.get("audio_call", isTamil)
+                                else -> Localization.get("premium_consultation", isTamil)
+                            }
+                            Text(
+                                text = title,
+                                style = MaterialTheme.typography.titleLarge,
+                                color = CosmicAppTheme.colors.accent,
+                                modifier = Modifier.padding(start = 16.dp, top = 24.dp, bottom = 8.dp)
                             )
                         }
-                    }
-
-                    // 7. Policy & Support Footer (Stronger Play Store Support)
-                    if (selectedTab == 0) {
-                        item { SupportAndPoliciesSection() }
+                        if (selectedTab != 0) {
+                            item {
+                                FilterBar(
+                                    filters = listOf("All", "Love", "Career", "Finance", "Marriage", "Health", "Education"),
+                                    selectedFilter = selectedFilter,
+                                    onFilterSelected = { selectedFilter = it }
+                                )
+                            }
+                        }
+                        if (isLoading) {
+                            item {
+                                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                                    CircularProgressIndicator(color = PeacockGreen)
+                                }
+                            }
+                        } else {
+                            items(filteredAstros) { astro ->
+                                AstrologerCard(
+                                    astro = astro,
+                                    onChatClick = { selectedAstro -> checkBalanceAndProceed { onChatClick(selectedAstro) } },
+                                    onCallClick = { selectedAstro, type -> checkBalanceAndProceed { onCallClick(selectedAstro, type) } },
+                                    selectedTab = selectedTab
+                                )
+                            }
+                        }
+                        if (selectedTab == 0) {
+                            item { SupportAndPoliciesSection() }
+                        }
                     }
                 }
             }
@@ -526,6 +522,245 @@ fun SupportAndPoliciesSection() {
             style = MaterialTheme.typography.labelSmall,
             color = Color.Gray.copy(alpha=0.6f)
         )
+    }
+}
+
+@Composable
+fun ReferralDashboard(referralCode: String, isTamil: Boolean) {
+    var stats by remember { mutableStateOf<com.astroluna.data.model.ReferralStats?>(null) }
+    var referrals by remember { mutableStateOf<com.astroluna.data.model.ReferralGroups?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+    val tokenManager = remember { com.astroluna.data.local.TokenManager(context) }
+    val userId = remember { tokenManager.getUserSession()?.userId ?: "" }
+
+    LaunchedEffect(Unit) {
+        try {
+            val response = ApiClient.api.getReferralStats(userId)
+            if (response.isSuccessful && response.body()?.ok == true) {
+                stats = response.body()!!.stats
+                referrals = response.body()!!.referrals
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            isLoading = false
+        }
+    }
+
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        item {
+            Text(
+                text = if (isTamil) "பரிந்துரை டாஷ்போர்டு" else "Referral Dashboard",
+                style = MaterialTheme.typography.headlineMedium,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+        }
+
+        if (isLoading) {
+            item {
+                Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = PeacockGreen)
+                }
+            }
+        } else {
+            // Stats Grid
+            item {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    StatCard("Level 1", stats?.level1Count ?: 0, Modifier.weight(1f), Color(0xFF6A1B9A))
+                    StatCard("Level 2", stats?.level2Count ?: 0, Modifier.weight(1f), Color(0xFF4527A0))
+                    StatCard("Level 3", stats?.level3Count ?: 0, Modifier.weight(1f), Color(0xFF283593))
+                }
+                Spacer(modifier = Modifier.height(12.dp))
+                StatCard(
+                    label = if (isTamil) "மொத்த பரிந்துரைகள்" else "Total Referrals",
+                    value = stats?.totalReferrals ?: 0,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = PeacockGreen
+                )
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                ReferAndEarnSection(referralCode)
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
+            // Referral Lists
+            val groups = listOf(
+                "Level 1 (Direct)" to (referrals?.l1 ?: emptyList()),
+                "Level 2" to (referrals?.l2 ?: emptyList()),
+                "Level 3" to (referrals?.l3 ?: emptyList())
+            )
+
+            groups.forEach { (title, users) ->
+                item {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = PeacockGreen,
+                        modifier = Modifier.padding(vertical = 12.dp)
+                    )
+                }
+                if (users.isEmpty()) {
+                    item {
+                        Text(
+                            text = "No users found",
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(start = 8.dp, bottom = 12.dp)
+                        )
+                    }
+                } else {
+                    items(users) { user ->
+                        ReferredUserItem(user)
+                    }
+                }
+            }
+
+            item { Spacer(modifier = Modifier.height(60.dp)) }
+        }
+    }
+}
+
+@Composable
+fun StatCard(label: String, value: Int, modifier: Modifier = Modifier, color: Color) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.9f))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(text = label, style = MaterialTheme.typography.labelMedium, color = Color.White.copy(alpha = 0.8f))
+            Text(text = value.toString(), style = MaterialTheme.typography.headlineSmall, color = Color.White, fontWeight = FontWeight.Black)
+        }
+    }
+}
+
+@Composable
+fun ReferredUserItem(user: com.astroluna.data.model.ReferredUser) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.1f))
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.White.copy(alpha = 0.1f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Person, contentDescription = null, tint = Color.White)
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(text = user.name, style = MaterialTheme.typography.bodyLarge, color = Color.White)
+                Text(
+                    text = "Joined: ${user.createdAt.take(10)}",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.White.copy(alpha = 0.6f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ReferAndEarnSection(code: String) {
+    val context = LocalContext.current
+    val gradient = Brush.horizontalGradient(listOf(Color(0xFF6A1B9A), Color(0xFF4527A0)))
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .background(gradient)
+                .padding(20.dp)
+        ) {
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Rounded.Star,
+                        contentDescription = null,
+                        tint = Color(0xFFFFD700),
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "பரிந்துரைத்து சம்பாதிக்கவும்", // Refer & Earn in Tamil
+                        style = MaterialTheme.typography.titleMedium,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "உங்கள் நண்பரை அழைக்கவும், நீங்கள் 3 நிலை வருமானத்தைப் பெறுவீர்கள்! (2%, 2%, 1% கமிஷன்)",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                            .border(1.dp, Color.White.copy(alpha = 0.4f), RoundedCornerShape(8.dp))
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = code,
+                            style = MaterialTheme.typography.titleLarge,
+                            color = Color.White,
+                            fontWeight = FontWeight.Black,
+                            letterSpacing = 2.sp
+                        )
+                    }
+
+                    Button(
+                        onClick = {
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_SUBJECT, "Download Astro Luna")
+                                putExtra(Intent.EXTRA_TEXT, "Hi! Use my referral code $code to join Astro Luna and get a special bonus on your first recharge! Download here: https://astroluna.com")
+                            }
+                            context.startActivity(Intent.createChooser(shareIntent, "Share Referral Code"))
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(text = "SHARE", color = Color(0xFF6A1B9A), fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -903,7 +1138,7 @@ fun HomeBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
         val items = listOf(
             Triple("Home", androidx.compose.material.icons.Icons.Default.Home, 0),
             Triple("Chat", androidx.compose.material.icons.Icons.Rounded.Chat, 1),
-            Triple("Video", androidx.compose.material.icons.Icons.Rounded.VideoCall, 2), // "Live" mapped to Video for now
+            Triple("Refer", androidx.compose.material.icons.Icons.Rounded.Group, 5),
             Triple("Call", androidx.compose.material.icons.Icons.Rounded.Call, 3),
             Triple("Profile", androidx.compose.material.icons.Icons.Default.Person, 4)
         )

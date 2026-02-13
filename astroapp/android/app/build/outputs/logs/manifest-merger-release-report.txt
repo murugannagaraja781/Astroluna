@@ -48,9 +48,9 @@ MERGED from [com.google.firebase:firebase-installations-interop:17.1.1] /Users/w
 MERGED from [androidx.room:room-runtime:2.6.1] /Users/wohozo/.gradle/caches/8.12/transforms/f7b3df101e617979df83e3899b86967c/transformed/room-runtime-2.6.1/AndroidManifest.xml:17:1-31:12
 MERGED from [androidx.room:room-ktx:2.6.1] /Users/wohozo/.gradle/caches/8.12/transforms/a456d461e98cabea2e8ea2587367a65d/transformed/jetified-room-ktx-2.6.1/AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.compose.material3:material3-android:1.2.1] /Users/wohozo/.gradle/caches/8.12/transforms/befcd05e05dbac4d7a10aa7bd0660f56/transformed/jetified-material3-release/AndroidManifest.xml:17:1-22:12
-MERGED from [androidx.compose.material:material-ripple-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/488cc87c97f7904cacb34a2ce31c1f7c/transformed/jetified-material-ripple-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.material:material-icons-core-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/2f9acfe04ab8fc1263b15efde44e9934/transformed/jetified-material-icons-core-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.material:material-icons-extended-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/54aa575e3404548770ea06e89b61dedf/transformed/jetified-material-icons-extended-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material:material-ripple-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/488cc87c97f7904cacb34a2ce31c1f7c/transformed/jetified-material-ripple-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.animation:animation-core-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/77bf6eaa9795a6de84e3e49eb6f7fe43/transformed/jetified-animation-core-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.animation:animation-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/e821a9ed7f24d1c52f4aa442b12db6a7/transformed/jetified-animation-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.foundation:foundation-layout-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/f1109141c120ca4bf826077a5259a2aa/transformed/jetified-foundation-layout-release/AndroidManifest.xml:2:1-7:12
@@ -63,6 +63,7 @@ MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.6.8] /Users/wohozo
 MERGED from [androidx.compose.ui:ui-graphics-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/18cc395e9d2def8daa38016afde68093/transformed/jetified-ui-graphics-release/AndroidManifest.xml:2:1-7:12
 MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] /Users/wohozo/.gradle/caches/8.12/transforms/440fcd8987d74650c0bab354d482bc5f/transformed/jetified-accompanist-drawablepainter-0.32.0/AndroidManifest.xml:17:1-23:12
 MERGED from [androidx.compose.ui:ui-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/16aef396cf49f4662e524959051ec347/transformed/jetified-ui-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-text-google-fonts:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/69150735fb6a2cd6819a21d0c7b244c1/transformed/jetified-ui-text-google-fonts-1.6.8/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.runtime:runtime-saveable-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/30283977be326fe52ac2e7f10fd7b6e6/transformed/jetified-runtime-saveable-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.runtime:runtime-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/aaed51e09fc04e38cb97191a9c434555/transformed/jetified-runtime-release/AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.compose.runtime:runtime-livedata:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/e54c6ed8c198b004b2b1c9782298a3f5/transformed/jetified-runtime-livedata-1.6.8/AndroidManifest.xml:2:1-7:12
@@ -395,7 +396,7 @@ MERGED from [de.hdodenhof:circleimageview:3.1.0] /Users/wohozo/.gradle/caches/8.
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:84:9-69
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:83:9-38
-activity#com.astroluna.app.MainActivity
+activity#com.astroluna.MainActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:92:9-100:20
 	android:exported
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:94:13-36
@@ -413,27 +414,27 @@ category#android.intent.category.LAUNCHER
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:98:17-77
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:98:27-74
-activity#com.astroluna.app.ui.guest.GuestDashboardActivity
+activity#com.astroluna.ui.guest.GuestDashboardActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:102:9-69
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:102:19-66
-activity#com.astroluna.app.ui.academy.AcademyActivity
+activity#com.astroluna.ui.academy.AcademyActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:103:9-64
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:103:19-61
-activity#com.astroluna.app.ui.horoscope.FreeHoroscopeActivity
+activity#com.astroluna.ui.horoscope.FreeHoroscopeActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:104:9-72
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:104:19-69
-activity#com.astroluna.app.ui.astro.AstrologerDashboardActivity
+activity#com.astroluna.ui.astro.AstrologerDashboardActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:105:9-74
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:105:19-71
-activity#com.astroluna.app.ui.astro.AstrologerHistoryActivity
+activity#com.astroluna.ui.astro.AstrologerHistoryActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:106:9-72
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:106:19-69
-activity#com.astroluna.app.ui.admin.SuperPowerAdminDashboardActivity
+activity#com.astroluna.ui.admin.SuperPowerAdminDashboardActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:107:9-143
 	android:exported
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:107:77-101
@@ -441,23 +442,23 @@ ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/Andro
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:107:102-141
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:107:19-76
-activity#com.astroluna.app.ui.settings.SettingsActivity
+activity#com.astroluna.ui.settings.SettingsActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:108:9-66
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:108:19-63
-activity#com.astroluna.app.ui.settings.ThemeSettingsActivity
+activity#com.astroluna.ui.settings.ThemeSettingsActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:109:9-71
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:109:19-68
-activity#com.astroluna.app.ui.rasipalan.RasipalanActivity
+activity#com.astroluna.ui.rasipalan.RasipalanActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:110:9-68
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:110:19-65
-activity#com.astroluna.app.ui.dashboard.GuestActivity
+activity#com.astroluna.ui.dashboard.GuestActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:111:9-64
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:111:19-61
-activity#com.astroluna.app.ui.payment.PaymentActivity
+activity#com.astroluna.ui.payment.PaymentActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:112:9-122:20
 	android:exported
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:113:13-36
@@ -473,35 +474,35 @@ category#android.intent.category.BROWSABLE
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:117:17-77
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:117:27-75
-activity#com.astroluna.app.ui.auth.LoginActivity
+activity#com.astroluna.ui.auth.LoginActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:123:9-59
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:123:19-56
-activity#com.astroluna.app.ui.auth.OtpVerificationActivity
+activity#com.astroluna.ui.auth.OtpVerificationActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:124:9-69
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:124:19-66
-activity#com.astroluna.app.ui.home.HomeActivity
+activity#com.astroluna.ui.home.HomeActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:125:9-58
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:125:19-55
-activity#com.astroluna.app.ui.wallet.WalletActivity
+activity#com.astroluna.ui.wallet.WalletActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:126:9-62
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:126:19-59
-activity#com.astroluna.app.ui.chat.ChatActivity
+activity#com.astroluna.ui.chat.ChatActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:127:9-100
 	android:windowSoftInputMode
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:127:56-98
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:127:19-55
-activity#com.astroluna.app.ui.call.CallActivity
+activity#com.astroluna.ui.call.CallActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:128:9-94
 	android:screenOrientation
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:128:56-92
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:128:19-55
-activity#com.astroluna.app.ui.intake.IntakeActivity
+activity#com.astroluna.ui.intake.IntakeActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:129:9-142
 	android:screenOrientation
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:129:60-96
@@ -509,7 +510,7 @@ ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/Andro
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:129:97-139
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:129:19-59
-activity#com.astroluna.app.ui.chart.ChartDisplayActivity
+activity#com.astroluna.ui.chart.ChartDisplayActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:130:9-133:58
 	android:screenOrientation
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:132:13-49
@@ -519,7 +520,7 @@ ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/Andro
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:131:13-69
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:130:19-64
-activity#com.astroluna.app.ui.chart.VipChartActivity
+activity#com.astroluna.ui.chart.VipChartActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:135:9-138:58
 	android:screenOrientation
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:137:13-49
@@ -529,7 +530,7 @@ ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/Andro
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:136:13-69
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:135:19-60
-activity#com.astroluna.app.ui.chart.MatchDisplayActivity
+activity#com.astroluna.ui.chart.MatchDisplayActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:140:9-142:51
 	android:screenOrientation
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:142:13-49
@@ -537,13 +538,13 @@ ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/Andro
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:141:13-69
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:140:19-64
-activity#com.astroluna.app.ui.city.CitySearchActivity
+activity#com.astroluna.ui.city.CitySearchActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:144:9-145:55
 	android:theme
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:145:13-52
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:144:19-61
-activity#com.astroluna.app.ui.wallet.PaymentStatusActivity
+activity#com.astroluna.ui.wallet.PaymentStatusActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:147:9-158:20
 	android:launchMode
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:150:13-44
@@ -555,7 +556,7 @@ ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/Andro
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:148:13-60
 intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:scheme:astroluna
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:152:13-157:29
-activity#com.astroluna.app.IncomingCallActivity
+activity#com.astroluna.IncomingCallActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:172:9-181:66
 	android:turnScreenOn
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:176:13-40
@@ -575,7 +576,7 @@ ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/Andro
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:180:13-36
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:173:13-49
-service#com.astroluna.app.FCMService
+service#com.astroluna.FCMService
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:193:9-199:19
 	android:exported
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:195:13-37
@@ -587,7 +588,7 @@ action#com.google.firebase.MESSAGING_EVENT
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:197:17-78
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:197:25-75
-service#com.astroluna.app.CallForegroundService
+service#com.astroluna.CallForegroundService
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:210:9-213:68
 	android:exported
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:212:13-37
@@ -601,7 +602,7 @@ ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/Andro
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:218:13-43
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:217:13-89
-activity#com.astroluna.app.ui.profile.AstrologerProfileActivity
+activity#com.astroluna.ui.profile.AstrologerProfileActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:220:9-224:54
 	android:screenOrientation
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:222:13-49
@@ -611,7 +612,7 @@ ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/Andro
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:224:13-52
 	android:name
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:221:13-65
-activity#com.astroluna.app.ui.profile.UserProfileActivity
+activity#com.astroluna.ui.profile.UserProfileActivity
 ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:226:9-230:54
 	android:screenOrientation
 		ADDED from /Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/AndroidManifest.xml:228:13-49
@@ -697,12 +698,12 @@ MERGED from [androidx.room:room-ktx:2.6.1] /Users/wohozo/.gradle/caches/8.12/tra
 MERGED from [androidx.room:room-ktx:2.6.1] /Users/wohozo/.gradle/caches/8.12/transforms/a456d461e98cabea2e8ea2587367a65d/transformed/jetified-room-ktx-2.6.1/AndroidManifest.xml:20:5-44
 MERGED from [androidx.compose.material3:material3-android:1.2.1] /Users/wohozo/.gradle/caches/8.12/transforms/befcd05e05dbac4d7a10aa7bd0660f56/transformed/jetified-material3-release/AndroidManifest.xml:20:5-44
 MERGED from [androidx.compose.material3:material3-android:1.2.1] /Users/wohozo/.gradle/caches/8.12/transforms/befcd05e05dbac4d7a10aa7bd0660f56/transformed/jetified-material3-release/AndroidManifest.xml:20:5-44
-MERGED from [androidx.compose.material:material-ripple-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/488cc87c97f7904cacb34a2ce31c1f7c/transformed/jetified-material-ripple-release/AndroidManifest.xml:5:5-44
-MERGED from [androidx.compose.material:material-ripple-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/488cc87c97f7904cacb34a2ce31c1f7c/transformed/jetified-material-ripple-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.material:material-icons-core-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/2f9acfe04ab8fc1263b15efde44e9934/transformed/jetified-material-icons-core-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.material:material-icons-core-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/2f9acfe04ab8fc1263b15efde44e9934/transformed/jetified-material-icons-core-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.material:material-icons-extended-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/54aa575e3404548770ea06e89b61dedf/transformed/jetified-material-icons-extended-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.material:material-icons-extended-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/54aa575e3404548770ea06e89b61dedf/transformed/jetified-material-icons-extended-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/488cc87c97f7904cacb34a2ce31c1f7c/transformed/jetified-material-ripple-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/488cc87c97f7904cacb34a2ce31c1f7c/transformed/jetified-material-ripple-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.animation:animation-core-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/77bf6eaa9795a6de84e3e49eb6f7fe43/transformed/jetified-animation-core-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.animation:animation-core-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/77bf6eaa9795a6de84e3e49eb6f7fe43/transformed/jetified-animation-core-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.animation:animation-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/e821a9ed7f24d1c52f4aa442b12db6a7/transformed/jetified-animation-release/AndroidManifest.xml:5:5-44
@@ -727,6 +728,8 @@ MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] /Users/w
 MERGED from [com.google.accompanist:accompanist-drawablepainter:0.32.0] /Users/wohozo/.gradle/caches/8.12/transforms/440fcd8987d74650c0bab354d482bc5f/transformed/jetified-accompanist-drawablepainter-0.32.0/AndroidManifest.xml:21:5-44
 MERGED from [androidx.compose.ui:ui-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/16aef396cf49f4662e524959051ec347/transformed/jetified-ui-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.ui:ui-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/16aef396cf49f4662e524959051ec347/transformed/jetified-ui-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-text-google-fonts:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/69150735fb6a2cd6819a21d0c7b244c1/transformed/jetified-ui-text-google-fonts-1.6.8/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-text-google-fonts:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/69150735fb6a2cd6819a21d0c7b244c1/transformed/jetified-ui-text-google-fonts-1.6.8/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.runtime:runtime-saveable-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/30283977be326fe52ac2e7f10fd7b6e6/transformed/jetified-runtime-saveable-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.runtime:runtime-saveable-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/30283977be326fe52ac2e7f10fd7b6e6/transformed/jetified-runtime-saveable-release/AndroidManifest.xml:5:5-44
 MERGED from [androidx.compose.runtime:runtime-android:1.6.8] /Users/wohozo/.gradle/caches/8.12/transforms/aaed51e09fc04e38cb97191a9c434555/transformed/jetified-runtime-release/AndroidManifest.xml:5:5-44
@@ -1101,7 +1104,7 @@ ADDED from [androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transfo
 		ADDED from [androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
 	android:name
 		ADDED from [androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:23:9-81
-permission#com.astroluna.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+permission#com.astroluna.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:22:5-24:47
 	android:protectionLevel
 		ADDED from [androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:24:9-44
@@ -1111,7 +1114,7 @@ uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
 	android:name
 		ADDED from [androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:26:22-94
-uses-permission#com.astroluna.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+uses-permission#com.astroluna.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
 ADDED from [androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:26:5-97
 	android:name
 		ADDED from [androidx.core:core:1.13.1] /Users/wohozo/.gradle/caches/8.12/transforms/86a0967657729368ca1da0069f8f3660/transformed/core-1.13.1/AndroidManifest.xml:26:22-94

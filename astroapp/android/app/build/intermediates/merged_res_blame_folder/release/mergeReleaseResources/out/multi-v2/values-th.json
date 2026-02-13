@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.astroluna.app-mergeReleaseResources-73:/values-th/values-th.xml",
+            "outputFile": "com.astroluna.app-mergeReleaseResources-74:/values-th/values-th.xml",
             "map": [
                 {
                     "source": "/Users/wohozo/.gradle/caches/8.12/transforms/9f0332e2b5b8217c146a61a224c8229e/transformed/jetified-foundation-release/res/values-th/values-th.xml",
