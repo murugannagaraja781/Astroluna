@@ -3361,7 +3361,7 @@
       background: rgba(11, 15, 26, 0.85);
       backdrop-filter: blur(20px);
       border-top: 1px solid var(--glass-border);
-      display: flex;
+      display: none;
       justify-content: space-around;
       padding: 12px 0 28px 0;
       z-index: 1000;
@@ -5758,6 +5758,12 @@
       enterApp();
       hideAllScreens();
       sLogin.classList.remove('hidden');
+
+      // Hide footer before login
+      const globalFooter = document.querySelector('.doc-bottom-nav');
+      if (globalFooter) globalFooter.style.display = 'none';
+      const appFooter = document.querySelector('.app-footer');
+      if (appFooter) appFooter.style.display = 'none';
     }
 
     function switchToApp(screen) {
