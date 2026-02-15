@@ -26,7 +26,14 @@ async function callPhonePePay(payload) {
   const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64');
 
   // Normalized Host URL (remove trailing slash)
-  const host = PHONEPE_HOST_URL.trim().replace(/\/$/, "");
+  let host = PHONEPE_HOST_URL.trim().replace(/\/$/, "");
+
+  // FIX: If user provided .../apis/pg, remove the /pg because it's added via endpoint
+  // This prevents URL like .../apis/pg/pg/v1/pay
+  if (host.endsWith("/pg")) {
+    host = host.substring(0, host.length - 3);
+  }
+
   const fullUrl = `${host}${endpoint}`;
 
   // Official PhonePe Signature Rule: Base64 + Endpoint + Salt
