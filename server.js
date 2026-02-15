@@ -28,17 +28,17 @@ async function callPhonePePay(payload) {
   // Normalized Host URL (remove trailing slash)
   let host = PHONEPE_HOST_URL.trim().replace(/\/$/, "");
 
-  // FIX: If user provided .../apis/pg, remove the /pg because it's added via endpoint
-  // This prevents URL like .../apis/pg/pg/v1/pay
-  if (host.endsWith("/pg")) {
-    host = host.substring(0, host.length - 3);
-  }
-
+  // Construct Full URL
   const fullUrl = `${host}${endpoint}`;
 
-  // Official PhonePe Signature Rule: Base64 + Endpoint + Salt
-  // The stringToSign must use the EXACT endpoint path appended to the host
-  const stringToSign = base64Payload + endpoint + PHONEPE_SALT_KEY;
+  // Use the actual pathname for signing (e.g., /apis/pg/v1/pay)
+  let signingPath = endpoint;
+  try {
+    const urlObj = new URL(fullUrl);
+    signingPath = urlObj.pathname;
+  } catch (e) { }
+
+  const stringToSign = base64Payload + signingPath + PHONEPE_SALT_KEY;
   const sha256 = crypto.createHash('sha256').update(stringToSign).digest('hex');
   const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
 
@@ -55,6 +55,7 @@ async function callPhonePePay(payload) {
 
   console.log(`[PhonePe] Initializing Payment...`);
   console.log(`[PhonePe] Full URL: ${fullUrl}`);
+  console.log(`[PhonePe] Signing Path: ${signingPath}`);
 
   const response = await fetch(fullUrl, options);
   const data = await response.json();
@@ -64,7 +65,7 @@ async function callPhonePePay(payload) {
     const logMsg = `\n--- ${new Date().toISOString()} ---
 [INITIATE]
 Full URL: ${fullUrl}
-Checksum String: [Base64] + ${endpoint} + [Salt]
+Signing Path: ${signingPath}
 Checksum: ${checksum}
 HTTP Status: ${response.status}
 Response Code: ${data.code}
