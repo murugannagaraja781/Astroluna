@@ -41,7 +41,7 @@ class PaymentActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "PaymentActivity"
-        private const val MERCHANT_ID = "M22LBBWEJKI6A"
+        private const val MERCHANT_ID = "M23VW0EJ3IVEK"
         private const val B2B_PG_REQUEST_CODE = 777
         private const val USE_NATIVE_SDK = false // Toggle this to switch between Native and Web
         private const val SERVER_URL = "https://astroluna.in"
@@ -61,7 +61,7 @@ class PaymentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         // Handle Deep Link Return
-        if (intent?.data != null && intent.data?.scheme == "astloluna") {
+        if (intent?.data != null && intent.data?.scheme == "astroluna") {
             Log.d(TAG, "Deep Link Intent received in onCreate: ${intent.data}")
             finish()
         }
@@ -149,12 +149,12 @@ class PaymentActivity : AppCompatActivity() {
                     val url = request?.url.toString()
                     Log.d(TAG, "WebView URL: $url")
 
-                    // Detect astloluna:// deep link (payment success/fail) and close immediately
-                    if (url.startsWith("astloluna://payment-success")) {
+                    // Detect astroluna:// deep link (payment success/fail) and close immediately
+                    if (url.startsWith("astroluna://payment-success")) {
                         handlePaymentResult("success")
                         return true
                     }
-                    if (url.startsWith("astloluna://payment-failed")) {
+                    if (url.startsWith("astroluna://payment-failed")) {
                         handlePaymentResult("failed")
                         return true
                     }
@@ -364,12 +364,12 @@ class PaymentActivity : AppCompatActivity() {
     private fun handleDeepLink(url: String): Boolean {
         Log.d(TAG, "DeepLink Check: $url")
 
-        if (url.startsWith("astloluna://payment-success") || url.contains("/wallet?status=success")) {
+        if (url.startsWith("astroluna://payment-success") || url.contains("/wallet?status=success")) {
             handlePaymentResult("success")
             return true
         }
 
-        if (url.startsWith("astloluna://payment-failed") || url.contains("/wallet?status=failure")) {
+        if (url.startsWith("astroluna://payment-failed") || url.contains("/wallet?status=failure")) {
             handlePaymentResult("failed")
             return true
         }
@@ -474,7 +474,7 @@ class PaymentActivity : AppCompatActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (intent.data != null && intent.data?.scheme == "astloluna") {
+        if (intent.data != null && intent.data?.scheme == "astroluna") {
             Log.d(TAG, "Deep Link Intent received in onNewIntent: ${intent.data}")
             finish()
         }
