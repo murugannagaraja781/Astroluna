@@ -3839,7 +3839,7 @@ app.post('/api/payment/create', async (req, res) => {
         amount: amount * 100, // Amount in Paise
         redirectUrl: "astroluna://payment-success",
         redirectMode: "GET", // Use GET for deep links
-        callbackUrl: `https://astroluna.in/api/payment/callback?isApp=true&txnId=${merchantTransactionId}`,
+        callbackUrl: `https://astroluna.in/api/payment/callback`,
         mobileNumber: userMobile,
         paymentInstrument: {
           type: "PAY_PAGE"
@@ -3850,6 +3850,7 @@ app.post('/api/payment/create', async (req, res) => {
 
       const appBase64Payload = Buffer.from(JSON.stringify(appPayload)).toString('base64');
       const appStringToSign = appBase64Payload + "/pg/v1/pay" + PHONEPE_SALT_KEY;
+      console.log(`App StringToSign (Sanitized): ${appBase64Payload.substring(0, 10)}... + /pg/v1/pay + SALT`);
       const appSha256 = crypto.createHash('sha256').update(appStringToSign).digest('hex');
       const appChecksum = appSha256 + "###" + PHONEPE_SALT_INDEX;
 
@@ -3907,7 +3908,7 @@ app.post('/api/payment/create', async (req, res) => {
       redirectUrl: redirectUrl,
       redirectMode: "POST",
       callbackUrl: `https://astroluna.in/api/payment/callback`,
-      mobileNumber: "9000090000",
+      mobileNumber: userMobile, // Use real mobile number
       paymentInstrument: {
         type: "PAY_PAGE"
       }
@@ -3924,6 +3925,7 @@ app.post('/api/payment/create', async (req, res) => {
       headers: {
         'Content-Type': 'application/json',
         'X-VERIFY': checksum,
+        'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
         'accept': 'application/json'
       },
       body: JSON.stringify({ request: base64Payload })
