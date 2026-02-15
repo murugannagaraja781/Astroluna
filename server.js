@@ -3859,16 +3859,18 @@ app.post('/api/payment/create', async (req, res) => {
         headers: {
           'Content-Type': 'application/json',
           'X-VERIFY': appChecksum,
+          'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
           'accept': 'application/json'
         },
         body: JSON.stringify({ request: appBase64Payload })
       };
 
       try {
-        console.log('Calling PhonePe API for app...');
-        const appFetchRes = await fetch(`${PHONEPE_HOST_URL}/pg/v1/pay`, appOptions);
+        const fullPayUrl = `${PHONEPE_HOST_URL}/pg/v1/pay`;
+        console.log(`Calling PhonePe API: ${fullPayUrl}`);
+        const appFetchRes = await fetch(fullPayUrl, appOptions);
         const appResponse = await appFetchRes.json();
-        console.log('PhonePe App Response:', JSON.stringify(appResponse));
+        console.log('PhonePe Response:', JSON.stringify(appResponse));
 
         if (appResponse.success) {
           const payUrl = appResponse.data.instrumentResponse?.redirectInfo?.url;
