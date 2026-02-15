@@ -3836,9 +3836,9 @@ app.post('/api/payment/create', async (req, res) => {
         merchantId: PHONEPE_MERCHANT_ID,
         merchantTransactionId: merchantTransactionId,
         merchantUserId: cleanUserId,
-        amount: amount * 100, // Amount in Paise
-        redirectUrl: "astroluna://payment-success",
-        redirectMode: "GET", // Use GET for deep links
+        amount: Math.round(amount * 100), // Amount in Paise (Ensure Integer)
+        redirectUrl: `https://astroluna.in/api/payment/callback?isApp=true`, // Use HTTPS, callback handles app redirect
+        redirectMode: "POST", // POST is safer and more standard
         callbackUrl: `https://astroluna.in/api/payment/callback`,
         mobileNumber: userMobile,
         paymentInstrument: {
@@ -3904,7 +3904,7 @@ app.post('/api/payment/create', async (req, res) => {
       merchantId: PHONEPE_MERCHANT_ID,
       merchantTransactionId: merchantTransactionId,
       merchantUserId: cleanUserId,
-      amount: amount * 100, // Amount in Paise
+      amount: Math.round(amount * 100), // Amount in Paise (Ensure Integer)
       redirectUrl: redirectUrl,
       redirectMode: "POST",
       callbackUrl: `https://astroluna.in/api/payment/callback`,
@@ -4223,7 +4223,7 @@ app.post('/api/phonepe/init', async (req, res) => {
       merchantId: PHONEPE_MERCHANT_ID,
       merchantTransactionId: merchantTransactionId,
       merchantUserId: cleanUserId,
-      amount: amount * 100, // Paise
+      amount: Math.round(amount * 100), // Paise (Ensure Integer)
       redirectUrl: `https://astroluna.in/api/payment/callback?isApp=true`,
       redirectMode: "POST",
       callbackUrl: `https://astroluna.in/api/phonepe/callback`,
@@ -4243,6 +4243,7 @@ app.post('/api/phonepe/init', async (req, res) => {
       headers: {
         'Content-Type': 'application/json',
         'X-VERIFY': checksum,
+        'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
         'accept': 'application/json'
       },
       body: JSON.stringify({ request: base64Payload })
@@ -4294,7 +4295,7 @@ app.post('/api/phonepe/sign', async (req, res) => {
       merchantId: PHONEPE_MERCHANT_ID,
       merchantTransactionId: merchantTransactionId,
       merchantUserId: cleanUserId,
-      amount: amount * 100,
+      amount: Math.round(amount * 100), // Ensure Integer
       callbackUrl: "https://astroluna.in/api/phonepe/callback",
       mobileNumber: userMobile,
       paymentInstrument: {
