@@ -26,10 +26,11 @@ async function callPhonePePay(payload) {
   const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64');
 
   // Normalized Host URL (remove trailing slash)
-  const host = PHONEPE_HOST_URL.replace(/\/$/, "");
+  const host = PHONEPE_HOST_URL.trim().replace(/\/$/, "");
   const fullUrl = `${host}${endpoint}`;
 
   // Official PhonePe Signature Rule: Base64 + Endpoint + Salt
+  // The stringToSign must use the EXACT endpoint path appended to the host
   const stringToSign = base64Payload + endpoint + PHONEPE_SALT_KEY;
   const sha256 = crypto.createHash('sha256').update(stringToSign).digest('hex');
   const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
@@ -55,14 +56,14 @@ async function callPhonePePay(payload) {
   try {
     const logMsg = `\n--- ${new Date().toISOString()} ---
 [INITIATE]
-Host: ${host}
-Endpoint: ${endpoint}
 Full URL: ${fullUrl}
+Checksum String: [Base64] + ${endpoint} + [Salt]
 Checksum: ${checksum}
 HTTP Status: ${response.status}
 Response Code: ${data.code}
 Response Message: ${data.message || 'N/A'}
 Success: ${data.success}
+Data: ${JSON.stringify(data.data || {})}
 ----------------------------\n`;
     const fs = require('fs');
     fs.appendFileSync('phonepe_debug.log', logMsg);
