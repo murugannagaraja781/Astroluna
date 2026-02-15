@@ -432,7 +432,8 @@ const UserSchema = new mongoose.Schema({
 
   // Referral System Fields
   referredBy: { type: String, default: null }, // userId of the referrer
-  referralCode: { type: String, unique: true, sparse: true } // unique code for sharing
+  referralCode: { type: String, unique: true, sparse: true }, // unique code for sharing
+  hasRecharged: { type: Boolean, default: false } // Only rechargers activate referral commission
 });
 
 const CallRequestSchema = new mongoose.Schema({
@@ -1838,7 +1839,7 @@ async function processBillingCharge(sessionId, durationSeconds, minuteIndex, typ
       }
 
       // --- Multi-Level Referral Logic ---
-      if (client.referredBy) {
+      if (client.referredBy && client.hasRecharged) {
         // 1. Client Cashback (2%)
         const clientCashback = amountToCharge * CASHBACK_CLIENT;
         client.walletBalance += clientCashback;
@@ -4366,6 +4367,7 @@ app.get('/api/phonepe/status/:transactionId', async (req, res) => {
         const user = await User.findOne({ userId: payment.userId });
         if (user) {
           user.walletBalance += payment.amount;
+          user.hasRecharged = true;
           await user.save();
           console.log(`[PhonePe] Wallet Credited: ${user.name} +₹${payment.amount}`);
 
@@ -4427,6 +4429,7 @@ app.post('/api/phonepe/callback', async (req, res) => {
       const user = await User.findOne({ userId: payment.userId });
       if (user) {
         user.walletBalance += payment.amount;
+        user.hasRecharged = true;
         await user.save();
         console.log(`[PhonePe Callback] Wallet Credited: ${user.name} +₹${payment.amount}`);
 
