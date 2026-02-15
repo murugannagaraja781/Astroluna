@@ -21,28 +21,18 @@ const PHONEPE_SALT_KEY = process.env.PHONEPE_SALT_KEY;
 const PHONEPE_SALT_INDEX = process.env.PHONEPE_SALT_INDEX;
 const PHONEPE_HOST_URL = process.env.PHONEPE_HOST_URL || "https://api-preprod.phonepe.com/apis/pg-sandbox";
 
-/**
- * Helper to call PhonePe API with proper checksum and logging
- */
 async function callPhonePePay(payload) {
   const endpoint = "/pg/v1/pay";
   const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64');
 
-  // Extract path from HOST_URL to handle potential /apis/hermes or /apis/pg-sandbox prefixes
-  let hostPath = "";
-  try {
-    const url = new URL(PHONEPE_HOST_URL);
-    hostPath = url.pathname === "/" ? "" : url.pathname;
-  } catch (e) { }
+  // Normalized Host URL (remove trailing slash)
+  const host = PHONEPE_HOST_URL.replace(/\/$/, "");
+  const fullUrl = `${host}${endpoint}`;
 
-  // Official docs say to use the API endpoint, but some setups require the full path from root
-  // We'll try the API endpoint first, and if we ever get AUTH_FAILED we'll know.
-  // Actually, we'll use a more flexible approach or just stick to the standard for now but log it.
+  // Official PhonePe Signature Rule: Base64 + Endpoint + Salt
   const stringToSign = base64Payload + endpoint + PHONEPE_SALT_KEY;
   const sha256 = crypto.createHash('sha256').update(stringToSign).digest('hex');
   const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
-
-  const fullUrl = `${PHONEPE_HOST_URL}${endpoint}`;
 
   const options = {
     method: 'POST',
@@ -55,15 +45,27 @@ async function callPhonePePay(payload) {
     body: JSON.stringify({ request: base64Payload })
   };
 
-  console.log(`[PhonePe] Calling: ${fullUrl}`);
+  console.log(`[PhonePe] Initializing Payment...`);
+  console.log(`[PhonePe] Full URL: ${fullUrl}`);
 
   const response = await fetch(fullUrl, options);
   const data = await response.json();
 
-  // Debug Log
+  // Detailed Debug Log
   try {
+    const logMsg = `\n--- ${new Date().toISOString()} ---
+[INITIATE]
+Host: ${host}
+Endpoint: ${endpoint}
+Full URL: ${fullUrl}
+Checksum: ${checksum}
+HTTP Status: ${response.status}
+Response Code: ${data.code}
+Response Message: ${data.message || 'N/A'}
+Success: ${data.success}
+----------------------------\n`;
     const fs = require('fs');
-    fs.appendFileSync('phonepe_debug.log', `\n--- ${new Date().toISOString()} ---\nURL: ${fullUrl}\nPayload: ${JSON.stringify(payload)}\nChecksumPath: ${endpoint}\nChecksum: ${checksum}\nResponse: ${JSON.stringify(data)}\n`);
+    fs.appendFileSync('phonepe_debug.log', logMsg);
   } catch (err) { }
 
   return { success: response.ok && data.success, data, status: response.status };
