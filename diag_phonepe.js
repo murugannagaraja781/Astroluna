@@ -15,6 +15,7 @@ console.log("--------------\n");
 const endpoints = [
     { name: "Hermes", url: "https://api.phonepe.com/apis/hermes/pg/v1/pay" },
     { name: "Standard PG", url: "https://api.phonepe.com/apis/pg/v1/pay" },
+    { name: "Prod Cluster", url: "https://api.phonepe.com/apis/prod/pg/v1/pay" },
     { name: "Standard Cluster", url: "https://api.phonepe.com/apis/standard/pg/v1/pay" },
     { name: "Standard Prod", url: "https://api.phonepe.com/apis/standard-prod/pg/v1/pay" },
     { name: "Prod-App", url: "https://api.phonepe.com/apis/prod-app/pg/v1/pay" }
@@ -22,7 +23,7 @@ const endpoints = [
 
 const saltKeys = [
     { name: "Decoded GUID", key: "fa9c8ed5-c266-4b51-bb40-7eff4e0e6fb1" },
-    { name: "GUID No Dashes", key: "fa9c8ed5c2664b51bb407eff4e0e6fb1" }
+    { name: "Literal Base64", key: "ZmE5YzhlZDUtYzI2Ni00YjUxLWJiNDAtN2VmZjRlMGU2ZmIx" }
 ];
 
 async function runTests() {
