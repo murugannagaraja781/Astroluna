@@ -1,67 +1,65 @@
-
 const crypto = require('crypto');
 const dotenv = require('dotenv');
 const path = require('path');
+const fetch = require('node-fetch');
 
 // Load .env
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const PHONEPE_MERCHANT_ID = process.env.PHONEPE_MERCHANT_ID;
-const PHONEPE_SALT_KEY = process.env.PHONEPE_SALT_KEY;
-const PHONEPE_SALT_INDEX = process.env.PHONEPE_SALT_INDEX;
-const PHONEPE_HOST_URL = process.env.PHONEPE_HOST_URL || "https://api-preprod.phonepe.com/apis/pg-sandbox";
 
 console.log("--- CONFIG ---");
 console.log("Merchant ID:", PHONEPE_MERCHANT_ID);
-console.log("Salt Key:", PHONEPE_SALT_KEY ? "EXISTS" : "MISSING");
-console.log("Salt Index:", PHONEPE_SALT_INDEX);
-console.log("Host URL:", PHONEPE_HOST_URL);
 console.log("--------------\n");
 
 const endpoints = [
-    { name: "Hermes Live", url: "https://api.phonepe.com/apis/hermes/pg/v1/pay" },
-    { name: "PG Live", url: "https://api.phonepe.com/apis/pg/v1/pay" },
-    { name: "Global Live", url: "https://api.phonepe.com/pg/v1/pay" },
-    { name: "Sandbox", url: "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay" }
+    { name: "Hermes", url: "https://api.phonepe.com/apis/hermes/pg/v1/pay" },
+    { name: "Standard PG", url: "https://api.phonepe.com/apis/pg/v1/pay" },
+    { name: "Standard Cluster", url: "https://api.phonepe.com/apis/standard/pg/v1/pay" },
+    { name: "Standard Prod", url: "https://api.phonepe.com/apis/standard-prod/pg/v1/pay" },
+    { name: "Prod-App", url: "https://api.phonepe.com/apis/prod-app/pg/v1/pay" }
 ];
 
 const saltKeys = [
-    { name: "User Provided (Decoded)", key: "fa9c8ed5-c266-4b51-bb40-7eff4e0e6fb1" },
-    { name: "User Provided (Literal)", key: "ZmE5YzhlZDUtYzI2Ni00YjUxLWJiNDAtN2VmZjRlMGU2ZmIx" },
-    { name: "From test_alt_key.js", key: "07bad376-5933-41d1-9a54-4b926e23e672" }
+    { name: "Decoded GUID", key: "fa9c8ed5-c266-4b51-bb40-7eff4e0e6fb1" },
+    { name: "GUID No Dashes", key: "fa9c8ed5c2664b51bb407eff4e0e6fb1" }
 ];
 
 async function runTests() {
     console.log(`Merchant ID: ${PHONEPE_MERCHANT_ID}`);
+    console.log("Starting Exhaustive Hardware/Cluster Mapping Check...");
+
     for (const sk of saltKeys) {
-        console.log(`\n\n=== Testing Salt Key: ${sk.name} (${sk.key}) ===`);
-        for (const ep of endpoints) {
-            console.log(`\n--- ${ep.name}: ${ep.url} ---`);
-            const result = await callPhonePePayInternal(ep.url, sk.key);
-            if (result.error) {
-                console.log("Error:", result.error);
-            } else {
-                console.log("Status:", result.status);
-                console.log("Success:", result.success);
-                console.log("Data:", JSON.stringify(result.data, null, 2));
-            }
-            if (result.success) {
-                console.log(`\n✅ WORKING CONFIG FOUND!`);
-                console.log(`Endpoint: ${ep.name}`);
-                console.log(`Salt Key: ${sk.name}`);
-                return;
+        for (const idx of [1, 2]) {
+            console.log(`\n--- Testing Salt Key: ${sk.name} | Index: ${idx} ---`);
+            for (const ep of endpoints) {
+                const result = await callPhonePePayInternal(ep.url, sk.key, idx);
+
+                let statusStr = result.status || "ERROR";
+                let errorMsg = result.error || (result.data ? (result.data.message || result.data.code) : "Unknown");
+
+                if (result.success) {
+                    console.log(`\n✅ SUCCESS FOUND!`);
+                    console.log(`Endpoint: ${ep.name} (${ep.url})`);
+                    console.log(`Salt Index: ${idx}`);
+                    console.log(`Salt Key: ${sk.name}`);
+                    return;
+                } else {
+                    console.log(`  [${ep.name}] ${statusStr}: ${errorMsg}`);
+                }
             }
         }
     }
+    console.log("\n⚠️ No working combination found. Account might not be active or needs a custom cluster URL.");
 }
 
-async function callPhonePePayInternal(fullUrl, saltKey) {
-    const endpoint = "/pg/v1/pay";
+async function callPhonePePayInternal(fullUrl, saltKey, saltIndex) {
+    const endpointPath = "/pg/v1/pay";
     const testPayload = {
         merchantId: PHONEPE_MERCHANT_ID,
         merchantTransactionId: "DIAG_" + Date.now(),
         merchantUserId: "DIAG_USER",
-        amount: 100,
+        amount: 100, // 1 Rupee
         redirectUrl: "https://astroluna.in/api/payment/callback",
         redirectMode: "POST",
         callbackUrl: "https://astroluna.in/api/payment/callback",
@@ -70,9 +68,9 @@ async function callPhonePePayInternal(fullUrl, saltKey) {
     };
 
     const base64Payload = Buffer.from(JSON.stringify(testPayload)).toString('base64');
-    const stringToSign = base64Payload + endpoint + saltKey;
+    const stringToSign = base64Payload + endpointPath + saltKey;
     const sha256 = crypto.createHash('sha256').update(stringToSign).digest('hex');
-    const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
+    const checksum = sha256 + "###" + saltIndex;
 
     const options = {
         method: 'POST',
@@ -87,10 +85,16 @@ async function callPhonePePayInternal(fullUrl, saltKey) {
 
     try {
         const response = await fetch(fullUrl, options);
-        const data = await response.json();
+        const text = await response.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            return { success: false, status: response.status, error: "Non-JSON response" };
+        }
         return { success: response.ok && data.success, data, status: response.status };
     } catch (err) {
-        return { success: false, error: err.message };
+        return { success: false, error: err.message, status: "FETCH_ERROR" };
     }
 }
 
