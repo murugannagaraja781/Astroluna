@@ -385,13 +385,14 @@
 
                 const result = await response.json();
 
-                if (result.ok && result.paymentUrl) {
+                if (result.ok && result.payload && result.payload.paymentUrl) {
                     // Redirect to PhonePe
-                    window.location.href = result.paymentUrl;
+                    window.location.href = result.payload.paymentUrl;
                 } else {
                     showLoading(false);
                     document.getElementById('payBtn').disabled = false;
-                    showError('Payment Error', result.error || 'Failed to initiate payment.');
+                    const errorMsg = result.error || (result.payload && result.payload.error) || 'Failed to initiate payment.';
+                    showError('Payment Error', errorMsg);
                 }
 
             } catch (error) {

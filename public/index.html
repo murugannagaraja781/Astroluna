@@ -10117,26 +10117,24 @@
           body: JSON.stringify({ amount, userId: state.me.userId, isApp })
         }).then(r => r.json());
 
-        if (res.ok) {
-          if (isApp && res.paymentUrl) {
-            // App Flow - Open payment URL in external browser
-            // This is more reliable than native SDK
+        if (res.ok && res.payload) {
+          const { paymentUrl, merchantTransactionId, base64Body, merchantId, checksum } = res.payload;
+
+          if (isApp && paymentUrl) {
             window.ReactNativeWebView.postMessage(JSON.stringify({
               type: 'OPEN_PAYMENT_URL',
-              url: res.paymentUrl,
-              txnId: res.merchantTransactionId
+              url: paymentUrl,
+              txnId: merchantTransactionId
             }));
-          } else if (res.paymentUrl) {
-            // Web Flow - Redirect to payment page
-            window.location.href = res.paymentUrl;
-          } else if (isApp && res.base64Body) {
-            // Legacy Native SDK Flow (Fallback)
+          } else if (paymentUrl) {
+            window.location.href = paymentUrl;
+          } else if (isApp && base64Body) {
             window.ReactNativeWebView.postMessage(JSON.stringify({
               type: 'UPI_PAY',
-              merchantId: res.merchantId,
-              txnId: res.merchantTransactionId,
-              base64Body: res.base64Body,
-              checksum: res.checksum
+              merchantId: merchantId,
+              txnId: merchantTransactionId,
+              base64Body: base64Body,
+              checksum: checksum
             }));
           } else {
             alert("Payment Error: No URL returned");

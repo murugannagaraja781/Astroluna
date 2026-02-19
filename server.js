@@ -47,8 +47,20 @@ async function callPhonePePay(payload) {
 
   console.log(`[PhonePe] Standard Init: ${fullUrl}`);
 
-  const response = await fetch(fullUrl, options);
-  const data = await response.json();
+  let response, data;
+  try {
+    response = await fetch(fullUrl, options);
+    const text = await response.text();
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("[PhonePe] Non-JSON Response:", text.substring(0, 500));
+      return { success: false, data: { message: "External API returned invalid response" }, status: response.status };
+    }
+  } catch (err) {
+    console.error("[PhonePe] Fetch Error:", err.message);
+    return { success: false, data: { message: "Failed to connect to PhonePe" }, status: 500 };
+  }
 
   // Debug Log
   try {
@@ -3898,32 +3910,40 @@ app.post('/api/payment/create', async (req, res) => {
       const intentUrl = data.instrumentResponse?.intentUrl;
 
       if (!payUrl) {
-        return res.json({ ok: false, error: 'No payment URL received from PhonePe' });
+        return res.json({
+          ok: false,
+          payload: null,
+          error: 'No payment URL received from PhonePe'
+        });
       }
 
       res.json({
         ok: true,
-        merchantTransactionId: merchantTransactionId,
-        paymentUrl: payUrl,
-        intentUrl: intentUrl,
-        useWebFlow: true
+        payload: {
+          merchantTransactionId: merchantTransactionId,
+          paymentUrl: payUrl,
+          intentUrl: intentUrl,
+          useWebFlow: true
+        },
+        error: null
       });
     } else {
       console.error("PhonePe Initiation Failed:", JSON.stringify(phonepeResult.data));
-      // Extract specific error code or message from PhonePe
       const errorMsg = phonepeResult.data?.message || phonepeResult.data?.code || 'Payment Init Failed';
-      res.json({ ok: false, error: errorMsg });
+      res.json({
+        ok: false,
+        payload: null,
+        error: errorMsg
+      });
     }
 
   } catch (e) {
     console.error("Payment Create Error Details:", e);
-    // Return structured error to prevent frontend crash
     res.json({
       ok: false,
+      payload: null,
       error: 'Internal Error',
-      details: e.message,
-      // Provide a dummy payload for defensive frontends that expect it
-      payload: { success: false, error: e.message }
+      details: e.message
     });
   }
 });
@@ -4282,14 +4302,22 @@ app.post('/api/phonepe/sign', async (req, res) => {
 
     res.json({
       ok: true,
-      payload: base64Payload,
-      checksum: checksum,
-      transactionId: merchantTransactionId
+      payload: {
+        base64Payload: base64Payload,
+        checksum: checksum,
+        transactionId: merchantTransactionId
+      },
+      error: null
     });
 
   } catch (e) {
     console.error("PhonePe Sign Error:", e);
-    res.status(500).json({ ok: false, error: 'Signing failed' });
+    res.json({
+      ok: false,
+      payload: null,
+      error: 'Signing failed',
+      details: e.message
+    });
   }
 });
 
