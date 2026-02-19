@@ -3916,8 +3916,15 @@ app.post('/api/payment/create', async (req, res) => {
     }
 
   } catch (e) {
-    console.error("Payment Create Error:", e);
-    res.json({ ok: false, error: 'Internal Error' });
+    console.error("Payment Create Error Details:", e);
+    // Return structured error to prevent frontend crash
+    res.json({
+      ok: false,
+      error: 'Internal Error',
+      details: e.message,
+      // Provide a dummy payload for defensive frontends that expect it
+      payload: { success: false, error: e.message }
+    });
   }
 });
 

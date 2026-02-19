@@ -19,27 +19,43 @@ console.log("Host URL:", PHONEPE_HOST_URL);
 console.log("--------------\n");
 
 const endpoints = [
-    "https://api.phonepe.com/apis/hermes/pg/v1/pay",
-    "https://api.phonepe.com/apis/pg/v1/pay",
-    "https://api.phonepe.com/pg/v1/pay"
+    { name: "Hermes Live", url: "https://api.phonepe.com/apis/hermes/pg/v1/pay" },
+    { name: "PG Live", url: "https://api.phonepe.com/apis/pg/v1/pay" },
+    { name: "Global Live", url: "https://api.phonepe.com/pg/v1/pay" },
+    { name: "Sandbox", url: "https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay" }
+];
+
+const saltKeys = [
+    { name: "User Provided (Decoded)", key: "fa9c8ed5-c266-4b51-bb40-7eff4e0e6fb1" },
+    { name: "User Provided (Literal)", key: "ZmE5YzhlZDUtYzI2Ni00YjUxLWJiNDAtN2VmZjRlMGU2ZmIx" },
+    { name: "From test_alt_key.js", key: "07bad376-5933-41d1-9a54-4b926e23e672" }
 ];
 
 async function runTests() {
-    console.log("Testing PhonePe Endpoints...");
-    for (const fullUrl of endpoints) {
-        console.log(`\n--- Testing: ${fullUrl} ---`);
-        const result = await callPhonePePayInternal(fullUrl);
-        console.log("Status:", result.status);
-        console.log("Success:", result.success);
-        console.log("Data:", JSON.stringify(result.data, null, 2));
-        if (result.success) {
-            console.log("\n✅ WORKING ENDPOINT FOUND:", fullUrl);
-            break;
+    console.log(`Merchant ID: ${PHONEPE_MERCHANT_ID}`);
+    for (const sk of saltKeys) {
+        console.log(`\n\n=== Testing Salt Key: ${sk.name} (${sk.key}) ===`);
+        for (const ep of endpoints) {
+            console.log(`\n--- ${ep.name}: ${ep.url} ---`);
+            const result = await callPhonePePayInternal(ep.url, sk.key);
+            if (result.error) {
+                console.log("Error:", result.error);
+            } else {
+                console.log("Status:", result.status);
+                console.log("Success:", result.success);
+                console.log("Data:", JSON.stringify(result.data, null, 2));
+            }
+            if (result.success) {
+                console.log(`\n✅ WORKING CONFIG FOUND!`);
+                console.log(`Endpoint: ${ep.name}`);
+                console.log(`Salt Key: ${sk.name}`);
+                return;
+            }
         }
     }
 }
 
-async function callPhonePePayInternal(fullUrl) {
+async function callPhonePePayInternal(fullUrl, saltKey) {
     const endpoint = "/pg/v1/pay";
     const testPayload = {
         merchantId: PHONEPE_MERCHANT_ID,
@@ -54,7 +70,7 @@ async function callPhonePePayInternal(fullUrl) {
     };
 
     const base64Payload = Buffer.from(JSON.stringify(testPayload)).toString('base64');
-    const stringToSign = base64Payload + endpoint + PHONEPE_SALT_KEY;
+    const stringToSign = base64Payload + endpoint + saltKey;
     const sha256 = crypto.createHash('sha256').update(stringToSign).digest('hex');
     const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
 
