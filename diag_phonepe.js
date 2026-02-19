@@ -18,12 +18,42 @@ console.log("Salt Index:", PHONEPE_SALT_INDEX);
 console.log("Host URL:", PHONEPE_HOST_URL);
 console.log("--------------\n");
 
-async function callPhonePePay(payload) {
-    const endpoint = "/pg/v1/pay";
-    const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64');
-    let host = PHONEPE_HOST_URL.trim().replace(/\/$/, "");
-    const fullUrl = `${host}${endpoint}`;
+const endpoints = [
+    "https://api.phonepe.com/apis/hermes/pg/v1/pay",
+    "https://api.phonepe.com/apis/pg/v1/pay",
+    "https://api.phonepe.com/pg/v1/pay"
+];
 
+async function runTests() {
+    console.log("Testing PhonePe Endpoints...");
+    for (const fullUrl of endpoints) {
+        console.log(`\n--- Testing: ${fullUrl} ---`);
+        const result = await callPhonePePayInternal(fullUrl);
+        console.log("Status:", result.status);
+        console.log("Success:", result.success);
+        console.log("Data:", JSON.stringify(result.data, null, 2));
+        if (result.success) {
+            console.log("\n✅ WORKING ENDPOINT FOUND:", fullUrl);
+            break;
+        }
+    }
+}
+
+async function callPhonePePayInternal(fullUrl) {
+    const endpoint = "/pg/v1/pay";
+    const testPayload = {
+        merchantId: PHONEPE_MERCHANT_ID,
+        merchantTransactionId: "DIAG_" + Date.now(),
+        merchantUserId: "DIAG_USER",
+        amount: 100,
+        redirectUrl: "https://astroluna.in/api/payment/callback",
+        redirectMode: "POST",
+        callbackUrl: "https://astroluna.in/api/payment/callback",
+        mobileNumber: "9999999999",
+        paymentInstrument: { type: "PAY_PAGE" }
+    };
+
+    const base64Payload = Buffer.from(JSON.stringify(testPayload)).toString('base64');
     const stringToSign = base64Payload + endpoint + PHONEPE_SALT_KEY;
     const sha256 = crypto.createHash('sha256').update(stringToSign).digest('hex');
     const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
@@ -39,38 +69,13 @@ async function callPhonePePay(payload) {
         body: JSON.stringify({ request: base64Payload })
     };
 
-    console.log(`[PhonePe] Standard Init: ${fullUrl}`);
-
     try {
         const response = await fetch(fullUrl, options);
         const data = await response.json();
         return { success: response.ok && data.success, data, status: response.status };
     } catch (err) {
-        console.error("Fetch Error:", err);
         return { success: false, error: err.message };
     }
 }
 
-const testPayload = {
-    merchantId: PHONEPE_MERCHANT_ID,
-    merchantTransactionId: "DIAG_" + Date.now(),
-    merchantUserId: "DIAG_USER",
-    amount: 100, // 1 Rupee
-    redirectUrl: "https://astroluna.in/api/payment/callback",
-    redirectMode: "POST",
-    callbackUrl: "https://astroluna.in/api/payment/callback",
-    mobileNumber: "9999999999",
-    paymentInstrument: { type: "PAY_PAGE" }
-};
-
-callPhonePePay(testPayload).then(res => {
-    console.log("\n--- RESULT ---");
-    console.log("Status:", res.status);
-    console.log("Success:", res.success);
-    console.log("Data:", JSON.stringify(res.data, null, 2));
-    if (res.error) console.log("Error:", res.error);
-    process.exit(0);
-}).catch(err => {
-    console.error("Fatal Error:", err);
-    process.exit(1);
-});
+runTests().then(() => process.exit(0));
