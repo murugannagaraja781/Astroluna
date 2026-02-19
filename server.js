@@ -21,6 +21,75 @@ const PHONEPE_SALT_KEY = process.env.PHONEPE_SALT_KEY;
 const PHONEPE_SALT_INDEX = process.env.PHONEPE_SALT_INDEX;
 const PHONEPE_HOST_URL = process.env.PHONEPE_HOST_URL || "https://api-preprod.phonepe.com/apis/pg-sandbox";
 
+// PhonePe OAuth Config
+const PHONEPE_CLIENT_ID = process.env.PHONEPE_CLIENT_ID;
+const PHONEPE_CLIENT_VERSION = process.env.PHONEPE_CLIENT_VERSION;
+const PHONEPE_CLIENT_SECRET = process.env.PHONEPE_CLIENT_SECRET;
+
+let phonepeTokenStore = {
+  accessToken: null,
+  expiresAt: 0 // epoch seconds
+};
+
+async function getPhonePeOAuthToken() {
+  try {
+    // Determine OAuth URL based on Host URL
+    const isSandbox = PHONEPE_HOST_URL.includes("sandbox") || PHONEPE_HOST_URL.includes("preprod");
+    const oauthUrl = isSandbox
+      ? "https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token"
+      : "https://api.phonepe.com/apis/identity-manager/v1/oauth/token";
+
+    const params = new URLSearchParams();
+    params.append('client_id', PHONEPE_CLIENT_ID);
+    params.append('client_version', PHONEPE_CLIENT_VERSION);
+    params.append('client_secret', PHONEPE_CLIENT_SECRET);
+    params.append('grant_type', 'client_credentials');
+
+    console.log(`[PhonePe OAuth] Requesting token from: ${oauthUrl}`);
+
+    const response = await fetch(oauthUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: params
+    });
+
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("[PhonePe OAuth] Non-JSON Response:", text.substring(0, 500));
+      return null;
+    }
+
+    if (response.ok && data.access_token) {
+      phonepeTokenStore = {
+        accessToken: data.access_token,
+        expiresAt: data.expires_at || (Math.floor(Date.now() / 1000) + 3600) // Default 1 hour if not provided
+      };
+      console.log(`[PhonePe OAuth] New Token Generated. Expires at: ${new Date(phonepeTokenStore.expiresAt * 1000).toISOString()}`);
+      return data.access_token;
+    } else {
+      console.error("[PhonePe OAuth] Token Generation Failed:", data);
+      return null;
+    }
+  } catch (err) {
+    console.error("[PhonePe OAuth] Error:", err.message);
+    return null;
+  }
+}
+
+async function getValidPhonePeToken() {
+  const now = Math.floor(Date.now() / 1000);
+  // Refresh if missing or expiring within 5 minutes
+  if (!phonepeTokenStore.accessToken || phonepeTokenStore.expiresAt < (now + 300)) {
+    return await getPhonePeOAuthToken();
+  }
+  return phonepeTokenStore.accessToken;
+}
+
 async function callPhonePePay(payload) {
   const endpoint = "/pg/v1/pay";
   const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64');
@@ -34,12 +103,14 @@ async function callPhonePePay(payload) {
   const sha256 = crypto.createHash('sha256').update(stringToSign).digest('hex');
   const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
 
+  const oauthToken = await getValidPhonePeToken();
   const options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-VERIFY': checksum,
       'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
+      'Authorization': `Bearer ${oauthToken}`,
       'accept': 'application/json'
     },
     body: JSON.stringify({ request: base64Payload })
@@ -4349,12 +4420,14 @@ app.get('/api/phonepe/status/:transactionId', async (req, res) => {
     const sha256 = crypto.createHash('sha256').update(stringToSign).digest('hex');
     const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
 
+    const oauthToken = await getValidPhonePeToken();
     const response = await fetch(`${PHONEPE_HOST_URL}${statusPath}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'X-VERIFY': checksum,
-        'X-MERCHANT-ID': PHONEPE_MERCHANT_ID
+        'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
+        'Authorization': `Bearer ${oauthToken}`
       }
     });
 
