@@ -1,0 +1,8 @@
+[dotenv@17.2.4] injecting env (9) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+✓ Call App: Firebase Admin SDK initialized
+[FCM v1] Initialized with service account
+Server running on http://0.0.0.0:3000
+📡 Mongoose connected to MongoDB
+✅ MongoDB Connected to: cluster0.tp2gekn.mongodb.net/astroluna
+SIGTERM received, shutting down gracefully...
+Server closed
