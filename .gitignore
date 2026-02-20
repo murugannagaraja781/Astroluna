@@ -37,3 +37,4 @@ Thumbs.db
 
 # Build logs
 build_log*.txt
+astroapp/android/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/csc.db.jar
