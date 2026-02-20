@@ -9,7 +9,7 @@ public final class PaymentActivity extends androidx.appcompat.app.AppCompatActiv
     @org.jetbrains.annotations.NotNull()
     private static final java.lang.String TAG = "PaymentActivity";
     @org.jetbrains.annotations.NotNull()
-    private static final java.lang.String MERCHANT_ID = "M22LBBWEJKI6A";
+    private static final java.lang.String MERCHANT_ID = "M23VW0EJ3IVEK";
     private static final int B2B_PG_REQUEST_CODE = 777;
     private static final boolean USE_NATIVE_SDK = false;
     @org.jetbrains.annotations.NotNull()

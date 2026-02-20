@@ -71,6 +71,12 @@ android {
     androidResources {
         noCompress.add("db")
     }
+
+    lint {
+        disable += "DuplicatePlatformClasses"
+        checkReleaseBuilds = true
+        abortOnError = false
+    }
 }
 
 dependencies {

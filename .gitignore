@@ -1,11 +1,39 @@
-node_modules
-firebase-service-account.json
-csc.db
+# Dependencies
+node_modules/
+
+# Environment
 .env
-astroapp/android/app/build/outputs/apk/debug/app-debug.apk
-astroapp/android/app/build/outputs/apk/release/app-release.apk
-astroapp/android/app/build/outputs/apk/debug/app-debug.apk
-astroapp/android/app/build/outputs/apk/debug/app-debug.apk
-astroapp/android/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/csc.db.jar
-astroapp/android/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/csc.db.jar
-astroapp/android/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/csc.db.jar
+
+# Database
+csc.db
+
+# Firebase
+firebase-service-account.json
+
+# APK builds
+*.apk
+astroapp/android/app/build/
+astroapp/android/.gradle/
+astroapp/android/build/
+
+# Public APKs
+public/*.apk
+
+# Debug logs
+phonepe_debug.log
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Keystore backups
+*.jks.bak
+
+# Build logs
+build_log*.txt
