@@ -10109,36 +10109,15 @@
       if (!state.me || !state.me.userId) return alert("Please login first");
 
       try {
-        const isApp = !!window.ReactNativeWebView;
-
         const res = await fetch('/api/payment/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount, userId: state.me.userId, isApp })
+          body: JSON.stringify({ amount, userId: state.me.userId, isApp: false })
         }).then(r => r.json());
 
-        if (res.ok && res.payload) {
-          const { paymentUrl, merchantTransactionId, base64Body, merchantId, checksum } = res.payload;
-
-          if (isApp && paymentUrl) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'OPEN_PAYMENT_URL',
-              url: paymentUrl,
-              txnId: merchantTransactionId
-            }));
-          } else if (paymentUrl) {
-            window.location.href = paymentUrl;
-          } else if (isApp && base64Body) {
-            window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'UPI_PAY',
-              merchantId: merchantId,
-              txnId: merchantTransactionId,
-              base64Body: base64Body,
-              checksum: checksum
-            }));
-          } else {
-            alert("Payment Error: No URL returned");
-          }
+        if (res.ok && res.payload && res.payload.paymentUrl) {
+          // PhonePe v2: redirect to payment URL
+          window.location.href = res.payload.paymentUrl;
         } else {
           alert("Recharge Error: " + (res.error || 'Unknown'));
         }

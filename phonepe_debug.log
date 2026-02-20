@@ -1,0 +1,40 @@
+
+--- 2026-02-20T15:17:49.391Z ---
+[INIT] URL: https://api.phonepe.com/apis/hermes/pg/v1/pay
+SignPath: /pg/v1/pay
+Status: 404
+Res: {"success":false,"code":"404"}
+
+--- 2026-02-20T16:38:28.326Z ---
+[INIT] URL: https://api.phonepe.com/apis/hermes/pg/v1/pay
+SignPath: /pg/v1/pay
+Status: 404
+Res: {"success":false,"code":"404"}
+
+--- 2026-02-20T17:14:32.266Z ---
+[v2 INIT] URL: https://api.phonepe.com/apis/pg/checkout/v2/pay
+OrderId: MT1771607671503931
+Amount: 100
+Status: 200
+Res: {"orderId":"OMO2602202244321159967362W","state":"PENDING","redirectUrl":"https://mercury-t2.phonepe.com/transact/pgv3?token=hq4wOGdzX31IuPyyh7/7AYOLiipO42P8QtgmusudZHta7zUAMbV5uMV5f6kF1hmvheryrLtNiVZXSn1KVubFUR5G4BnpAOSX4TQNvhsjpzFQD4akLKVOdj139eoAh7lBK9pNk/xqh7T+4nJlDkyyugcBr6rDPLAX9Tldosij228FDIEc7ms5QvqI1JFVFxBxsVT+dTDoNshFhBAkNWuPH2pA6B1S3XUlu+77KoSNovPhYX+jiOVs0SEHM1/CFZDyOF5Ha+go2loJtb7o5hKaIw73XXgy7uqTxOBbNjiHG1Vae/PJN54kHqq0o5Rle0i801+hByaaSMe8qWXA4WZwDgmVXkxJnLh6cp+chMtXoCfLE7BAw7EwlWLAm3GJbO2LQqEPXeKjIo8jXY5WrPvlcx8CYYcL1Ah23LRZhk35PPOIW7Xg53dp8ACz6tf/r9k8FFIhNezS1fn7Po6dy8iLnc5dF8LcS9rriq7X39dSwaTgoqFmfT4L53o0E9F8AwJMZpIt6E5bbYgQlhxTwfX2&routingKey=W","expireAt":1771608872088}
+
+--- 2026-02-20T17:21:42.362Z ---
+[v2 INIT] URL: https://api.phonepe.com/apis/pg/checkout/v2/pay
+OrderId: MT1771608101804699
+Amount: 1000
+Status: 200
+Res: {"orderId":"OMO2602202251422306220691W","state":"PENDING","redirectUrl":"https://mercury-t2.phonepe.com/transact/pgv3?token=hq4wOGdzX31IuPyyh7/7AYOLiipO42P8QtgmusudZHta7zUAMbV5uMV5f6kF1hmvheryrLtNiVZXSn1KVubFUR5G4BnpAOSX4TQNvhsjpzFQDri4aKVORD10y9hPhblBK9pNk/xqh7T+4nJlDkyyugcBr6rDPLATvzpjosij228FDIEc7ms5QvqI1JFVFxBxsVT+dTDoNshFhBAkNWuPH2pA6B1S3XUlu+77KoSNovPhYX+jiOVs0SEHM1/CFZDyOF5Ha+go2loJtb7o5hKaIw73XXgy7uqTxOBbNjiHG1Vae/PJN54kHqq0o5Rle0i801+hByaaSMe8qWXA4WZwDgmVXkxJnLh6cp+chMtXoCfLE7BAw7EwlWLAm3GJbO2LQqEfc6qjIo8jfbVTqOHmSU8aW4tF4iJ0k6lSkUWBRM2aQ6K1yXUC2we0zKrLqec7InFXE+jqzcCtO9qdwc6TxotkVMvpQf/fmZr8uOptpfLGk911Lyo6y2o0Os8LfgJg59sNLvMYXI311Qje+doJ&routingKey=W","expireAt":1771609302140}
+
+--- 2026-02-20T17:24:58.336Z ---
+[v2 INIT] URL: https://api.phonepe.com/apis/pg/checkout/v2/pay
+OrderId: MT1771608297998932
+Amount: 100
+Status: 200
+Res: {"orderId":"OMO2602202254583107927342W","state":"PENDING","redirectUrl":"https://mercury-t2.phonepe.com/transact/pgv3?token=hq4wOGdzX31IuPyyh7/7AYOLiipO42P8QtgmusudZHta7zUAMbV5uMV5f6kF1hmvheryrLtNiVZXSn1KVubFUR5G4BnpAOSX4TQNvhsjpzFQDri0KqZgSH91y+oAh4dBK9pNk/xqh7T+4nJlDkyyugcBr6rDPLATvjhzjMij228FDIEc7ms5QvqI1JFVFxBxsVT+dTDoNshFhBAkNWuPH2pA6B1S3XUlu+77KoSNovPhYX+jiOVs0SEHM1/CFZDyOF5Ha+go2loJtb7o5hKaIw73XXgy7uqTxOBbNjiHG1Vae/PJN54kHqq0o5Rle0i801+hByaaSMe8qWXA4WZwDgmVXkxJnLh6cp+chMtXoCfLE7BAw7EwlWLAm3GJbO2LQqEfa+CgSY8jfpE4vOzEbmt7ZrNQ8TJy+clnv3HSMsbIF5ip7Slz+lzPy8XkksAEIUQLccvuyeK5MY+e8/6P3o59XLjCVtXklp/No/NW2b3NkqgAAjsl6GsdG4oTazSNMj+gluoiDj1yM/1HdbiW&routingKey=W","expireAt":1771609498299}
+
+--- 2026-02-20T17:28:15.810Z ---
+[v2 INIT] URL: https://api.phonepe.com/apis/pg/checkout/v2/pay
+OrderId: MT1771608495448456
+Amount: 100
+Status: 200
+Res: {"orderId":"OMO2602202258157838877275W","state":"PENDING","redirectUrl":"https://mercury-t2.phonepe.com/transact/pgv3?token=hq4wOGdzX31IuPyyh7/7AYOLiipO42P8QtgmusudZHta7zUAMbV5uMV5f6kF1hmvheryrLtNiVZXSn1KVubFUR5G4BnpAOSX4TQNvhsjpzFQDrisKqZOcnp1y9BLhIdBK9pNk/xqh7T+4nJlDkyyugcBr6rDPLAT9zhzvsij228FDIEc7ms5QvqI1JFVFxBxsVT+dTDoNshFhBAkNWuPH2pA6B1S3XUlu+77KoSNovPhYX+jiOVs0SEHM1/CFZDyOF5Ha+go2loJtb7o5hKaIw73XXgy7uqTxOBbNjiHG1Vae/PJN54kHqq0o5Rle0i801+hByaaSMe8qWXA4WZwDgmVXkxJnLh6cp+chMtXoCfLE7BAw7EwlWLAm3GJbO2LQqEfY+CgMo8jUZA4iNrGaxoCeKcOwBQPnqZTuHTQQe2PS+XdtAINyHPR+a/Zu+FGH3AjJbf19IP4M/KNqvi9+KIqR5PBQNr1tK7Igu9h8LPkochfdH8a5F8YNZQAezRQP/7+96tSL+yRjKJ6XGV+&routingKey=W","expireAt":1771609695771}

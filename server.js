@@ -97,67 +97,72 @@ async function getValidPhonePeToken() {
   return phonepeTokenStore.accessToken;
 }
 
-async function callPhonePePay(payload) {
-  const endpoint = "/pg/v1/pay";
-  const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64');
+// ===== PhonePe Standard Checkout v2 =====
+async function callPhonePePayV2(merchantOrderId, amount, redirectUrl, userMobile) {
+  const endpoint = "https://api.phonepe.com/apis/pg/checkout/v2/pay";
 
-  // Normalized Host URL
-  let host = PHONEPE_HOST_URL.trim().replace(/\/$/, "");
-  const fullUrl = `${host}${endpoint}`;
-
-  // Use strict endpoint for signing
-  const stringToSign = base64Payload + endpoint + PHONEPE_SALT_KEY;
-  const sha256 = crypto.createHash('sha256').update(stringToSign).digest('hex');
-  const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
-
+  // Get OAuth token
   const oauthToken = await getValidPhonePeToken();
+  if (!oauthToken) {
+    console.error("[PhonePe v2] Failed to get OAuth token");
+    return { success: false, data: { message: "OAuth token generation failed" }, status: 401 };
+  }
+
+  // Standard Checkout v2 payload
+  const payload = {
+    merchantOrderId: merchantOrderId,
+    amount: amount, // amount in paisa
+    expireAfter: 1200, // 20 minutes
+    metaInfo: {
+      udf1: userMobile || "9999999999"
+    },
+    paymentFlow: {
+      type: "PG_CHECKOUT",
+      merchantUrls: {
+        redirectUrl: redirectUrl
+      }
+    }
+  };
+
   const headers = {
     'Content-Type': 'application/json',
-    'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
+    'Authorization': `O-Bearer ${oauthToken}`,
     'accept': 'application/json'
   };
 
-  if (oauthToken) {
-    // For Hermes Production with OAuth, ONLY send the Authorization header.
-    // Do NOT send X-VERIFY as it can cause 400 Bad Request.
-    headers['Authorization'] = `Bearer ${oauthToken}`;
-  } else {
-    // Fallback for older non-OAuth merchants
-    headers['X-VERIFY'] = checksum;
-  }
-
-  const options = {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify({ request: base64Payload })
-  };
-
-  console.log(`[PhonePe] Cluster: ${fullUrl}`);
-
+  console.log(`[PhonePe v2] Requesting: ${endpoint}`);
+  console.log(`[PhonePe v2] OrderId: ${merchantOrderId}, Amount: ${amount} paisa`);
 
   let response, data;
   try {
-    response = await fetch(fullUrl, options);
+    response = await fetch(endpoint, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(payload)
+    });
     const text = await response.text();
     try {
       data = JSON.parse(text);
     } catch (e) {
-      console.error("[PhonePe] Non-JSON Response:", text.substring(0, 500));
+      console.error("[PhonePe v2] Non-JSON Response:", text.substring(0, 500));
       return { success: false, data: { message: "External API returned invalid response" }, status: response.status };
     }
   } catch (err) {
-    console.error("[PhonePe] Fetch Error:", err.message);
+    console.error("[PhonePe v2] Fetch Error:", err.message);
     return { success: false, data: { message: "Failed to connect to PhonePe" }, status: 500 };
   }
 
   // Debug Log
   try {
     const fs = require('fs');
-    const logMsg = `\n--- ${new Date().toISOString()} ---\n[INIT] URL: ${fullUrl}\nSignPath: ${endpoint}\nStatus: ${response.status}\nRes: ${JSON.stringify(data)}\n`;
+    const logMsg = `\n--- ${new Date().toISOString()} ---\n[v2 INIT] URL: ${endpoint}\nOrderId: ${merchantOrderId}\nAmount: ${amount}\nStatus: ${response.status}\nRes: ${JSON.stringify(data)}\n`;
     fs.appendFileSync('phonepe_debug.log', logMsg);
   } catch (err) { }
 
-  return { success: response.ok && data.success, data, status: response.status };
+  const isSuccess = response.ok && data.orderId && data.redirectUrl;
+  console.log(`[PhonePe v2] Response Status: ${response.status}, Success: ${isSuccess}`);
+
+  return { success: isSuccess, data, status: response.status };
 }
 
 
@@ -3961,41 +3966,24 @@ app.post('/api/payment/create', async (req, res) => {
       isApp: !!isApp // Store the source
     });
 
-    // PhonePe Payload
-    // FIX: Sanitize UserID (Only Alphanumeric) and Use Valid Mobile
-    const cleanUserId = userId.replace(/[^a-zA-Z0-9]/g, '') || "User";
+    // PhonePe Standard Checkout v2
+    const amountInPaisa = Math.round(amount * 100);
+    const callbackRedirectUrl = isApp
+      ? `https://astroluna.in/api/payment/callback?isApp=true&txnId=${merchantTransactionId}`
+      : `https://astroluna.in/api/payment/callback?txnId=${merchantTransactionId}`;
 
-    // --- NATIVE APP FLOW (Use Web Payment via External Browser) ---
-    // Native SDK has issues, so we use browser redirect which is more reliable
-    // --- UNIFIED PHONEPE CALL ---
-    const phonepePayload = isApp ? {
-      merchantId: PHONEPE_MERCHANT_ID,
-      merchantTransactionId: merchantTransactionId,
-      merchantUserId: cleanUserId,
-      amount: Math.round(amount * 100),
-      redirectUrl: `https://astroluna.in/api/payment/callback?isApp=true`,
-      redirectMode: "POST",
-      callbackUrl: `https://astroluna.in/api/payment/callback`,
-      mobileNumber: userMobile,
-      paymentInstrument: { type: "PAY_PAGE" }
-    } : {
-      merchantId: PHONEPE_MERCHANT_ID,
-      merchantTransactionId: merchantTransactionId,
-      merchantUserId: cleanUserId,
-      amount: Math.round(amount * 100),
-      redirectUrl: redirectUrl,
-      redirectMode: "POST",
-      callbackUrl: `https://astroluna.in/api/payment/callback`,
-      mobileNumber: userMobile,
-      paymentInstrument: { type: "PAY_PAGE" }
-    };
-
-    const phonepeResult = await callPhonePePay(phonepePayload);
+    const phonepeResult = await callPhonePePayV2(
+      merchantTransactionId,
+      amountInPaisa,
+      callbackRedirectUrl,
+      userMobile
+    );
 
     if (phonepeResult.success) {
-      const data = phonepeResult.data.data;
-      const payUrl = data.instrumentResponse?.redirectInfo?.url || data.instrumentResponse?.intentUrl;
-      const intentUrl = data.instrumentResponse?.intentUrl;
+      const payUrl = phonepeResult.data.redirectUrl;
+      const orderId = phonepeResult.data.orderId;
+
+      console.log(`[PhonePe v2] Payment created: orderId=${orderId}, redirectUrl=${payUrl ? 'YES' : 'NO'}`);
 
       if (!payUrl) {
         return res.json({
@@ -4009,14 +3997,14 @@ app.post('/api/payment/create', async (req, res) => {
         ok: true,
         payload: {
           merchantTransactionId: merchantTransactionId,
+          orderId: orderId,
           paymentUrl: payUrl,
-          intentUrl: intentUrl,
           useWebFlow: true
         },
         error: null
       });
     } else {
-      console.error("PhonePe Initiation Failed:", JSON.stringify(phonepeResult.data));
+      console.error("PhonePe v2 Initiation Failed:", JSON.stringify(phonepeResult.data));
       const errorMsg = phonepeResult.data?.message || phonepeResult.data?.code || 'Payment Init Failed';
       res.json({
         ok: false,
@@ -4036,42 +4024,187 @@ app.post('/api/payment/create', async (req, res) => {
   }
 });
 
-// 2. Callback (Webhook)
+// ===== PhonePe v2: Check Order Status API =====
+async function checkPhonePeOrderStatus(merchantOrderId) {
+  const endpoint = `https://api.phonepe.com/apis/pg/checkout/v2/order/${merchantOrderId}/status?details=true`;
+
+  const oauthToken = await getValidPhonePeToken();
+  if (!oauthToken) {
+    console.error("[PhonePe Status] No OAuth token");
+    return { success: false, state: 'ERROR' };
+  }
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `O-Bearer ${oauthToken}`,
+        'accept': 'application/json'
+      }
+    });
+
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("[PhonePe Status] Non-JSON Response:", text.substring(0, 500));
+      return { success: false, state: 'ERROR' };
+    }
+
+    console.log(`[PhonePe Status] OrderId: ${merchantOrderId}, State: ${data.state}, Status: ${response.status}`);
+
+    // Debug Log
+    try {
+      const fs = require('fs');
+      const logMsg = `\n--- ${new Date().toISOString()} ---\n[v2 STATUS] OrderId: ${merchantOrderId}\nState: ${data.state}\nRes: ${JSON.stringify(data).substring(0, 500)}\n`;
+      fs.appendFileSync('phonepe_debug.log', logMsg);
+    } catch (err) { }
+
+    return { success: true, data, state: data.state || 'UNKNOWN' };
+  } catch (err) {
+    console.error("[PhonePe Status] Error:", err.message);
+    return { success: false, state: 'ERROR' };
+  }
+}
+
+// Helper: Process payment result (shared between GET redirect and POST callback)
+async function processPaymentResult(merchantTransactionId, isSuccess, providerReferenceId, isApp, res) {
+  const payment = await Payment.findOne({
+    $or: [
+      { transactionId: merchantTransactionId },
+      { merchantTransactionId: merchantTransactionId }
+    ]
+  });
+
+  if (!payment) {
+    console.error('Payment not found for:', merchantTransactionId);
+    return res.redirect('/?status=fail&reason=not_found');
+  }
+
+  const redirectIsApp = isApp || payment.isApp;
+
+  console.log(`[WALLET DEBUG] isSuccess: ${isSuccess}, Payment: ${payment._id}, userId: ${payment.userId}, amount: ${payment.amount}, currentStatus: ${payment.status}`);
+
+  if (isSuccess) {
+    if (payment.status !== 'success') {
+      payment.status = 'success';
+      payment.providerRefId = providerReferenceId || '';
+      await payment.save();
+
+      // Credit Wallet
+      const user = await User.findOne({ userId: payment.userId });
+      if (user) {
+        // Rule: 18% GST. If user pays 118, credit 100.
+        const creditAmount = Math.round(payment.amount / 1.18);
+        user.walletBalance += creditAmount;
+        await user.save();
+        console.log(`✅ Wallet Credited: ${user.name} +₹${creditAmount} (Paid: ₹${payment.amount}, GST deducted)`);
+
+        // Notify Socket if online
+        const sId = userSockets.get(user.userId);
+        if (sId) {
+          io.to(sId).emit('wallet-update', {
+            balance: user.walletBalance,
+            totalEarnings: user.totalEarnings
+          });
+          io.to(sId).emit('app-notification', { text: `✅ Recharge Successful! +₹${creditAmount} (Excl. 18% GST)` });
+        }
+      }
+    }
+
+    if (redirectIsApp) {
+      const txnId = merchantTransactionId || '';
+      return res.redirect(`/payment-success?amount=${payment.amount || ''}&txnId=${txnId}`);
+    }
+    return res.redirect(`/wallet?status=success&amount=${payment.amount}`);
+  } else {
+    // Failure
+    if (payment.status !== 'success') {
+      payment.status = 'failed';
+      await payment.save();
+    }
+
+    if (redirectIsApp) {
+      return res.redirect('/payment-failed');
+    }
+    return res.redirect(`/wallet?status=failure`);
+  }
+}
+
+// 2a. Callback - GET (User redirect from PhonePe v2)
+app.get('/api/payment/callback', async (req, res) => {
+  console.log('=================================');
+  console.log('[CALLBACK GET] /api/payment/callback');
+  console.log('[CALLBACK GET] Query:', req.query);
+  console.log('=================================');
+
+  try {
+    const merchantTransactionId = req.query.txnId;
+    const isApp = req.query.isApp === 'true';
+
+    if (!merchantTransactionId) {
+      console.error('[CALLBACK GET] No txnId in query');
+      return res.redirect('/wallet?status=failure&reason=no_txnId');
+    }
+
+    // Check payment status via PhonePe Order Status API
+    const statusResult = await checkPhonePeOrderStatus(merchantTransactionId);
+    const state = statusResult.state;
+
+    // v2 states: COMPLETED, FAILED, PENDING
+    const isSuccess = state === 'COMPLETED';
+    const providerRefId = statusResult.data?.paymentDetails?.[0]?.providerReferenceId || '';
+
+    console.log(`[CALLBACK GET] txnId: ${merchantTransactionId}, State: ${state}, isSuccess: ${isSuccess}`);
+
+    await processPaymentResult(merchantTransactionId, isSuccess, providerRefId, isApp, res);
+
+  } catch (e) {
+    console.error("Callback GET Error:", e);
+    return res.redirect('/?status=error');
+  }
+});
+
+// 2b. Callback - POST (S2S webhook from PhonePe)
 app.post('/api/payment/callback', async (req, res) => {
   console.log('=================================');
-  console.log('[CALLBACK HIT] /api/payment/callback');
-  console.log('[CALLBACK] Body:', JSON.stringify(req.body).substring(0, 200));
-  console.log('[CALLBACK] Query:', req.query);
+  console.log('[CALLBACK POST] /api/payment/callback');
+  console.log('[CALLBACK POST] Body:', JSON.stringify(req.body).substring(0, 200));
+  console.log('[CALLBACK POST] Query:', req.query);
   console.log('=================================');
 
   try {
     let decoded = {};
 
-    // Case 1: Base64 Encoded JSON (S2S or App Intent)
+    // Case 1: Base64 Encoded JSON (S2S callback)
     if (req.body.response) {
       decoded = JSON.parse(Buffer.from(req.body.response, 'base64').toString('utf-8'));
     }
-    // Case 2: Direct Form POST (Web Redirect)
-    else if (req.body.code || req.body.merchantTransactionId) {
+    // Case 2: Direct Form POST
+    else if (req.body.code || req.body.merchantTransactionId || req.body.state) {
       decoded = req.body;
     }
-    // Case 3: GET Query Params (Fallback)
-    else if (req.query.code || req.query.merchantTransactionId) {
-      decoded = req.query;
+    // Case 3: v2 redirect with txnId in query — check status via API
+    else if (req.query.txnId) {
+      const merchantTransactionId = req.query.txnId;
+      const isApp = req.query.isApp === 'true';
+      const statusResult = await checkPhonePeOrderStatus(merchantTransactionId);
+      const isSuccess = statusResult.state === 'COMPLETED';
+      const providerRefId = statusResult.data?.paymentDetails?.[0]?.providerReferenceId || '';
+
+      return await processPaymentResult(merchantTransactionId, isSuccess, providerRefId, isApp, res);
     }
     else {
-      console.log('[CALLBACK ERROR] No payment data found in Body or Query');
-      // Return HTML with alert
-      console.log('[CALLBACK ERROR] No payment data found in Body or Query');
+      console.log('[CALLBACK POST] No payment data found');
 
       const userAgent = req.headers['user-agent'] || '';
       const isAndroidApp = req.query.isApp === 'true' || userAgent.includes('Android') || userAgent.includes('astrolunaApp');
 
-      // AUTO-REDIRECT TO APP IF DETECTED (Even if isApp param is missing)
       if (isAndroidApp) {
         const intentUrl = `intent://payment-failed?reason=no_response#Intent;scheme=astroluna;package=com.astroluna.app;end`;
         const customScheme = `astroluna://payment-failed?reason=no_response`;
-
         return res.send(`
           <html>
           <head>
@@ -4081,96 +4214,32 @@ app.post('/api/payment/callback', async (req, res) => {
           <body>
           <h3>Redirecting...</h3>
           <script>
-            // Try Intent first (Chrome/Android)
             window.location.href = "${intentUrl}";
-
-            // Fallback
             setTimeout(() => { window.location.href = "${customScheme}"; }, 800);
           </script>
           </body></html>
         `);
       }
 
-      // Web Fallback
-      return res.redirect('/wallet?status=failure&reason=no_response');
+      // Send 200 OK for S2S (PhonePe expects it)
+      return res.status(200).json({ ok: true });
     }
 
-    // PhonePe response format: { success, code, data: { merchantTransactionId, ... } }
-    const code = decoded.code;
-    const merchantTransactionId = decoded.data?.merchantTransactionId || decoded.merchantTransactionId || req.query.txnId; // Fallback to Query ID
+    // Process decoded v1/legacy response
+    const code = decoded.code || decoded.state;
+    const merchantTransactionId = decoded.data?.merchantTransactionId || decoded.merchantTransactionId || decoded.merchantOrderId || req.query.txnId;
     const providerReferenceId = decoded.data?.providerReferenceId || decoded.providerReferenceId;
 
-    console.log(`Payment Callback: ${merchantTransactionId} | Status: ${code}`);
-    console.log(`[DEBUG] Full decoded response:`, JSON.stringify(decoded).substring(0, 300));
+    console.log(`[CALLBACK POST] Decoded: txnId=${merchantTransactionId}, code=${code}`);
 
-    const payment = await Payment.findOne({
-      $or: [
-        { transactionId: merchantTransactionId },
-        { merchantTransactionId: merchantTransactionId }
-      ]
-    });
-    if (!payment) {
-      console.error('Payment not found for:', merchantTransactionId);
-      return res.redirect('/?status=fail&reason=not_found');
-    }
+    // v1 success codes + v2 COMPLETED state
+    const isSuccess = code === 'PAYMENT_SUCCESS' || code === 'SUCCESS' || code === 'COMPLETED';
+    const isApp = req.query.isApp === 'true';
 
-
-    // Credit wallet ONLY for SUCCESS (not pending)
-    const isSuccess = code === 'PAYMENT_SUCCESS' || code === 'SUCCESS';
-    const isFailed = code === 'PAYMENT_ERROR' || code === 'PAYMENT_FAILED' || code === 'FAILURE';
-
-    console.log(`[WALLET DEBUG] Code: "${code}", isSuccess: ${isSuccess}, isFailed: ${isFailed}`);
-    console.log(`[WALLET DEBUG] Payment found: ${payment._id}, userId: ${payment.userId}, amount: ${payment.amount}, status: ${payment.status}`);
-
-    const redirectIsApp = payment.isApp || req.query.isApp === 'true';
-
-    if (isSuccess) {
-      // Treat as success - credit wallet
-      if (payment.status !== 'success') {
-        payment.status = 'success'; // Always mark as success
-        payment.providerRefId = providerReferenceId;
-        await payment.save();
-
-        // Credit Wallet
-        const user = await User.findOne({ userId: payment.userId });
-        if (user) {
-          // Rule: 18% GST. If user pays 118, credit 100.
-          const creditAmount = Math.round(payment.amount / 1.18);
-          user.walletBalance += creditAmount;
-          await user.save();
-          console.log(`✅ Wallet Credited: ${user.name} +₹${creditAmount} (Paid: ₹${payment.amount}, GST deducted)`);
-
-          // Notify Socket if online
-          const sId = userSockets.get(user.userId);
-          if (sId) {
-            io.to(sId).emit('wallet-update', {
-              balance: user.walletBalance,
-              totalEarnings: user.totalEarnings
-            });
-            io.to(sId).emit('app-notification', { text: `✅ Recharge Successful! +₹${creditAmount} (Excl. 18% GST)` });
-          }
-        }
-      }
-
-      if (redirectIsApp) {
-        const txnId = merchantTransactionId || '';
-        return res.redirect(`/payment-success?amount=${payment.amount || ''}&txnId=${txnId}`);
-      }
-      return res.redirect(`/wallet?status=success&amount=${payment.amount}`);
-
-    } else {
-      // Failure Handling
-      payment.status = 'failed';
-      await payment.save();
-
-      if (redirectIsApp) {
-        return res.redirect('/payment-failed');
-      }
-      return res.redirect(`/wallet?status=failure`);
-    }
+    await processPaymentResult(merchantTransactionId, isSuccess, providerReferenceId, isApp, res);
 
   } catch (e) {
-    console.error("Callback Error:", e);
+    console.error("Callback POST Error:", e);
     return res.redirect('/?status=error');
   }
 });
