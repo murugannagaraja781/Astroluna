@@ -4310,23 +4310,8 @@ app.post('/api/phonepe/init', async (req, res) => {
       }
     };
 
-    const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64');
-    const stringToSign = base64Payload + "/pg/v1/pay" + PHONEPE_SALT_KEY;
-    const sha256 = crypto.createHash('sha256').update(stringToSign).digest('hex');
-    const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
-
-    const response = await fetch(`${PHONEPE_HOST_URL}/pg/v1/pay`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-VERIFY': checksum,
-        'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
-        'accept': 'application/json'
-      },
-      body: JSON.stringify({ request: base64Payload })
-    });
-
-    const data = await response.json();
+    const phonepeResult = await callPhonePePay(payload);
+    const data = phonepeResult.data;
     console.log('[PhonePe SDK Init]', JSON.stringify(data));
 
     if (data.success) {
