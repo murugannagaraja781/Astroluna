@@ -16,20 +16,21 @@ const { fetchDailyHoroscope } = require("./utils/rasiEng/horoscopeData");
 
 // PhonePe Config
 // PhonePe Config
-const PHONEPE_MERCHANT_ID = process.env.PHONEPE_MERCHANT_ID;
-const PHONEPE_SALT_KEY = process.env.PHONEPE_SALT_KEY;
-const PHONEPE_SALT_INDEX = process.env.PHONEPE_SALT_INDEX;
-const PHONEPE_HOST_URL = process.env.PHONEPE_HOST_URL || "https://api-preprod.phonepe.com/apis/pg-sandbox";
+const PHONEPE_MERCHANT_ID = (process.env.PHONEPE_MERCHANT_ID || "").trim();
+const PHONEPE_SALT_KEY = (process.env.PHONEPE_SALT_KEY || "").trim();
+const PHONEPE_SALT_INDEX = (process.env.PHONEPE_SALT_INDEX || "").trim();
+const PHONEPE_HOST_URL = (process.env.PHONEPE_HOST_URL || "https://api.phonepe.com/apis/hermes").trim();
 
 // PhonePe OAuth Config
-const PHONEPE_CLIENT_ID = process.env.PHONEPE_CLIENT_ID;
-const PHONEPE_CLIENT_VERSION = process.env.PHONEPE_CLIENT_VERSION;
-const PHONEPE_CLIENT_SECRET = process.env.PHONEPE_CLIENT_SECRET;
+const PHONEPE_CLIENT_ID = (process.env.PHONEPE_CLIENT_ID || "").trim();
+const PHONEPE_CLIENT_VERSION = (process.env.PHONEPE_CLIENT_VERSION || "1").trim();
+const PHONEPE_CLIENT_SECRET = (process.env.PHONEPE_CLIENT_SECRET || "").trim();
 
 let phonepeTokenStore = {
   accessToken: null,
   expiresAt: 0 // epoch seconds
 };
+
 
 async function getPhonePeOAuthToken() {
   try {
@@ -57,6 +58,9 @@ async function getPhonePeOAuthToken() {
       },
       body: params
     });
+
+    console.log(`[PhonePe OAuth] Status: ${response.status}`);
+
 
     const text = await response.text();
     let data;
