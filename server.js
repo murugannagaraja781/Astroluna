@@ -110,16 +110,12 @@ async function callPhonePePay(payload) {
   const headers = {
     'Content-Type': 'application/json',
     'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
+    'X-VERIFY': checksum, // Re-adding X-VERIFY as fallback/requirement
     'accept': 'application/json'
   };
 
-  // Important: Discovery showed that for these specific credentials on Hermes,
-  // we must NOT send X-VERIFY if we are using the Authorization header.
   if (oauthToken) {
     headers['Authorization'] = `Bearer ${oauthToken}`;
-  } else {
-    // Fallback to Checksum if no OAuth token available (older credentials)
-    headers['X-VERIFY'] = checksum;
   }
 
   const options = {
@@ -4309,9 +4305,9 @@ app.post('/api/phonepe/init', async (req, res) => {
       merchantId: PHONEPE_MERCHANT_ID,
       merchantTransactionId: merchantTransactionId,
       merchantUserId: cleanUserId,
-      amount: Math.round(amount * 100), // Paise (Ensure Integer)
+      amount: Math.round(amount * 100),
       redirectUrl: `https://astroluna.in/api/payment/callback?isApp=true`,
-      redirectMode: "POST",
+      redirectMode: "REDIRECT", // Changed from POST to REDIRECT
       callbackUrl: `https://astroluna.in/api/phonepe/callback`,
       mobileNumber: userMobile,
       paymentInstrument: {
@@ -4323,14 +4319,21 @@ app.post('/api/phonepe/init', async (req, res) => {
     const data = phonepeResult.data;
     console.log('[PhonePe SDK Init]', JSON.stringify(data));
 
-    if (data.success) {
+    if (data && data.success) {
       res.json({
         ok: true,
         transactionId: merchantTransactionId,
         data: data.data
       });
     } else {
-      res.json({ ok: false, error: data.message || 'Payment initialization failed' });
+      // Return detailed error from PhonePe
+      const errorMsg = data?.message || data?.code || 'Payment initialization failed';
+      console.error(`[PhonePe Init Failed] Status: ${phonepeResult.status}`, data);
+      res.json({
+        ok: false,
+        error: errorMsg,
+        details: data // Send full data for debugging
+      });
     }
 
   } catch (e) {
