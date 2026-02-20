@@ -107,15 +107,24 @@ async function callPhonePePay(payload) {
   const checksum = sha256 + "###" + PHONEPE_SALT_INDEX;
 
   const oauthToken = await getValidPhonePeToken();
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
+    'accept': 'application/json'
+  };
+
+  // Important: Discovery showed that for these specific credentials on Hermes,
+  // we must NOT send X-VERIFY if we are using the Authorization header.
+  if (oauthToken) {
+    headers['Authorization'] = `Bearer ${oauthToken}`;
+  } else {
+    // Fallback to Checksum if no OAuth token available (older credentials)
+    headers['X-VERIFY'] = checksum;
+  }
+
   const options = {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-VERIFY': checksum,
-      'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
-      'Authorization': `Bearer ${oauthToken}`,
-      'accept': 'application/json'
-    },
+    headers: headers,
     body: JSON.stringify({ request: base64Payload })
   };
 
