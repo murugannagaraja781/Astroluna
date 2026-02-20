@@ -114,12 +114,16 @@ async function callPhonePePay(payload) {
   const headers = {
     'Content-Type': 'application/json',
     'X-MERCHANT-ID': PHONEPE_MERCHANT_ID,
-    'X-VERIFY': checksum, // Re-adding X-VERIFY as fallback/requirement
     'accept': 'application/json'
   };
 
   if (oauthToken) {
+    // For Hermes Production with OAuth, ONLY send the Authorization header.
+    // Do NOT send X-VERIFY as it can cause 400 Bad Request.
     headers['Authorization'] = `Bearer ${oauthToken}`;
+  } else {
+    // Fallback for older non-OAuth merchants
+    headers['X-VERIFY'] = checksum;
   }
 
   const options = {
@@ -128,7 +132,8 @@ async function callPhonePePay(payload) {
     body: JSON.stringify({ request: base64Payload })
   };
 
-  console.log(`[PhonePe] Standard Init: ${fullUrl}`);
+  console.log(`[PhonePe] Cluster: ${fullUrl}`);
+
 
   let response, data;
   try {
