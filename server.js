@@ -33,11 +33,14 @@ let phonepeTokenStore = {
 
 async function getPhonePeOAuthToken() {
   try {
-    // Determine OAuth URL based on Host URL
-    const isSandbox = PHONEPE_HOST_URL.includes("sandbox") || PHONEPE_HOST_URL.includes("preprod");
-    const oauthUrl = isSandbox
-      ? "https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token"
-      : "https://api.phonepe.com/apis/identity-manager/v1/oauth/token";
+    // Discovery found that some pre-prod credentials work on the production identity manager
+    let oauthUrl = "https://api.phonepe.com/apis/identity-manager/v1/oauth/token";
+
+    // Fallback logic if we want to honor sandbox flag
+    if (PHONEPE_HOST_URL.includes("sandbox") && !PHONEPE_HOST_URL.includes("hermes")) {
+      oauthUrl = "https://api-preprod.phonepe.com/apis/pg-sandbox/v1/oauth/token";
+    }
+
 
     const params = new URLSearchParams();
     params.append('client_id', PHONEPE_CLIENT_ID);
@@ -4373,13 +4376,12 @@ app.post('/api/phonepe/sign', async (req, res) => {
 
     res.json({
       ok: true,
-      payload: {
-        base64Payload: base64Payload,
-        checksum: checksum,
-        transactionId: merchantTransactionId
-      },
+      payload: base64Payload,
+      checksum: checksum,
+      transactionId: merchantTransactionId,
       error: null
     });
+
 
   } catch (e) {
     console.error("PhonePe Sign Error:", e);
