@@ -37,8 +37,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -89,9 +89,7 @@ dependencies {
     // Material Design
     implementation("com.google.android.material:material:1.12.0")
 
-    // Image Loading
-    implementation("com.github.bumptech.glide:glide:4.16.0")
-    implementation("de.hdodenhof:circleimageview:3.1.0")
+    // Image Loading (Reduced to Coil only)
     implementation("io.coil-kt:coil-compose:2.6.0")
 
     // Firebase (Safe 2024 versions)
@@ -126,8 +124,8 @@ dependencies {
     // PhonePe (Keep slightly older or check compatibility)
     implementation("phonepe.intentsdk.android.release:IntentSDK:5.3.0")
 
-    // Icons
-    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    // Icons (Using core only to save 10MB+)
+    implementation("androidx.compose.material:material-icons-core:1.6.8")
 
     // Jetpack Compose (BOM 2024.06.00)
     implementation(platform("androidx.compose:compose-bom:2024.06.00"))
