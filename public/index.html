@@ -6179,8 +6179,9 @@
     }
 
     function shareReferral() {
-      const code = document.getElementById('displayReferralCode').innerText;
-      const text = `Join me on Astro Luna! Use my referral code *${code}* and get a join bonus. Get expert astrology consultations, daily horoscope and more! \n\nDownload App: https://astroluna.in`;
+      const code = document.getElementById('displayReferralCode').innerText.trim();
+      const refLink = `https://astroluna.in/?ref=${code}`;
+      const text = `Join me on Astro Luna! Use my referral code *${code}* or click below to get a join bonus. \n\n${refLink} \n\nGet expert consultations, daily horoscopes and more!`;
       const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
     }

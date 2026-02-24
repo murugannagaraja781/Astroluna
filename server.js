@@ -1511,6 +1511,16 @@ app.post('/api/verify-otp', async (req, res) => {
             adminAmount: -REFERRAL_BONUS_AMOUNT,
             reason: 'referral'
           });
+
+          // Notify Referrer in real-time
+          const referrerSocket = userSockets.get(referrer.userId);
+          if (referrerSocket) {
+            io.to(referrerSocket).emit('wallet-update', { balance: referrer.walletBalance });
+            io.to(referrerSocket).emit('notification', {
+              title: 'Referral Bonus!',
+              text: `₹${REFERRAL_BONUS_AMOUNT} credited for referring ${name}!`
+            });
+          }
         }
       }
 
@@ -2245,7 +2255,9 @@ io.on('connection', (socket) => {
           role: user.role,
           name: user.name,
           walletBalance: user.walletBalance,
-          totalEarnings: user.totalEarnings || 0
+          totalEarnings: user.totalEarnings || 0,
+          referralCode: user.referralCode,
+          hasRecharged: user.hasRecharged || false
         });
         console.log(`User registered: ${user.name} (${user.role})`);
 
