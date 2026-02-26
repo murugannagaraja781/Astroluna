@@ -16,21 +16,18 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Call
-import androidx.compose.material.icons.rounded.Chat
-import androidx.compose.material.icons.rounded.VideoCall
-import androidx.compose.material.icons.rounded.Star
-import androidx.compose.material.icons.rounded.AccountBalanceWallet
-import androidx.compose.material.icons.rounded.Group
-import androidx.compose.material.icons.rounded.Share
-import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -699,7 +696,7 @@ fun ReferAndEarnSection(code: String) {
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = androidx.compose.material.icons.Icons.Rounded.Star,
+                        imageVector = androidx.compose.material.icons.Icons.Default.Star,
                         contentDescription = null,
                         tint = Color(0xFFFFD700),
                         modifier = Modifier.size(24.dp)
@@ -927,7 +924,7 @@ fun HomeTopBar(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        Icons.Rounded.AccountBalanceWallet,
+                        Icons.Default.AddCircle,
                         contentDescription = null,
                         tint = Color(0xFF7FDBFF), // Neon Cyan
                         modifier = Modifier.size(16.dp)
@@ -1083,7 +1080,7 @@ fun AstrologerCard(
                             .border(2.dp, if(astro.isBusy) Color.Red else if(astro.isOnline) PeacockGreen else Color.LightGray, CircleShape)
                     )
                      Icon(
-                        imageVector = Icons.Filled.CheckCircle,
+                        imageVector = Icons.Default.Check,
                         contentDescription = "Verified",
                         tint = Color(0xFF2196F3),
                         modifier = Modifier.size(20.dp).background(Color.White, CircleShape).border(1.dp, Color.White, CircleShape)
@@ -1092,7 +1089,7 @@ fun AstrologerCard(
                  Spacer(modifier = Modifier.height(8.dp))
                  Row(verticalAlignment = Alignment.CenterVertically) {
                      Text("${if(astro.rating > 0) astro.rating else 4.5}", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = Color.Black)
-                     Icon(Icons.Rounded.Star, null, tint = Color(0xFFFFD700), modifier = Modifier.size(12.dp))
+                     Icon(Icons.Default.Star, null, tint = Color(0xFFFFD700), modifier = Modifier.size(12.dp))
                  }
                  Text("${if(astro.orders>0) astro.orders else 3908} Orders", style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp), color = Color.Gray)
              }
@@ -1112,17 +1109,17 @@ fun AstrologerCard(
                      }
                  }
                  Spacer(modifier = Modifier.height(6.dp))
-                 InfoRow(Icons.Filled.Bolt, if(astro.skills.isNotEmpty()) astro.skills.joinToString(", ") else "Vedic, Vastu")
-                 InfoRow(Icons.Filled.Translate, "Hindi, English, Tamil")
-                 InfoRow(Icons.Filled.Schedule, "Exp: ${if(astro.experience>0) astro.experience else 5} Years")
+                 InfoRow(Icons.Default.Star, if(astro.skills.isNotEmpty()) astro.skills.joinToString(", ") else "Vedic, Vastu")
+                 InfoRow(Icons.Default.Info, "Hindi, English, Tamil")
+                 InfoRow(Icons.Default.Info, "Exp: ${if(astro.experience>0) astro.experience else 5} Years")
 
                  Spacer(modifier = Modifier.height(12.dp))
 
                  Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                      // Only show buttons for services the astrologer has enabled
-                     if (showChat && astro.isChatOnline) AstrologerActionButton("Chat", Icons.Rounded.Chat, !astro.isBusy, AquaBlue, { onChatClick(astro) })
-                     if (showVideo && astro.isVideoOnline) AstrologerActionButton("Video", Icons.Rounded.VideoCall, !astro.isBusy, PriceRed, { onCallClick(astro, "Video") }, Modifier.padding(start=4.dp))
-                     if (showCall && astro.isAudioOnline) AstrologerActionButton("Call", Icons.Rounded.Call, !astro.isBusy, PeacockGreen, { onCallClick(astro, "Audio") }, Modifier.padding(start=4.dp))
+                     if (showChat && astro.isChatOnline) AstrologerActionButton("Chat", Icons.Default.Send, !astro.isBusy, AquaBlue, { onChatClick(astro) })
+                     if (showVideo && astro.isVideoOnline) AstrologerActionButton("Video", Icons.Default.PlayArrow, !astro.isBusy, PriceRed, { onCallClick(astro, "Video") }, Modifier.padding(start=4.dp))
+                     if (showCall && astro.isAudioOnline) AstrologerActionButton("Call", Icons.Default.Phone, !astro.isBusy, PeacockGreen, { onCallClick(astro, "Audio") }, Modifier.padding(start=4.dp))
                  }
              }
         }
@@ -1137,9 +1134,9 @@ fun HomeBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
     ) {
         val items = listOf(
             Triple("Home", androidx.compose.material.icons.Icons.Default.Home, 0),
-            Triple("Chat", androidx.compose.material.icons.Icons.Rounded.Chat, 1),
-            Triple("Refer", androidx.compose.material.icons.Icons.Rounded.Group, 5),
-            Triple("Call", androidx.compose.material.icons.Icons.Rounded.Call, 3),
+            Triple("Chat", androidx.compose.material.icons.Icons.Default.Send, 1),
+            Triple("Refer", androidx.compose.material.icons.Icons.Default.Person, 5),
+            Triple("Call", androidx.compose.material.icons.Icons.Default.Phone, 3),
             Triple("Profile", androidx.compose.material.icons.Icons.Default.Person, 4)
         )
 
@@ -1204,7 +1201,7 @@ fun DailyHoroscopeCard(content: String) {
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.Star,
+                        imageVector = Icons.Default.Star,
                         contentDescription = null,
                         tint = PeacockGreen,
                         modifier = Modifier.size(24.dp)
@@ -1564,7 +1561,7 @@ fun CustomerStoryCard(name: String, loc: String, review: String) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = name, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold))
                     Spacer(modifier = Modifier.weight(1f))
-                    Icon(imageVector = Icons.Filled.Menu, contentDescription=null, modifier=Modifier.size(16.dp), tint=Color.Gray) // 3-dot placeholder
+                    Icon(imageVector = Icons.Default.Menu, contentDescription=null, modifier=Modifier.size(16.dp), tint=Color.Gray) // 3-dot placeholder
                 }
                 Text(text = loc, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -1601,7 +1598,7 @@ fun StickyFooterButtons(
             modifier = Modifier.weight(1f).height(46.dp),
             contentPadding = PaddingValues(horizontal = 4.dp)
         ) {
-            Icon(imageVector = androidx.compose.material.icons.Icons.Rounded.Chat, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.Black)
+            Icon(imageVector = androidx.compose.material.icons.Icons.Default.Send, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.Black)
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "Chat with Astro",
@@ -1625,7 +1622,7 @@ fun StickyFooterButtons(
             modifier = Modifier.weight(1f).height(46.dp),
             contentPadding = PaddingValues(horizontal = 4.dp)
         ) {
-            Icon(imageVector = androidx.compose.material.icons.Icons.Rounded.Call, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.Black)
+            Icon(imageVector = androidx.compose.material.icons.Icons.Default.Phone, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.Black)
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "Talk to Astro",

@@ -499,7 +499,7 @@ fun DashaNodeInternal(period: DashaPeriod) {
 
             if (hasSub) {
                 Icon(
-                    if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    if (expanded) Icons.Default.ArrowBack else Icons.Default.ArrowBack,
                     contentDescription = null,
                     tint = Color.Gray
                 )

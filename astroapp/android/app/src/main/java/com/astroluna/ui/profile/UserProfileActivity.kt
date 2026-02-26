@@ -17,9 +17,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -141,7 +141,7 @@ fun UserProfileScreen(
                     if (isUploading) {
                         CircularProgressIndicator(color = Color.White)
                     } else {
-                        Icon(Icons.Default.CameraAlt, "Change", tint = Color.White)
+                        Icon(Icons.Default.Edit, "Change", tint = Color.White)
                     }
                 }
             }

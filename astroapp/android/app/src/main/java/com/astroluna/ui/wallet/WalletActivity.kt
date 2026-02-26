@@ -16,9 +16,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountBalanceWallet
-import androidx.compose.material.icons.rounded.AddCircle
-import androidx.compose.material.icons.rounded.History
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -213,7 +213,7 @@ fun WalletScreen(
                     actions = {
                         IconButton(onClick = onRefreshHistory) {
                             Icon(
-                                Icons.Rounded.History,
+                                Icons.Default.Refresh,
                                 contentDescription = "Refresh",
                                 tint = neonCyan
                             )
@@ -305,7 +305,7 @@ fun WalletScreen(
                                     )
                                 }
                                 Icon(
-                                    Icons.Rounded.AccountBalanceWallet,
+                                    Icons.Default.AddCircle,
                                     contentDescription = null,
                                     tint = neonCyan,
                                     modifier = Modifier.size(32.dp)
@@ -414,7 +414,7 @@ fun WalletScreen(
                                     contentColor = Color.White
                                 )
                             ) {
-                                Icon(Icons.Rounded.AddCircle, null)
+                                Icon(Icons.Default.Add, null)
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text("RECHARGE NOW", fontWeight = FontWeight.Black, letterSpacing = 1.sp)
                             }

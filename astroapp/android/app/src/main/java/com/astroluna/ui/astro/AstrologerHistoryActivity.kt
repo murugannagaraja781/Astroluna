@@ -10,9 +10,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Chat
-import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -126,7 +126,7 @@ fun HistoryScreen(userId: String, onBack: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Icon(
-                        imageVector = Icons.Default.History,
+                        imageVector = Icons.Default.Phone,
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
                         tint = Color.Gray
@@ -164,7 +164,7 @@ fun HistoryCard(item: SessionHistoryItem) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = if (item.type == "chat") Icons.Default.Chat else Icons.Default.Call,
+                    imageVector = if (item.type == "chat") Icons.Default.Phone else Icons.Default.Phone,
                     contentDescription = null,
                     tint = colors.accent,
                     modifier = Modifier.size(24.dp)

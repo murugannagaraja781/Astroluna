@@ -22,8 +22,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.CallEnd
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -392,7 +392,7 @@ fun IncomingCallScreen(
                         modifier = Modifier.size(72.dp),
                         shape = CircleShape
                     ) {
-                        Icon(Icons.Default.CallEnd, "Decline", modifier = Modifier.size(32.dp))
+                        Icon(Icons.Default.Phone, "Decline", modifier = Modifier.size(32.dp))
                     }
                     Text("Decline", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(top=8.dp))
                 }
@@ -409,7 +409,7 @@ fun IncomingCallScreen(
                              CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                         } else {
                              // Shake or animate icon if needed
-                            Icon(Icons.Default.Call, "Accept", modifier = Modifier.size(32.dp))
+                            Icon(Icons.Default.Phone, "Accept", modifier = Modifier.size(32.dp))
                         }
                     }
                     Text(if (isSocketConnected) "Accept" else "Connecting...", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(top=8.dp))

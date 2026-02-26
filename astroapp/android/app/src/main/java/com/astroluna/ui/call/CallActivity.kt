@@ -13,14 +13,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CallEnd
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.MicOff
-import androidx.compose.material.icons.filled.Videocam
-import androidx.compose.material.icons.filled.VideocamOff
-import androidx.compose.material.icons.filled.VolumeUp
-import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,8 +39,7 @@ import androidx.core.content.ContextCompat
 import android.media.MediaRecorder
 import android.os.Build
 import java.io.File
-import androidx.compose.material.icons.filled.FiberManualRecord
-import androidx.compose.material.icons.filled.Stop
+// Note: Recording icons replaced with core Check/AddCircle
 import com.astroluna.R
 import com.astroluna.data.remote.SocketManager
 import com.astroluna.data.local.TokenManager
@@ -1218,11 +1216,11 @@ fun CallScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ControlBtnItem(onClick = onToggleMic, icon = if (!isMuted) Icons.Default.Mic else Icons.Default.MicOff, label = "Mute", active = !isMuted)
+                    ControlBtnItem(onClick = onToggleMic, icon = if (!isMuted) Icons.Default.Phone else Icons.Default.Phone, label = "Mute", active = !isMuted)
                     if (callType == "video") {
-                        ControlBtnItem(onClick = onToggleCamera, icon = if (isVideoEnabled) Icons.Default.Videocam else Icons.Default.VideocamOff, label = "Video", active = isVideoEnabled)
+                        ControlBtnItem(onClick = onToggleCamera, icon = if (isVideoEnabled) Icons.Default.PlayArrow else Icons.Default.PlayArrow, label = "Video", active = isVideoEnabled)
                     }
-                    ControlBtnItem(onClick = onToggleSpeaker, icon = if (isSpeakerOn) Icons.Default.VolumeUp else Icons.Default.VolumeOff, label = "Speaker", active = isSpeakerOn)
+                    ControlBtnItem(onClick = onToggleSpeaker, icon = if (isSpeakerOn) Icons.Default.Refresh else Icons.Default.Refresh, label = "Speaker", active = isSpeakerOn)
                 }
 
                 // Actions Row
@@ -1245,13 +1243,13 @@ fun CallScreen(
                             .shadow(8.dp, CircleShape)
                             .background(Color(0xFFFF5252), CircleShape)
                     ) {
-                        Icon(Icons.Default.CallEnd, "End", tint = Color.White, modifier = Modifier.size(32.dp))
+                        Icon(Icons.Default.Phone, "End", tint = Color.White, modifier = Modifier.size(32.dp))
                     }
 
                     if (role == "astrologer") {
                         ControlBtnItem(
                             onClick = onToggleRecording,
-                            icon = if (isRecording) Icons.Default.Stop else Icons.Default.FiberManualRecord,
+                            icon = if (isRecording) Icons.Default.Check else Icons.Default.AddCircle,
                             label = if (isRecording) "Stop" else "REC",
                             active = isRecording
                         )

@@ -9,8 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -88,7 +88,7 @@ fun PaymentStatusScreen(
 ) {
     val bgColor = if (isSuccess) Color(0xFFE8F5E9) else Color(0xFFFBE9E7)
     val iconColor = if (isSuccess) Color(0xFF4CAF50) else Color(0xFFD32F2F)
-    val icon: ImageVector = if (isSuccess) Icons.Default.CheckCircle else Icons.Default.Error
+    val icon: ImageVector = if (isSuccess) Icons.Default.Check else Icons.Default.Warning
     val title = if (isSuccess) "Payment Successful!" else "Payment Failed"
     val message = if (isSuccess) "Your wallet has been recharged.\nTxn ID: ${txnId ?: "N/A"}" else "Transaction could not be completed."
 

@@ -23,12 +23,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.MonetizationOn
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -275,8 +275,8 @@ fun AstrologerDashboardScreen(
 
     val services = remember {
         mutableStateListOf(
-            ServiceData("Chat", true, Icons.Default.Chat),
-            ServiceData("Call", true, Icons.Default.Call),
+            ServiceData("Chat", true, Icons.Default.Send),
+            ServiceData("Call", true, Icons.Default.Phone),
             ServiceData("Video", true, Icons.Default.Person)
         )
     }
@@ -471,7 +471,7 @@ fun AstrologerDashboardScreen(
                         .background(Color.White.copy(alpha = 0.1f))
                         .border(1.dp, Color.White.copy(alpha = 0.2f), CircleShape)
                 ) {
-                    Icon(Icons.Default.Notifications, null, tint = Color.White)
+                    Icon(Icons.Default.Info, null, tint = Color.White)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(
@@ -698,11 +698,11 @@ fun AstrologerDashboardScreen(
 
             // 4. Action Grid - Custom Row-based Layout to work inside verticalScroll
             val actions = listOf(
-                "Call" to Icons.Default.Call,
-                "Chat" to Icons.Default.Chat,
-                "Earnings" to Icons.Default.MonetizationOn,
+                "Call" to Icons.Default.Phone,
+                "Chat" to Icons.Default.Send,
+                "Earnings" to Icons.Default.AddCircle,
                 "Reviews" to Icons.Default.Star,
-                "History" to Icons.Default.History,
+                "History" to Icons.Default.Refresh,
                 "Profile" to Icons.Default.Person
             )
 
@@ -816,7 +816,7 @@ fun ServiceTogglesCard(
             // Chat Toggle
             ServiceToggleRow(
                 label = "Chat",
-                icon = Icons.Default.Chat,
+                icon = Icons.Default.Send,
                 isEnabled = isChatOnline,
                 onToggle = onChatToggle
             )
@@ -826,7 +826,7 @@ fun ServiceTogglesCard(
             // Audio Call Toggle
             ServiceToggleRow(
                 label = "Audio Call",
-                icon = Icons.Default.Call,
+                icon = Icons.Default.Phone,
                 isEnabled = isAudioOnline,
                 onToggle = onAudioToggle
             )

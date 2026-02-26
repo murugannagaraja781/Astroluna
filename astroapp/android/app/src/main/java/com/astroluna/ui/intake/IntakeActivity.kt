@@ -19,9 +19,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.AutoFixHigh
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Edit
 import com.astroluna.ui.theme.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -616,7 +616,7 @@ fun IntakeScreen(
                     },
                     navigationIcon = {
                         IconButton(onClick = onClose) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -814,7 +814,7 @@ fun IntakeScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable { launchLocationPicker() },
-                                trailingIcon = { Icon(Icons.Default.LocationOn, "Pick", tint = PeacockGreen) },
+                                trailingIcon = { Icon(Icons.Default.Place, "Pick", tint = PeacockGreen) },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     disabledTextColor = RoyalMidnightBlue,
@@ -833,7 +833,7 @@ fun IntakeScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable { launchLocationPicker() },
-                                trailingIcon = { Icon(Icons.Default.LocationOn, "Pick", tint = PeacockGreen) },
+                                trailingIcon = { Icon(Icons.Default.Place, "Pick", tint = PeacockGreen) },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     disabledTextColor = RoyalMidnightBlue,
@@ -852,7 +852,7 @@ fun IntakeScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable { launchLocationPicker() },
-                                trailingIcon = { Icon(Icons.Default.LocationOn, "Pick", tint = PeacockGreen) },
+                                trailingIcon = { Icon(Icons.Default.Place, "Pick", tint = PeacockGreen) },
                                 shape = RoundedCornerShape(12.dp),
                                 colors = OutlinedTextFieldDefaults.colors(
                                     disabledTextColor = RoyalMidnightBlue,
@@ -1083,7 +1083,7 @@ fun IntakeScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable { launchPartnerLocationPicker() },
-                                    trailingIcon = { Icon(Icons.Default.LocationOn, "Pick", tint = PeacockGreen) },
+                                    trailingIcon = { Icon(Icons.Default.Place, "Pick", tint = PeacockGreen) },
                                     shape = RoundedCornerShape(12.dp),
                                     colors = OutlinedTextFieldDefaults.colors(
                                         disabledTextColor = RoyalMidnightBlue,
@@ -1101,7 +1101,7 @@ fun IntakeScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable { launchPartnerLocationPicker() },
-                                    trailingIcon = { Icon(Icons.Default.LocationOn, "Pick", tint = PeacockGreen) },
+                                    trailingIcon = { Icon(Icons.Default.Place, "Pick", tint = PeacockGreen) },
                                     shape = RoundedCornerShape(12.dp),
                                     colors = OutlinedTextFieldDefaults.colors(
                                         disabledTextColor = RoyalMidnightBlue,
@@ -1119,7 +1119,7 @@ fun IntakeScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable { launchPartnerLocationPicker() },
-                                    trailingIcon = { Icon(Icons.Default.LocationOn, "Pick", tint = PeacockGreen) },
+                                    trailingIcon = { Icon(Icons.Default.Place, "Pick", tint = PeacockGreen) },
                                     shape = RoundedCornerShape(12.dp),
                                     colors = OutlinedTextFieldDefaults.colors(
                                         disabledTextColor = RoyalMidnightBlue,
@@ -1211,7 +1211,7 @@ fun IntakeScreen(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        Icons.Default.AutoAwesome,
+                                        Icons.Default.Star,
                                         contentDescription = "Cosmic",
                                         tint = Color.White,
                                         modifier = Modifier.size(40.dp)
@@ -1262,7 +1262,7 @@ fun IntakeScreen(
                                             fontWeight = FontWeight.Bold,
                                             color = Color(0xFFCE93D8) // Lavender
                                         )
-                                        Icon(Icons.Default.AutoFixHigh, "", tint = Color(0xFFCE93D8), modifier = Modifier.size(20.dp))
+                                        Icon(Icons.Default.Edit, "", tint = Color(0xFFCE93D8), modifier = Modifier.size(20.dp))
                                     }
 
                                     Divider(

@@ -13,12 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Chat
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.rounded.VideoCall
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -101,7 +96,7 @@ fun AstrologerProfileScreen(
 
     Scaffold(
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 title = { Text("Profile", color = Color.White, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -113,7 +108,7 @@ fun AstrologerProfileScreen(
                         Icon(Icons.Default.Share, "Share", tint = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = peacockTeal)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = peacockTeal)
             )
         }
     ) { padding ->
@@ -168,7 +163,7 @@ fun AstrologerProfileScreen(
                     )
                    // Verified Badge
                     Icon(
-                        imageVector = Icons.Default.CheckCircle,
+                        imageVector = Icons.Default.Check,
                         contentDescription = "Verified",
                         tint = Color(0xFF4CAF50),
                         modifier = Modifier
@@ -218,9 +213,9 @@ fun AstrologerProfileScreen(
                        .padding(16.dp),
                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    StatItem(icon = Icons.Default.Chat, value = "49k Mins")
-                    StatItem(icon = Icons.Default.Call, value = "31k Mins")
-                    StatItem(icon = Icons.Default.CheckCircle, value = "$exp years Exp")
+                    StatItem(icon = Icons.Default.Send, value = "49k Mins")
+                    StatItem(icon = Icons.Default.Phone, value = "31k Mins")
+                    StatItem(icon = Icons.Default.Check, value = "$exp years Exp")
                 }
 
                 // Bio
@@ -243,7 +238,7 @@ fun AstrologerProfileScreen(
                     // Only show buttons for services the astrologer has enabled
                     if (isChatOnline) {
                         ActionButton(
-                            icon = Icons.Default.Chat,
+                            icon = Icons.Default.Send,
                             label = "Chat",
                             color = Color(0xFF00BCD4),
                             isEnabled = true,
@@ -253,7 +248,7 @@ fun AstrologerProfileScreen(
 
                     if (isAudioOnline) {
                         ActionButton(
-                            icon = Icons.Default.Call,
+                            icon = Icons.Default.Phone,
                             label = "Call",
                             color = Color(0xFF00796B),
                             isEnabled = true,
@@ -263,7 +258,7 @@ fun AstrologerProfileScreen(
 
                     if (isVideoOnline) {
                         ActionButton(
-                            icon = androidx.compose.material.icons.Icons.Rounded.VideoCall,
+                            icon = Icons.Default.PlayArrow,
                             label = "Video",
                             color = Color(0xFFD32F2F),
                             isEnabled = true,

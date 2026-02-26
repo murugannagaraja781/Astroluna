@@ -16,11 +16,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.*
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -546,8 +543,8 @@ fun ChatBubble(msg: ChatMessage, amIAstrologer: Boolean, onReply: () -> Unit) {
                                  verticalAlignment = Alignment.CenterVertically
                             ) {
                                 val icon = when(msg.status) {
-                                    "read" -> Icons.Default.DoneAll
-                                    "delivered" -> Icons.Default.DoneAll
+                                    "read" -> Icons.Default.Done
+                                    "delivered" -> Icons.Default.Done
                                     else -> Icons.Default.Check
                                 }
                                 val tint = Color(0xFF2196F3)
