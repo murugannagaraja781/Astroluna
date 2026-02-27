@@ -577,7 +577,9 @@ const UserSchema = new mongoose.Schema({
   // Referral System Fields
   referredBy: { type: String, default: null }, // userId of the referrer
   referralCode: { type: String, unique: true, sparse: true }, // unique code for sharing
-  hasRecharged: { type: Boolean, default: false } // Only rechargers activate referral commission
+  hasRecharged: { type: Boolean, default: false }, // Only rechargers activate referral commission
+  referralEarnings: { type: Number, default: 0 }, // Total amount earned from referrals
+  referralWithdrawn: { type: Number, default: 0 } // Total amount withdrawn from referral earnings
 });
 
 const CallRequestSchema = new mongoose.Schema({
@@ -646,6 +648,7 @@ const BillingLedger = mongoose.model('BillingLedger', BillingLedgerSchema);
 const WithdrawalSchema = new mongoose.Schema({
   astroId: String,
   amount: Number,
+  type: { type: String, enum: ['payout', 'referral'], default: 'payout' },
   status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
   requestedAt: { type: Date, default: Date.now },
   processedAt: Date
@@ -865,13 +868,20 @@ app.get('/api/referral/stats/:userId', async (req, res) => {
     // or we'd ideally have tagged ledger entries.
 
     // For now, let's return the counts and the list for the dashboard
+    const user = await User.findOne({ userId }).select('referralEarnings referralWithdrawn');
+    const referralEarnings = user ? (user.referralEarnings || 0) : 0;
+    const referralWithdrawn = user ? (user.referralWithdrawn || 0) : 0;
+    const withdrawableAmount = referralEarnings - referralWithdrawn;
+
     res.json({
       ok: true,
       stats: {
         level1Count: l1Users.length,
         level2Count: l2Users.length,
         level3Count: l3Users.length,
-        totalReferrals: l1Users.length + l2Users.length + l3Users.length
+        totalReferrals: l1Users.length + l2Users.length + l3Users.length,
+        referralEarnings: Math.floor(referralEarnings),
+        withdrawableAmount: Math.floor(withdrawableAmount)
       },
       referrals: {
         l1: l1Users,
@@ -879,6 +889,69 @@ app.get('/api/referral/stats/:userId', async (req, res) => {
         l3: l3Users
       }
     });
+
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// --- Referral Withdrawal Request API ---
+app.post('/api/withdraw-referral', async (req, res) => {
+  try {
+    const { userId, amount } = req.body;
+    if (!userId || !amount || amount < 1000) {
+      return res.json({ ok: false, error: 'Minimum withdrawal is ₹1000' });
+    }
+
+    const user = await User.findOne({ userId });
+    if (!user) return res.json({ ok: false, error: 'User not found' });
+
+    const available = (user.referralEarnings || 0) - (user.referralWithdrawn || 0);
+    if (amount > available) {
+      return res.json({ ok: false, error: 'Insufficient referral balance' });
+    }
+
+    if (user.walletBalance < amount) {
+      return res.json({ ok: false, error: 'Insufficient wallet balance' });
+    }
+
+    // Create withdrawal record
+    const withdrawalId = crypto.randomUUID();
+    await Withdrawal.create({
+      withdrawalId,
+      astroId: userId, // Reusing field for userId
+      amount,
+      type: 'referral',
+      status: 'pending'
+    });
+
+    // Deduct and update
+    user.walletBalance -= amount;
+    user.referralWithdrawn = (user.referralWithdrawn || 0) + amount;
+    await user.save();
+
+    // Create a ledger entry for withdrawal
+    await BillingLedger.create({
+      billingId: crypto.randomUUID(),
+      sessionId: 'referral_withdrawal_' + userId,
+      minuteIndex: 0,
+      chargedToClient: amount,
+      creditedToAstrologer: 0,
+      adminAmount: amount,
+      reason: 'payout_withdrawal'
+    });
+
+    // Notify user via socket
+    const socketId = userSockets.get(userId);
+    if (socketId) {
+      io.to(socketId).emit('wallet-update', { balance: user.walletBalance });
+      io.to(socketId).emit('notification', {
+        title: 'Withdrawal Requested',
+        text: `₹${amount} referral withdrawal is pending approval.`
+      });
+    }
+
+    res.json({ ok: true, message: 'Withdrawal request submitted successfully' });
 
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
@@ -1497,6 +1570,7 @@ app.post('/api/verify-otp', async (req, res) => {
 
           // Credit referral bonus to referrer
           referrer.walletBalance += REFERRAL_BONUS_AMOUNT;
+          referrer.referralEarnings = (referrer.referralEarnings || 0) + REFERRAL_BONUS_AMOUNT;
           await referrer.save();
 
           console.log(`[Referral] User ${name} referred by ${referrer.name}. Bonus Rs.${REFERRAL_BONUS_AMOUNT} given.`);
@@ -2005,6 +2079,7 @@ async function processBillingCharge(sessionId, durationSeconds, minuteIndex, typ
         if (l1) {
           const l1Com = amountToCharge * COMMISSION_L1;
           l1.walletBalance += l1Com;
+          l1.referralEarnings = (l1.referralEarnings || 0) + l1Com;
           await l1.save();
           adminShare -= l1Com;
 
@@ -2018,6 +2093,7 @@ async function processBillingCharge(sessionId, durationSeconds, minuteIndex, typ
             if (l2) {
               const l2Com = amountToCharge * COMMISSION_L2;
               l2.walletBalance += l2Com;
+              l2.referralEarnings = (l2.referralEarnings || 0) + l2Com;
               await l2.save();
               adminShare -= l2Com;
 
@@ -2031,6 +2107,7 @@ async function processBillingCharge(sessionId, durationSeconds, minuteIndex, typ
                 if (l3) {
                   const l3Com = amountToCharge * COMMISSION_L3;
                   l3.walletBalance += l3Com;
+                  l3.referralEarnings = (l3.referralEarnings || 0) + l3Com;
                   await l3.save();
                   adminShare -= l3Com;
 
@@ -3565,6 +3642,12 @@ io.on('connection', (socket) => {
       if (u) {
         // REFUND
         u.walletBalance += w.amount;
+
+        // If it was a referral withdrawal, reverse the referralWithdrawn count
+        if (w.type === 'referral') {
+          u.referralWithdrawn = Math.max(0, (u.referralWithdrawn || 0) - w.amount);
+        }
+
         await u.save();
 
         const sId = userSockets.get(u.userId);

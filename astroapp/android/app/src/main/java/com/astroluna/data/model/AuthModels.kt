@@ -40,7 +40,9 @@ data class ReferralStats(
     val level1Count: Int,
     val level2Count: Int,
     val level3Count: Int,
-    val totalReferrals: Int
+    val totalReferrals: Int,
+    val referralEarnings: Int = 0,
+    val withdrawableAmount: Int = 0
 )
 
 @Keep

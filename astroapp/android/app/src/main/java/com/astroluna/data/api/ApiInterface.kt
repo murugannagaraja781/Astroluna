@@ -73,4 +73,7 @@ interface ApiInterface {
     suspend fun generateRasiChart(@Body request: com.google.gson.JsonObject): Response<com.google.gson.JsonObject>
     @retrofit2.http.GET("api/referral/stats/{userId}")
     suspend fun getReferralStats(@retrofit2.http.Path("userId") userId: String): Response<com.astroluna.data.model.ReferralStatsResponse>
+
+    @POST("api/withdraw-referral")
+    suspend fun withdrawReferral(@Body request: com.google.gson.JsonObject): Response<com.google.gson.JsonObject>
 }

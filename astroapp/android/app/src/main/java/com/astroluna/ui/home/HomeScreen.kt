@@ -568,6 +568,67 @@ fun ReferralDashboard(referralCode: String, isTamil: Boolean) {
         }
     }
 
+    var isWithdrawing by remember { mutableStateOf(false) }
+    var withdrawalAmount by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+
+    if (isWithdrawing) {
+        AlertDialog(
+            onDismissRequest = { isWithdrawing = false },
+            title = { Text("Withdraw Referral Earnings") },
+            text = {
+                Column {
+                    Text("Available: ₹${stats?.withdrawableAmount ?: 0}")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = withdrawalAmount,
+                        onValueChange = { if (it.all { char -> char.isDigit() }) withdrawalAmount = it },
+                        label = { Text("Amount (Min ₹1000)") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val amt = withdrawalAmount.toIntOrNull() ?: 0
+                        if (amt >= 1000 && amt <= (stats?.withdrawableAmount ?: 0)) {
+                            scope.launch {
+                                try {
+                                    val body = com.google.gson.JsonObject().apply {
+                                        addProperty("userId", userId)
+                                        addProperty("amount", amt)
+                                    }
+                                    val res = ApiClient.api.withdrawReferral(body)
+                                    if (res.isSuccessful && res.body()?.get("ok")?.asBoolean == true) {
+                                        android.widget.Toast.makeText(context, "Withdrawal Requested!", android.widget.Toast.LENGTH_SHORT).show()
+                                        isWithdrawing = false
+                                        // Refresh stats
+                                        val refresh = ApiClient.api.getReferralStats(userId)
+                                        if (refresh.isSuccessful) stats = refresh.body()?.stats
+                                    } else {
+                                        val err = res.body()?.get("error")?.asString ?: "Failed"
+                                        android.widget.Toast.makeText(context, err, android.widget.Toast.LENGTH_SHORT).show()
+                                    }
+                                } catch (e: Exception) {
+                                    android.widget.Toast.makeText(context, "Error: ${e.message}", android.widget.Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            android.widget.Toast.makeText(context, "Invalid Amount", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = PeacockGreen)
+                ) {
+                    Text("Withdraw")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { isWithdrawing = false }) { Text("Cancel") }
+            }
+        )
+    }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp)
@@ -589,6 +650,20 @@ fun ReferralDashboard(referralCode: String, isTamil: Boolean) {
                 }
             }
         } else {
+            // New: Earnings Section
+            item {
+                ReferralEarningsCard(
+                    earned = stats?.referralEarnings ?: 0,
+                    withdrawable = stats?.withdrawableAmount ?: 0,
+                    isTamil = isTamil,
+                    onWithdrawClick = {
+                        withdrawalAmount = (stats?.withdrawableAmount ?: 1000).toString()
+                        isWithdrawing = true
+                    }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             // Stats Grid
             item {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -792,6 +867,70 @@ fun ReferAndEarnSection(code: String, stats: com.astroluna.data.model.ReferralSt
                         Text(text = "SHARE", color = Color(0xFF6A1B9A), fontWeight = FontWeight.Bold)
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReferralEarningsCard(
+    earned: Int,
+    withdrawable: Int,
+    isTamil: Boolean,
+    onWithdrawClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A237E)),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(8.dp)
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(
+                text = if (isTamil) "பரிந்துரை வருவாய்" else "Referral Earnings",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Column {
+                    Text(
+                        text = if (isTamil) "மொத்த வருவாய்" else "Total Earned",
+                        color = Color.White.copy(alpha = 0.7f),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Text("₹$earned", color = Color.White, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = if (isTamil) "திரும்பப் பெறக்கூடியது" else "Withdrawable",
+                        color = Color.White.copy(alpha = 0.7f),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    Text("₹$withdrawable", color = PeacockGreen, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                }
+            }
+            Spacer(modifier = Modifier.height(20.dp))
+            Button(
+                onClick = onWithdrawClick,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = PeacockGreen),
+                enabled = withdrawable >= 1000,
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text(
+                    text = if (isTamil) "திரும்பப் பெறு (₹1000)" else "Withdraw (Min ₹1000)",
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            if (withdrawable < 1000) {
+               Text(
+                   text = if (isTamil) "திரும்பப் பெற மேலும் ₹${1000 - withdrawable} தேவை" else "Need ₹${1000 - withdrawable} more to withdraw",
+                   color = Color.White.copy(alpha = 0.5f),
+                   style = MaterialTheme.typography.labelSmall,
+                   modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)
+               )
             }
         }
     }

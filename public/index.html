@@ -4900,6 +4900,18 @@
         </div>
       </div>
 
+      <!-- Tab: Referral Withdrawals -->
+      <div id="admin-sect-referrals" class="admin-tab-section">
+        <div class="dashboard-header">
+          <h2 class="dashboard-title">
+            <i class="fas fa-hand-holding-usd"></i> Referral Withdrawals
+          </h2>
+        </div>
+        <div id="adminReferralWithdrawalsList" style="display:flex; flex-direction:column; gap:15px; margin-top:10px;">
+          <!-- Items auto-injected -->
+        </div>
+      </div>
+
       <!-- Admin Footer (Static) -->
       <div class="admin-footer">
         <div class="admin-footer-content">
@@ -4950,6 +4962,13 @@
       <div class="admin-nav-item" id="anav-payouts" onclick="navAdmin('payouts')">
         <i class="fas fa-user-astronaut"></i>
         <span>Astrologers</span>
+      </div>
+      <div class="admin-nav-item" id="anav-referrals" onclick="navAdmin('referrals')" style="position:relative;">
+        <i class="fas fa-hand-holding-usd"></i>
+        <span>Referrals</span>
+        <div id="badge-referrals" class="hidden"
+          style="position:absolute; top:2px; right:15px; background:red; color:white; border-radius:50%; min-width:16px; height:16px; font-size:10px; display:flex; align-items:center; justify-content:center; padding:2px; font-weight:bold;">
+          0</div>
       </div>
       <div class="admin-nav-item" id="anav-users" onclick="navAdmin('users')">
         <i class="fas fa-users"></i>
@@ -7663,6 +7682,8 @@
         fetchAcademyVideosAdmin();
       } else if (tab === 'slider') {
         fetchAdminBanners();
+      } else if (tab === 'referrals') {
+        loadAdminReferralWithdrawals();
       }
     };
 
@@ -7715,6 +7736,7 @@
       if (afoot) afoot.classList.add('show');
 
       navAdmin('home'); // Default to home tab
+      loadAdminWithdrawals(); // Refresh badges/payouts
 
       // Fetch initial data
       socket.emit('get-all-users', (res) => {
@@ -8259,7 +8281,7 @@
         if (res.ok && res.list && res.list.length > 0) {
           section.style.display = 'block';
           container.innerHTML = '';
-          res.list.filter(x => x.status === 'pending').forEach(w => {
+          res.list.filter(x => x.status === 'pending' && x.type !== 'referral').forEach(w => {
             const div = document.createElement('div');
             div.className = 'admin-card';
             div.style.borderLeft = '4px solid #F59E0B';
@@ -8274,11 +8296,11 @@
                            <div style="display:flex; gap:5px;">
                              <button onclick="adminApproveWithdrawal('${w._id}')"
                                style="background: #059669; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                               Approve
+                                Approve
                              </button>
                              <button onclick="adminRejectWithdrawal('${w._id}')"
                                style="background: #DC2626; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
-                               Reject
+                                Reject
                              </button>
                            </div>
                         </div>
@@ -8289,6 +8311,76 @@
         } else {
           section.style.display = 'none';
         }
+
+        // --- Referral Badge Logic ---
+        if (res.ok && res.list) {
+          const pendingReferrals = res.list.filter(x => x.status === 'pending' && x.type === 'referral').length;
+          const badge = document.getElementById('badge-referrals');
+          if (badge) {
+            if (pendingReferrals > 0) {
+              badge.innerText = pendingReferrals;
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
+          }
+        }
+      });
+    }
+
+    function loadAdminReferralWithdrawals() {
+      const container = document.getElementById('adminReferralWithdrawalsList');
+      if (!container) return;
+      container.innerHTML = '<div style="text-align:center; padding:20px; color:white;"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
+
+      socket.emit('get-withdrawals', {}, (res) => {
+        if (res.ok && res.list) {
+          const referrals = res.list.filter(x => x.type === 'referral').sort((a, b) => new Date(b.requestedAt) - new Date(a.requestedAt));
+          if (referrals.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:40px; color:#9ca3af;">No referral withdrawal requests found.</div>';
+            return;
+          }
+
+          container.innerHTML = referrals.map(w => {
+            const isPending = w.status === 'pending';
+            const statusColor = w.status === 'approved' ? '#059669' : (w.status === 'rejected' ? '#dc2626' : '#f59e0b');
+
+            return `
+              <div class="admin-card" style="border-left: 4px solid ${statusColor}; background:rgba(255,255,255,0.05); color:white; margin-bottom:10px; padding:15px; border-radius:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <div style="font-weight:bold; font-size:1.1rem; color:var(--accent-gold);">${w.astroName}</div>
+                    <div style="font-size:0.8rem; color:#9ca3af;">${new Date(w.requestedAt).toLocaleString()}</div>
+                    <div style="margin-top:5px;"><span style="background:${statusColor}33; color:${statusColor}; padding:2px 8px; border-radius:10px; font-size:0.75rem; font-weight:bold; text-transform:uppercase;">${w.status}</span></div>
+                  </div>
+                  <div style="text-align:right;">
+                    <div style="font-size:1.5rem; font-weight:bold; color:white; margin-bottom:10px;">₹${w.amount}</div>
+                    ${isPending ? `
+                      <div style="display:flex; gap:10px;">
+                        <button onclick="adminApproveWithdrawal('${w._id}')" style="background:#059669; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold;">Approve</button>
+                        <button onclick="adminRejectWithdrawal('${w._id}')" style="background:#dc2626; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer; font-weight:bold;">Reject</button>
+                      </div>
+                    ` : `<div style="color:#9ca3af; font-size:0.8rem;">Processed on ${w.processedAt ? new Date(w.processedAt).toLocaleDateString() : 'N/A'}</div>`}
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('');
+
+          // Refresh badge too
+          const pendingReferrals = res.list.filter(x => x.status === 'pending' && x.type === 'referral').length;
+          const badge = document.getElementById('badge-referrals');
+          if (badge) {
+            if (pendingReferrals > 0) {
+              badge.innerText = pendingReferrals;
+              badge.classList.remove('hidden');
+            } else {
+              badge.classList.add('hidden');
+            }
+          }
+        } else {
+          container.innerHTML = '<div style="text-align:center; padding:40px; color:#dc2626;">Error loading referrals.</div>';
+        }
       });
     }
 
@@ -8297,7 +8389,8 @@
       socket.emit('approve-withdrawal', { withdrawalId: wid }, (res) => {
         if (res.ok) {
           alert("Withdrawal Approved.");
-          loadAdminWithdrawals(); // Refresh list
+          loadAdminWithdrawals(); // Refresh list & Payout badges
+          loadAdminReferralWithdrawals(); // Refresh current tab if it's referrals
           refreshAdminData();
         } else {
           alert("Error: " + (res.msg || 'Failed'));
@@ -8310,7 +8403,8 @@
       socket.emit('reject-withdrawal', { withdrawalId: wid }, (res) => {
         if (res.ok) {
           alert("Withdrawal Rejected & Funds Refunded.");
-          loadAdminWithdrawals(); // Refresh list
+          loadAdminWithdrawals(); // Refresh list & Payout badges
+          loadAdminReferralWithdrawals(); // Refresh current tab if it's referrals
           refreshAdminData();
         } else {
           alert("Error: " + (res.msg || 'Failed'));
