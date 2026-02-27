@@ -269,18 +269,41 @@ fun HomeScreen(
     // Language State (Default Tamil)
     var isTamil by rememberSaveable { mutableStateOf(true) }
 
-    // Banners State
+    // Banners & Referral Stats State
     var banners by remember { mutableStateOf<List<Banner>>(emptyList()) }
+    var refStats by remember { mutableStateOf<com.astroluna.data.model.ReferralStats?>(null) }
+    val tokenManager = remember { com.astroluna.data.local.TokenManager(context) }
+    val userId = remember { tokenManager.getUserSession()?.userId ?: "" }
 
-    // Fetch Banners
+    // Fetch Banners & Stats
     LaunchedEffect(Unit) {
+        // Initial Fetch
         try {
             val response = ApiClient.api.getBanners()
             if (response.isSuccessful && response.body()?.ok == true) {
                 banners = response.body()!!.banners
             }
+            if (!isGuest && userId.isNotEmpty()) {
+                val statsRes = ApiClient.api.getReferralStats(userId)
+                if (statsRes.isSuccessful && statsRes.body()?.ok == true) {
+                    refStats = statsRes.body()!!.stats
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+
+        // Live Update Stats (Every 30s)
+        if (!isGuest && userId.isNotEmpty()) {
+            while (true) {
+                kotlinx.coroutines.delay(30000)
+                try {
+                    val rRes = ApiClient.api.getReferralStats(userId)
+                    if (rRes.isSuccessful && rRes.body()?.ok == true) {
+                        refStats = rRes.body()!!.stats
+                    }
+                } catch (e: Exception) { }
+            }
         }
     }
 
@@ -405,7 +428,7 @@ fun HomeScreen(
                         if (selectedTab == 0) {
                             item { DailyHoroscopeCard(horoscope) }
                             if (!isGuest && referralCode.isNotEmpty()) {
-                                item { ReferAndEarnSection(referralCode) }
+                                item { ReferAndEarnSection(referralCode, refStats) }
                             }
                         }
                         if (selectedTab == 0) {
@@ -677,7 +700,7 @@ fun ReferredUserItem(user: com.astroluna.data.model.ReferredUser) {
 }
 
 @Composable
-fun ReferAndEarnSection(code: String) {
+fun ReferAndEarnSection(code: String, stats: com.astroluna.data.model.ReferralStats? = null) {
     val context = LocalContext.current
     val gradient = Brush.horizontalGradient(listOf(Color(0xFF6A1B9A), Color(0xFF4527A0)))
 
@@ -713,10 +736,22 @@ fun ReferAndEarnSection(code: String) {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "உங்கள் நண்பரை அழைக்கவும், நீங்கள் 3 நிலை வருமானத்தைப் பெறுவீர்கள்! (2%, 2%, 1% கமிஷன்)",
+                    text = "உங்கள் நண்பரை அழைக்கவும், நீங்கள் 3 நிலை வருமானத்தைப் பெறுவீர்கள்!",
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.White.copy(alpha = 0.8f)
                 )
+
+                if (stats != null) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        ReferralStatChip("L1: ${stats.level1Count}", Color.White.copy(alpha = 0.2f))
+                        ReferralStatChip("L2: ${stats.level2Count}", Color.White.copy(alpha = 0.2f))
+                        ReferralStatChip("L3: ${stats.level3Count}", Color.White.copy(alpha = 0.2f))
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -759,6 +794,22 @@ fun ReferAndEarnSection(code: String) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ReferralStatChip(text: String, bgColor: Color) {
+    Box(
+        modifier = Modifier
+            .background(bgColor, RoundedCornerShape(16.dp))
+            .padding(horizontal = 12.dp, vertical = 4.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = Color.White,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 

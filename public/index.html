@@ -8064,6 +8064,12 @@
                 <div style="font-size:0.75rem; color:#6b7280; margin-top:4px;">
                   <i class="fas fa-link"></i> Ref: ${u.referredBy ? u.referredBy.slice(0, 8) : 'Direct'}
                 </div>
+                ${u.refStats ? `
+                <div style="font-size:0.65rem; color:#9ca3af; margin-top:4px;">
+                  L1: <b style="color:#7C3AED;">${u.refStats.l1}</b> |
+                  L2: <b style="color:#7C3AED;">${u.refStats.l2}</b> |
+                  L3: <b style="color:#7C3AED;">${u.refStats.l3}</b>
+                </div>` : ''}
                 <div style="font-size:0.75rem; margin-top:4px;">${onlineStatus}</div>
               </div>
               <div style="text-align:right;">
@@ -8126,6 +8132,12 @@
                 <div style="font-size:0.75rem; color:#6b7280; margin-top:4px;">
                   <i class="fas fa-link"></i> Ref: ${u.referredBy ? u.referredBy.slice(0, 8) : 'Direct'}
                 </div>
+                ${u.refStats ? `
+                <div style="font-size:0.65rem; color:#9ca3af; margin-top:4px;">
+                  L1: <b style="color:#7C3AED;">${u.refStats.l1}</b> |
+                  L2: <b style="color:#7C3AED;">${u.refStats.l2}</b> |
+                  L3: <b style="color:#7C3AED;">${u.refStats.l3}</b>
+                </div>` : ''}
                <div style="margin-top:5px;">
                   <span class="user-pill" style="background:${isAstro ? '#fef3c7' : '#EFF6FF'}; color:${isAstro ? '#d97706' : '#1E3A8A'}; font-weight:bold; font-size:0.7rem; padding:2px 8px; border-radius:10px;">${u.role.toUpperCase()}</span>
                   ${isAstro && isDocs ? '<span style="font-size:0.7rem; color:#059669; margin-left:5px;"><i class="fas fa-file-contract"></i> Docs</span>' : ''}

@@ -3279,9 +3279,35 @@ io.on('connection', (socket) => {
   socket.on('get-all-users', async (cb) => {
     if (!await checkAdmin(socket.id)) return cb({ ok: false });
     try {
-      const users = await User.find({}).sort({ role: 1, name: 1 }); // Sort by role then name
-      cb({ ok: true, users });
-    } catch (e) { cb({ ok: false }); }
+      const usersRaw = await User.find({}).sort({ role: 1, name: 1 }).lean();
+
+      // Enhance users with referral counts (L1, L2, L3)
+      // This is slightly heavy but requested for tracking
+      const allUsers = await Promise.all(usersRaw.map(async (u) => {
+        const l1 = await User.find({ referredBy: u.userId }).select('userId').lean();
+        const l1Ids = l1.map(x => x.userId);
+
+        const l2 = await User.find({ referredBy: { $in: l1Ids } }).select('userId').lean();
+        const l2Ids = l2.map(x => x.userId);
+
+        const l3 = await User.find({ referredBy: { $in: l2Ids } }).select('userId').lean();
+
+        return {
+          ...u,
+          refStats: {
+            l1: l1.length,
+            l2: l2.length,
+            l3: l3.length,
+            total: l1.length + l2.length + l3.length
+          }
+        };
+      }));
+
+      cb({ ok: true, users: allUsers });
+    } catch (e) {
+      console.error("[Admin] Error fetching all users:", e);
+      cb({ ok: false });
+    }
   });
 
   // --- Admin: Edit User (Name Only) ---
