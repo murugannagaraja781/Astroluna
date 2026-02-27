@@ -835,8 +835,10 @@ generateTamilHoroscope();
 // --- Endpoints ---
 // --- Get User Profile (Wallet Balance) ---
 app.get('/api/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+  console.log(`[Refer-Debug] User profile requested: ${userId}`);
+  logActivity('auth', `User profile requested: ${userId}`);
   try {
-    const { userId } = req.params;
     const user = await User.findOne({ userId });
     if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
 
@@ -862,14 +864,22 @@ app.get('/api/user/:userId', async (req, res) => {
       image: user.image
     });
   } catch (err) {
+    console.error(`[Refer-Debug] Error fetching user profile: ${err.message}`);
+    logActivity('auth', 'Error profile', { userId, error: err.message });
     res.status(500).json({ ok: false, error: 'Internal Error' });
   }
 });
 
 // --- Get Referral Stats Dashboard Data ---
 app.get('/api/referral/stats/:userId', async (req, res) => {
+  const { userId } = req.params;
+  console.log(`[Refer-Debug] Referral stats requested: ${userId}`);
+  logActivity('referral', `EXTREME_DEBUG: Fetching stats start for user: ${userId}`);
   try {
-    const { userId } = req.params;
+    if (!userId || userId === 'undefined' || userId === 'null') {
+      logActivity('referral', 'EXTREME_DEBUG: Invalid userId received');
+      return res.status(400).json({ ok: false, error: 'Invalid User ID' });
+    }
 
     // Level 1 Users
     const l1Users = await User.find({ referredBy: userId }).select('userId name createdAt').lean();
@@ -881,6 +891,8 @@ app.get('/api/referral/stats/:userId', async (req, res) => {
 
     // Level 3 Users
     const l3Users = await User.find({ referredBy: { $in: l2Ids } }).select('userId name createdAt').lean();
+
+    logActivity('referral', `EXTREME_DEBUG: DB Queries Done. counts: L1=${l1Users.length}, L2=${l2Users.length}, L3=${l3Users.length}`);
 
     // Calculate Earnings from Ledger for this specific user's referral activities
     // We can filter reasoning by 'referral' or just check where this user's wallet was credited
@@ -894,38 +906,51 @@ app.get('/api/referral/stats/:userId', async (req, res) => {
     const referralWithdrawn = user ? (user.referralWithdrawn || 0) : 0;
     const withdrawableAmount = referralEarnings - referralWithdrawn;
 
-    res.json({
+    const responseData = {
       ok: true,
       stats: {
         level1Count: l1Users.length,
         level2Count: l2Users.length,
         level3Count: l3Users.length,
-        totalReferrals: l1Users.length + l2Users.length + l3Users.length,
-        referralEarnings: Math.floor(referralEarnings),
-        withdrawableAmount: Math.floor(withdrawableAmount)
+        totalReferrals: (l1Users.length || 0) + (l2Users.length || 0) + (l3Users.length || 0),
+        referralEarnings: Math.floor(referralEarnings || 0),
+        withdrawableAmount: Math.floor(withdrawableAmount || 0)
       },
       referrals: {
-        l1: l1Users,
-        l2: l2Users,
-        l3: l3Users
+        l1: l1Users || [],
+        l2: l2Users || [],
+        l3: l3Users || []
       }
+    };
+
+    logActivity('referral', 'EXTREME_DEBUG: Sending Response', {
+      stats: responseData.stats,
+      l1Count: responseData.referrals.l1.length
     });
 
+    res.json(responseData);
+
   } catch (err) {
+    logActivity('referral', 'Stats Error', { userId, error: err.message });
     res.status(500).json({ ok: false, error: err.message });
   }
 });
 
 // --- Referral Withdrawal Request API ---
 app.post('/api/withdraw-referral', async (req, res) => {
+  logActivity('referral', 'Withdrawal request started', req.body);
   try {
     const { userId, amount } = req.body;
     if (!userId || !amount || amount < 1000) {
+      logActivity('referral', 'Withdrawal validation failed', { userId, amount });
       return res.json({ ok: false, error: 'Minimum withdrawal is ₹1000' });
     }
 
     const user = await User.findOne({ userId });
-    if (!user) return res.json({ ok: false, error: 'User not found' });
+    if (!user) {
+      logActivity('referral', 'User not found', { userId });
+      return res.json({ ok: false, error: 'User not found' });
+    }
 
     const available = (user.referralEarnings || 0) - (user.referralWithdrawn || 0);
     if (amount > available) {
@@ -972,9 +997,11 @@ app.post('/api/withdraw-referral', async (req, res) => {
       });
     }
 
+    logActivity('referral', 'Withdrawal successful', { userId, amount });
     res.json({ ok: true, message: 'Withdrawal request submitted successfully' });
 
   } catch (err) {
+    logActivity('referral', 'Withdrawal Error', { error: err.message });
     res.status(500).json({ ok: false, error: err.message });
   }
 });
