@@ -1,20 +1,28 @@
+# Environment
+.env
+csc.db
+*.db
+firebase-service-account.json
+
+# Android Build Artifacts (Keep source)
+astroapp/android/app/build/
+astroapp/android/build/
+astroapp/android/.gradle/
+astroapp/.gradle/
+astroapp/android/gradle-8.5/
+astroapp/android/TestSocket.class
+astroapp/android/build_*.txt
+astroapp/android/gradlew*
+!astroapp/android/gradlew
+!astroapp/android/gradlew.bat
+
+# Keystore
+*.jks
+!upload-keystore.jks
+
 # Dependencies
 node_modules/
 
-# Environment
-.env
-astroapp/android
-# Database
-csc.db
-
-# Firebase
-firebase-service-account.json
-
-# APK builds
-*.apk
-astroapp/android/app/build/
-astroapp/android/.gradle/
-astroapp/android/build/
 
 # Public APKs
 public/*.apk
@@ -38,3 +46,7 @@ Thumbs.db
 # Build logs
 build_log*.txt
 astroapp/android/app/build/intermediates/compressed_assets/debug/compressDebugAssets/out/assets/csc.db.jar
+
+# SSH Keys (Security: NEVER commit these)
+github_action_key
+github_action_key.pub

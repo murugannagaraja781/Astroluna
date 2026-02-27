@@ -631,7 +631,7 @@
       background: rgba(11, 15, 26, 0.8);
       backdrop-filter: blur(15px);
       border-bottom: 1px solid var(--glass-border);
-      padding: 20px 24px;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -991,7 +991,7 @@
       color: #FECACA;
       padding: 12px 16px;
       border-radius: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
       font-size: 0.85rem;
       backdrop-filter: blur(10px);
     }
@@ -2676,7 +2676,7 @@
     <div id="screen-login" class="hidden">
       <div class="form-box">
         <div class="logo-circle"
-          style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-light) 100%); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 1.8rem; box-shadow: 0 0 25px rgba(92, 8, 116, 0.5); border: 2px solid var(--glass-border);">
+          style="width: 70px; height: 70px; background: linear-gradient(135deg, var(--brand-purple) 0%, var(--brand-light) 100%); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; color: var(--accent-gold); font-size: 1.8rem; box-shadow: 0 0 25px rgba(92, 8, 116, 0.5); border: 2px solid var(--glass-border);">
           <i class="fas fa-moon"></i>
         </div>
         <h2>✨ Astro Luna</h2>
@@ -3611,8 +3611,8 @@
       .astro-profile-banner {
         background: linear-gradient(135deg, var(--brand-purple) 0%, #312E81 100%);
         border-radius: var(--radius-xl);
-        padding: 30px;
-        margin-bottom: 24px;
+        padding: 15px 20px;
+        margin-bottom: 15px;
         position: relative;
         overflow: hidden;
         box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
@@ -3655,14 +3655,14 @@
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 12px;
-        margin-bottom: 24px;
+        margin-bottom: 16px;
       }
 
       .status-card {
         background: var(--secondary-bg);
         border: 1px solid var(--glass-border);
         border-radius: var(--radius-lg);
-        padding: 20px 10px;
+        padding: 15px 10px;
         text-align: center;
         transition: var(--transition);
         position: relative;
@@ -3700,9 +3700,9 @@
       .premium-earnings-card {
         background: linear-gradient(135deg, #059669 0%, #064E3B 100%);
         border-radius: var(--radius-xl);
-        padding: 28px;
+        padding: 20px;
         color: white;
-        margin-bottom: 24px;
+        margin-bottom: 16px;
         box-shadow: 0 20px 40px rgba(5, 150, 105, 0.3);
         position: relative;
         overflow: hidden;
@@ -5506,7 +5506,7 @@
   <script src="https://unpkg.com/simple-peer/simplepeer.min.js"></script>
   <script>
     // State (exposed to window for Android WebView access)
-    const state = { me: null, socket: null, session: null, peer: null, localStream: null };
+    const state = { me: null, socket: null, session: null, peer: null, localStream: null, referralCodePrefill: null };
     window.state = state; // Expose for Android onResume wallet refresh
 
     // Persistent Session Helper
@@ -5589,7 +5589,17 @@
       }
 
       // Auto-accept call if opened from notification (native call accept)
+      // Capture Referral Code from URL or LocalStorage
       const urlParams = new URLSearchParams(window.location.search);
+      const refCode = urlParams.get('ref') || urlParams.get('referral');
+      if (refCode) {
+        state.referralCodePrefill = refCode;
+        localStorage.setItem('pending_referral', refCode);
+        console.log('[Referral] Captured code from URL:', refCode);
+      } else {
+        state.referralCodePrefill = localStorage.getItem('pending_referral');
+      }
+
       const acceptedCall = urlParams.get('acceptedCall');
       const autoAccept = urlParams.get('autoAccept');
       const callType = urlParams.get('callType') || 'audio';
@@ -6180,14 +6190,15 @@
 
     function shareReferral() {
       const code = document.getElementById('displayReferralCode').innerText.trim();
-      const refLink = `https://astroluna.in/?ref=${code}`;
-      const text = `Join me on Astro Luna! Use my referral code *${code}* or click below to get a join bonus. \n\n${refLink} \n\nGet expert consultations, daily horoscopes and more!`;
+      const refUrl = window.location.origin + '/?ref=' + code;
+      const text = `Join me on Astro Luna! Get expert astrology consultations, daily horoscope and more! \n\nRegister via my link to get a join bonus: ${refUrl} \n\nReferral Code: *${code}*`;
       const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank');
     }
 
     // Login Handlers
-    document.getElementById('btnSendOtp').onclick = async () => {
+    const btnSendOtp = document.getElementById('btnSendOtp');
+    if (btnSendOtp) btnSendOtp.onclick = async () => {
       const phone = document.getElementById('inputPhone').value.replace(/[^0-9]/g, '');
       if (!phone) { alert('Enter Phone Number'); return; }
       if (phone.length !== 10) { alert('Please enter a valid 10-digit mobile number'); return; }
@@ -6215,16 +6226,20 @@
       btn.disabled = false;
     };
 
-    document.getElementById('btnVerifyOtp').onclick = async () => {
+    const btnVerifyOtp = document.getElementById('btnVerifyOtp');
+    if (btnVerifyOtp) btnVerifyOtp.onclick = async () => {
       const phone = document.getElementById('inputPhone').value;
       const otp = document.getElementById('inputOtp').value;
       const refCode = document.getElementById('inputReferral').value;
       const res = await fetch('/api/verify-otp', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, otp, referralCode: refCode })
+        body: JSON.stringify({ phone, otp, referralCode: refCode || state.referralCodePrefill })
       }).then(r => r.json());
 
       if (res.ok) {
+        // Clear pending referral after successful login/registration
+        localStorage.removeItem('pending_referral');
+        state.referralCodePrefill = null;
         state.me = res;
         saveSession(res);
 
@@ -7010,7 +7025,8 @@
       }, 1000);
 
       // Cancel Button
-      document.getElementById('btnCancelRequest').onclick = () => cancelCalling('Cancelled by user.');
+      const btnCancel = document.getElementById('btnCancelRequest');
+      if (btnCancel) btnCancel.onclick = () => cancelCalling('Cancelled by user.');
 
       function cancelCalling(reason) {
         clearInterval(callingInterval);
@@ -7404,7 +7420,8 @@
     });
 
     // End Session
-    document.getElementById('btnEnd').onclick = () => {
+    const btnEnd = document.getElementById('btnEnd');
+    if (btnEnd) btnEnd.onclick = () => {
       if (state.session) {
         socket.emit('end-session', { sessionId: state.session.id, toUserId: state.session.partnerId });
       }
@@ -7532,7 +7549,8 @@
       }
     };
 
-    document.getElementById('btnSend').onclick = () => {
+    const btnSend = document.getElementById('btnSend');
+    if (btnSend) btnSend.onclick = () => {
       const txt = document.getElementById('msgInput').value.trim();
       if (!txt) return;
 
@@ -8042,7 +8060,10 @@
             <div class="admin-user-header">
               <div>
                 <div class="admin-user-name">${u.name}</div>
-                <div style="font-size:0.8rem; color:#9ca3af; margin-top:2px;">${u.phone} • ID: ${u.userId.slice(0, 6)}...</div>
+                <div style="font-size:0.8rem; color:#9ca3af; margin-top:2px;">${u.phone || 'No Phone'} • ID: ${u.userId.slice(0, 6)}...</div>
+                <div style="font-size:0.75rem; color:#6b7280; margin-top:4px;">
+                  <i class="fas fa-link"></i> Ref: ${u.referredBy ? u.referredBy.slice(0, 8) : 'Direct'}
+                </div>
                 <div style="font-size:0.75rem; margin-top:4px;">${onlineStatus}</div>
               </div>
               <div style="text-align:right;">
@@ -8102,6 +8123,9 @@
                  ${isVerified ? '<i class="fas fa-check-circle" style="color:#3B82F6;"></i>' : ''}
                </div>
                <div style="font-size:0.8rem; color:#9ca3af; margin-top:2px;">${u.phone} • ID: ${u.userId.slice(0, 6)}...</div>
+                <div style="font-size:0.75rem; color:#6b7280; margin-top:4px;">
+                  <i class="fas fa-link"></i> Ref: ${u.referredBy ? u.referredBy.slice(0, 8) : 'Direct'}
+                </div>
                <div style="margin-top:5px;">
                   <span class="user-pill" style="background:${isAstro ? '#fef3c7' : '#EFF6FF'}; color:${isAstro ? '#d97706' : '#1E3A8A'}; font-weight:bold; font-size:0.7rem; padding:2px 8px; border-radius:10px;">${u.role.toUpperCase()}</span>
                   ${isAstro && isDocs ? '<span style="font-size:0.7rem; color:#059669; margin-left:5px;"><i class="fas fa-file-contract"></i> Docs</span>' : ''}

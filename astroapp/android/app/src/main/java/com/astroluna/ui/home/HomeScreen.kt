@@ -745,7 +745,8 @@ fun ReferAndEarnSection(code: String) {
                             val shareIntent = Intent(Intent.ACTION_SEND).apply {
                                 type = "text/plain"
                                 putExtra(Intent.EXTRA_SUBJECT, "Download Astro Luna")
-                                putExtra(Intent.EXTRA_TEXT, "Hi! Use my referral code $code to join Astro Luna and get a special bonus on your first recharge! Download here: https://astroluna.in")
+                                val shareUrl = "https://astroluna.in?ref=$code"
+                                putExtra(Intent.EXTRA_TEXT, "Join me on Astro Luna! Get expert astrology consultations, daily horoscope and more! \n\nRegister via my link to get a join bonus: $shareUrl \n\nReferral Code: $code")
                             }
                             context.startActivity(Intent.createChooser(shareIntent, "Share Referral Code"))
                         },
