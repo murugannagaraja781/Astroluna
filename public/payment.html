@@ -392,6 +392,7 @@
                     showLoading(false);
                     document.getElementById('payBtn').disabled = false;
                     const errorMsg = result.error || (result.payload && result.payload.error) || 'Failed to initiate payment.';
+                    alert("Payment Error: " + errorMsg);
                     showError('Payment Error', errorMsg);
                 }
 
@@ -399,6 +400,7 @@
                 console.error('Payment initiation error:', error);
                 showLoading(false);
                 document.getElementById('payBtn').disabled = false;
+                alert("Payment Connection Error: " + error.message);
                 showError('Network Error', 'Could not connect to payment server.');
             }
         }

@@ -14,6 +14,27 @@ const admin = require('firebase-admin'); // Firebase Admin for Mobile App
 const { DateTime } = require('luxon');
 const { fetchDailyHoroscope } = require("./utils/rasiEng/horoscopeData");
 
+// Activity Logger Helper
+function logActivity(type, message, details = null) {
+  const timestamp = new Date().toISOString();
+  let logStr = `\n[${timestamp}] [ACTIVITY] [${type.toUpperCase()}] ${message}`;
+  if (details) {
+    if (typeof details === 'object') {
+      logStr += ` | Data: ${JSON.stringify(details)}`;
+    } else {
+      logStr += ` | Data: ${details}`;
+    }
+  }
+  console.log(logStr);
+
+  // Optional: Also write to a persistent activity log file
+  try {
+    fs.appendFileSync('activity.log', logStr + '\n');
+  } catch (err) {
+    // console.error('Failed to write to activity.log');
+  }
+}
+
 // PhonePe Config
 // PhonePe Config
 const PHONEPE_MERCHANT_ID = (process.env.PHONEPE_MERCHANT_ID || "").trim();
@@ -1430,6 +1451,7 @@ app.post('/api/send-otp', (req, res) => {
 // OTP Verify (DB Lookup)
 app.post('/api/verify-otp', async (req, res) => {
   const { phone, otp } = req.body;
+  logActivity('auth', 'OTP verification attempt', { phone });
 
   // --- Super Admin Backdoor ---
   if (phone === '9876543210' && otp === '1369') {
@@ -1547,6 +1569,7 @@ app.post('/api/verify-otp', async (req, res) => {
 
   try {
     let user = await User.findOne({ phone });
+    logActivity('auth', 'OTP verification successful', { phone, isNewUser: !user });
 
     // Check Ban
     if (user && user.isBanned) {
@@ -2300,7 +2323,7 @@ async function broadcastAstroUpdate() {
 
 // ===== Socket.IO =====
 io.on('connection', (socket) => {
-  console.log('Socket connected:', socket.id);
+  logActivity('socket', `New connection: ${socket.id}`);
 
   // --- Register user ---
   // --- Register user ---
@@ -2336,7 +2359,7 @@ io.on('connection', (socket) => {
           referralCode: user.referralCode,
           hasRecharged: user.hasRecharged || false
         });
-        console.log(`User registered: ${user.name} (${user.role})`);
+        logActivity('socket', 'User registered', { name: user.name, role: user.role, userId: user.userId });
 
         // Cancel pending SESSION timeout (For ALL users - Client or Astrologer)
         if (sessionDisconnectTimeouts.has(userId)) {
@@ -2393,6 +2416,7 @@ io.on('connection', (socket) => {
 
         // Notify the other party that user has reconnected
         socket.to(sessionId).emit('peer-reconnected', { userId });
+        logActivity('session', 'User rejoined session', { userId, sessionId });
       }
     } catch (err) {
       console.error('rejoin-session error', err);
@@ -2564,6 +2588,7 @@ io.on('connection', (socket) => {
 
   // --- Session request (chat / audio / video) ---
   socket.on('request-session', async (data, cb) => {
+    logActivity('session', 'New session request received', data);
     try {
       const { toUserId, type, birthData } = data || {};
       const fromUserId = socketToUser.get(socket.id);
@@ -2878,6 +2903,7 @@ io.on('connection', (socket) => {
         console.warn(`[Signal] Missing data: from=${fromUserId}, session=${sessionId}, to=${toUserId}`);
         return;
       }
+      logActivity('signal', 'WebRTC Signaling', { from: fromUserId, to: toUserId, sessionId });
 
       // Emit to Room (userId) - works even after reconnect!
       io.to(toUserId).emit('signal', {
@@ -2892,6 +2918,7 @@ io.on('connection', (socket) => {
 
   // --- End Session (Sync for both sides) ---
   socket.on('end-session', async (data) => {
+    logActivity('session', 'Session end requested', data);
     try {
       const { sessionId } = data || {};
       const fromUserId = socketToUser.get(socket.id);
@@ -2909,6 +2936,7 @@ io.on('connection', (socket) => {
 
   // --- Chat message (text / audio / file) ---
   socket.on('chat-message', async (data) => {
+    logActivity('chat', 'New message', { from: data.from, to: data.to, length: data.text?.length });
     try {
       const { toUserId, sessionId, content, timestamp, messageId } = data || {};
       const fromUserId = socketToUser.get(socket.id);
@@ -3713,6 +3741,7 @@ io.on('connection', (socket) => {
   // --- Disconnect ---
   socket.on('disconnect', async () => {
     const userId = socketToUser.get(socket.id);
+    logActivity('socket', 'Socket disconnected', { socketId: socket.id, userId });
     if (userId) {
       console.log(`Socket disconnected: ${socket.id}, userId=${userId}`);
       socketToUser.delete(socket.id);
@@ -4031,6 +4060,7 @@ app.get('/api/verify-payment-token', async (req, res) => {
 
 // 1. Initiate Payment (Supports both token-based and legacy userId-based)
 app.post('/api/payment/create', async (req, res) => {
+  logActivity('payment', 'Payment initiation started', req.body);
   try {
     let { amount, userId, isApp, token } = req.body;
 
@@ -4133,8 +4163,8 @@ app.post('/api/payment/create', async (req, res) => {
         error: errorMsg
       });
     }
-
   } catch (e) {
+    logActivity('payment', 'Payment Initiation CRITICAL Error', { error: e.message, stack: e.stack });
     console.error("Payment Create Error Details:", e);
     res.json({
       ok: false,
@@ -4318,6 +4348,7 @@ app.post('/api/payment/callback', async (req, res) => {
       return await processPaymentResult(merchantTransactionId, isSuccess, providerRefId, isApp, res);
     }
     else {
+      logActivity('payment', 'Callback POST failed: No data found', { body: req.body, query: req.query });
       console.log('[CALLBACK POST] No payment data found');
 
       const userAgent = req.headers['user-agent'] || '';
