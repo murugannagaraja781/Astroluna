@@ -600,7 +600,12 @@ const UserSchema = new mongoose.Schema({
   referralCode: { type: String, unique: true, sparse: true }, // unique code for sharing
   hasRecharged: { type: Boolean, default: false }, // Only rechargers activate referral commission
   referralEarnings: { type: Number, default: 0 }, // Total amount earned from referrals
-  referralWithdrawn: { type: Number, default: 0 } // Total amount withdrawn from referral earnings
+  referralWithdrawn: { type: Number, default: 0 }, // Total amount withdrawn from referral earnings
+
+  // Astrologer Registration Request
+  astrologerRequestStatus: { type: String, enum: ['none', 'pending', 'approved', 'rejected'], default: 'none' },
+  astrologerRequestedAt: Date,
+  astrologerExperience: String // Short description from the applicant
 });
 
 const CallRequestSchema = new mongoose.Schema({
@@ -833,6 +838,60 @@ function generateTamilHoroscope() {
 generateTamilHoroscope();
 
 // --- Endpoints ---
+
+// === Astrologer Registration Request API ===
+app.post('/api/astrologer/request', async (req, res) => {
+  try {
+    const { userId, experience } = req.body;
+    if (!userId) return res.status(400).json({ ok: false, error: 'User ID required' });
+
+    const user = await User.findOne({ userId });
+    if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
+
+    if (user.role === 'astrologer') {
+      return res.json({ ok: false, error: 'You are already an astrologer' });
+    }
+    if (user.astrologerRequestStatus === 'pending') {
+      return res.json({ ok: false, error: 'Your request is already pending approval' });
+    }
+
+    user.astrologerRequestStatus = 'pending';
+    user.astrologerRequestedAt = new Date();
+    user.astrologerExperience = experience || '';
+    await user.save();
+
+    console.log(`[Astrologer Request] New request from ${user.name} (${user.phone})`);
+    logActivity('astrologer', 'New Astrologer Request', { userId, name: user.name, phone: user.phone });
+
+    // Notify all Super Admins via socket
+    io.to('superadmin').emit('admin-notification', {
+      type: 'astrologer_request',
+      text: `⭐ New Astrologer Request: ${user.name} (${user.phone || 'No Phone'})`,
+      data: { userId: user.userId, name: user.name }
+    });
+
+    res.json({ ok: true, message: 'Your request has been submitted. You will be notified once approved.' });
+  } catch (err) {
+    console.error('[Astrologer Request] Error:', err.message);
+    res.status(500).json({ ok: false, error: 'Server Error' });
+  }
+});
+
+// Admin: Get Pending Astrologer Requests
+app.get('/api/admin/astrologer-requests', async (req, res) => {
+  try {
+    const requests = await User.find({ astrologerRequestStatus: 'pending' })
+      .select('userId name phone image experience astrologerExperience astrologerRequestedAt createdAt')
+      .sort({ astrologerRequestedAt: -1 })
+      .lean();
+
+    res.json({ ok: true, requests });
+  } catch (err) {
+    console.error('[Admin] Astrologer requests error:', err.message);
+    res.status(500).json({ ok: false, error: 'Server Error' });
+  }
+});
+
 // --- Get User Profile (Wallet Balance) ---
 app.get('/api/user/:userId', async (req, res) => {
   const { userId } = req.params;
@@ -3505,6 +3564,91 @@ io.on('connection', (socket) => {
 
       cb({ ok: true });
     } catch (e) { cb({ ok: false }); }
+  });
+
+  // === Astrologer Request: Approve ===
+  socket.on('admin-approve-astrologer', async (data, cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false, error: 'Unauthorized' });
+    try {
+      const user = await User.findOne({ userId: data.userId });
+      if (!user) return cb({ ok: false, error: 'User not found' });
+
+      user.role = 'astrologer';
+      user.walletBalance = 0;
+      user.astrologerRequestStatus = 'approved';
+      await user.save();
+
+      console.log(`[Astrologer Approved] ${user.name} (${user.phone}) approved by admin`);
+      logActivity('astrologer', 'Request Approved', { userId: user.userId, name: user.name });
+
+      // Notify user via socket if online
+      const sId = userSockets.get(user.userId);
+      if (sId) {
+        io.to(sId).emit('wallet-update', { balance: 0 });
+        io.to(sId).emit('app-notification', {
+          text: '🎉 Congratulations! Your astrologer request has been APPROVED! Please re-login to access your astrologer dashboard.'
+        });
+        io.to(sId).emit('role-changed', { role: 'astrologer' });
+      }
+
+      // FCM Push Notification
+      if (user.fcmToken) {
+        await sendFcmV1Push(user.fcmToken, {
+          type: 'astrologer_approved',
+          userId: user.userId
+        }, {
+          title: '🎉 Astrologer Request Approved!',
+          body: 'Congratulations! You are now an Astrologer on AstroLuna. Please re-login to start your journey.'
+        });
+        console.log(`[FCM] Approval notification sent to ${user.name}`);
+      }
+
+      broadcastAstroUpdate();
+      cb({ ok: true });
+    } catch (e) {
+      console.error('[Approve Astrologer Error]', e);
+      cb({ ok: false, error: e.message });
+    }
+  });
+
+  // === Astrologer Request: Reject ===
+  socket.on('admin-reject-astrologer', async (data, cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false, error: 'Unauthorized' });
+    try {
+      const user = await User.findOne({ userId: data.userId });
+      if (!user) return cb({ ok: false, error: 'User not found' });
+
+      user.astrologerRequestStatus = 'rejected';
+      await user.save();
+
+      console.log(`[Astrologer Rejected] ${user.name} (${user.phone}) rejected by admin`);
+      logActivity('astrologer', 'Request Rejected', { userId: user.userId, name: user.name });
+
+      // Notify user via socket if online
+      const sId = userSockets.get(user.userId);
+      if (sId) {
+        io.to(sId).emit('app-notification', {
+          text: '❌ Your astrologer registration request was not approved at this time. Please contact support for more details.'
+        });
+      }
+
+      // FCM Push Notification
+      if (user.fcmToken) {
+        await sendFcmV1Push(user.fcmToken, {
+          type: 'astrologer_rejected',
+          userId: user.userId
+        }, {
+          title: 'Astrologer Request Update',
+          body: 'Your astrologer registration request was not approved at this time. Please contact support for more info.'
+        });
+        console.log(`[FCM] Rejection notification sent to ${user.name}`);
+      }
+
+      cb({ ok: true });
+    } catch (e) {
+      console.error('[Reject Astrologer Error]', e);
+      cb({ ok: false, error: e.message });
+    }
   });
 
   socket.on('admin-add-wallet', async (data, cb) => {
