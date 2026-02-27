@@ -837,35 +837,36 @@ generateTamilHoroscope();
 app.get('/api/user/:userId', async (req, res) => {
   const { userId } = req.params;
   console.log(`[Refer-Debug] User profile requested: ${userId}`);
-  logActivity('auth', `User profile requested: ${userId}`);
   try {
     const user = await User.findOne({ userId });
-    if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
+    if (!user) {
+      logActivity('auth', 'Profile Not Found', { userId });
+      return res.status(404).json({ ok: false, error: 'User not found' });
+    }
 
+    // Ensure referral code exists
     if (!user.referralCode) {
       user.referralCode = await generateReferralCode(user.name || 'User');
       await user.save();
     }
 
-    res.json({
+    const responseData = {
       ok: true,
-      userId: user.userId,
-      name: user.name,
-      phone: user.phone,
-      role: user.role,
-      walletBalance: user.walletBalance,
-      referralCode: user.referralCode,
-      isOnline: user.isOnline,
-      isAvailable: user.isAvailable,
-      isChatOnline: user.isChatOnline || false,
-      isAudioOnline: user.isAudioOnline || false,
-      isVideoOnline: user.isVideoOnline || false,
-      totalEarnings: user.totalEarnings || 0,
-      image: user.image
-    });
+      userId: user.userId || '',
+      name: user.name || 'User',
+      phone: user.phone || '',
+      role: user.role || 'client',
+      walletBalance: Number(user.walletBalance || 0),
+      referralCode: user.referralCode || '',
+      isOnline: Boolean(user.isOnline),
+      isAvailable: Boolean(user.isAvailable),
+      totalEarnings: Number(user.totalEarnings || 0),
+      image: user.image || ''
+    };
+
+    res.json(responseData);
   } catch (err) {
-    console.error(`[Refer-Debug] Error fetching user profile: ${err.message}`);
-    logActivity('auth', 'Error profile', { userId, error: err.message });
+    console.error(`[Refer-Debug] Profile Error: ${err.message}`);
     res.status(500).json({ ok: false, error: 'Internal Error' });
   }
 });
@@ -874,64 +875,53 @@ app.get('/api/user/:userId', async (req, res) => {
 app.get('/api/referral/stats/:userId', async (req, res) => {
   const { userId } = req.params;
   console.log(`[Refer-Debug] Referral stats requested: ${userId}`);
-  logActivity('referral', `EXTREME_DEBUG: Fetching stats start for user: ${userId}`);
   try {
-    if (!userId || userId === 'undefined' || userId === 'null') {
-      logActivity('referral', 'EXTREME_DEBUG: Invalid userId received');
+    if (!userId || userId === 'undefined') {
       return res.status(400).json({ ok: false, error: 'Invalid User ID' });
     }
 
-    // Level 1 Users
-    const l1Users = await User.find({ referredBy: userId }).select('userId name createdAt').lean();
-    const l1Ids = l1Users.map(u => u.userId);
+    // Fetch referral levels
+    const l1 = await User.find({ referredBy: userId }).select('userId name createdAt').lean();
+    const l1Ids = l1.map(u => u.userId);
+    const l2 = await User.find({ referredBy: { $in: l1Ids } }).select('userId name createdAt').lean();
+    const l2Ids = l2.map(u => u.userId);
+    const l3 = await User.find({ referredBy: { $in: l2Ids } }).select('userId name createdAt').lean();
 
-    // Level 2 Users
-    const l2Users = await User.find({ referredBy: { $in: l1Ids } }).select('userId name createdAt').lean();
-    const l2Ids = l2Users.map(u => u.userId);
+    const user = await User.findOne({ userId }).select('referralEarnings referralWithdrawn referralCode');
+    const earnings = user ? (user.referralEarnings || 0) : 0;
+    const withdrawn = user ? (user.referralWithdrawn || 0) : 0;
 
-    // Level 3 Users
-    const l3Users = await User.find({ referredBy: { $in: l2Ids } }).select('userId name createdAt').lean();
-
-    logActivity('referral', `EXTREME_DEBUG: DB Queries Done. counts: L1=${l1Users.length}, L2=${l2Users.length}, L3=${l3Users.length}`);
-
-    // Calculate Earnings from Ledger for this specific user's referral activities
-    // We can filter reasoning by 'referral' or just check where this user's wallet was credited
-    // To be precise, we'd need a separate 'ReferralEarning' schema or track it in BillingLedger.
-    // Given the current structure, we'll estimate total earnings from User totalEarnings if they are primarily a recruiter,
-    // or we'd ideally have tagged ledger entries.
-
-    // For now, let's return the counts and the list for the dashboard
-    const user = await User.findOne({ userId }).select('referralEarnings referralWithdrawn');
-    const referralEarnings = user ? (user.referralEarnings || 0) : 0;
-    const referralWithdrawn = user ? (user.referralWithdrawn || 0) : 0;
-    const withdrawableAmount = referralEarnings - referralWithdrawn;
+    // Clean data for Android (Remove _id, format dates)
+    const cleanList = (list) => list.map(u => ({
+      userId: u.userId,
+      name: u.name || 'User',
+      date: u.createdAt ? new Date(u.createdAt).toDateString() : ''
+    }));
 
     const responseData = {
       ok: true,
+      referralCode: user?.referralCode || '',
       stats: {
-        level1Count: l1Users.length,
-        level2Count: l2Users.length,
-        level3Count: l3Users.length,
-        totalReferrals: (l1Users.length || 0) + (l2Users.length || 0) + (l3Users.length || 0),
-        referralEarnings: Math.floor(referralEarnings || 0),
-        withdrawableAmount: Math.floor(withdrawableAmount || 0)
+        level1Count: l1.length,
+        level2Count: l2.length,
+        level3Count: l3.length,
+        totalReferrals: l1.length + l2.length + l3.length,
+        referralEarnings: Math.floor(earnings),
+        withdrawableAmount: Math.floor(earnings - withdrawn),
+        earnings: Math.floor(earnings) // Double key for compatibility
       },
       referrals: {
-        l1: l1Users || [],
-        l2: l2Users || [],
-        l3: l3Users || []
+        l1: cleanList(l1),
+        l2: cleanList(l2),
+        l3: cleanList(l3)
       }
     };
 
-    logActivity('referral', 'EXTREME_DEBUG: Sending Response', {
-      stats: responseData.stats,
-      l1Count: responseData.referrals.l1.length
-    });
-
+    console.log(`[Refer-Debug] Sending Response for ${userId} (L1: ${l1.length} users)`);
     res.json(responseData);
 
   } catch (err) {
-    logActivity('referral', 'Stats Error', { userId, error: err.message });
+    console.error(`[Refer-Debug] Stats Error for ${userId}: ${err.message}`);
     res.status(500).json({ ok: false, error: err.message });
   }
 });
