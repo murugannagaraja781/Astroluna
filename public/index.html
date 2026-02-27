@@ -5927,31 +5927,28 @@
         console.log('Restoring session for:', session.name);
         state.me = session;
 
-        // Show the dashboard immediately from cached session (no blank page)
-        sLogin.classList.add('hidden');
-        if (session.role === 'astrologer') loadAstroDash(session);
-        else if (session.role === 'superadmin') loadAdminDash(session);
-        else {
-          loadClientDash(session);
-        }
-        hideSplash();
-
-        // Then refresh data from server in background
+        // Show the dash only after server registration to ensure role/permissions are synced
         socket.emit('register', { name: session.name, phone: session.phone, userId: session.userId }, (ack) => {
           if (ack.ok) {
-            // Merge fresh data from server (wallet, earnings, etc.)
             state.me = { ...session, ...ack };
             if (session.intakeDetails) state.me.intakeDetails = session.intakeDetails;
-            saveSession(state.me); // Update localStorage with fresh data
+            saveSession(state.me);
 
-            // Send FCM token to server for push notifications
+            sLogin.classList.add('hidden');
+            if (state.me.role === 'astrologer') loadAstroDash(state.me);
+            else if (state.me.role === 'superadmin') loadAdminDash(state.me);
+            else {
+              loadClientDash(state.me);
+            }
+            hideSplash();
+
+            // Send FCM token
             const fcmToken = localStorage.getItem('fcmToken');
             if (fcmToken) {
               socket.emit('save-fcm-token', { fcmToken });
-              console.log('[FCM] Token sent to server (session restore)');
             }
 
-            // Update wallet display with fresh data
+            // Update wallet
             if (state.me.walletBalance !== undefined) {
               const cw = document.getElementById('clientWallet');
               if (cw) cw.innerText = Number(state.me.walletBalance || 0).toFixed(0);
@@ -5959,8 +5956,8 @@
               if (db) db.innerText = Number(state.me.walletBalance || 0).toFixed(2);
             }
           } else {
-            // If register fails (e.g. user deleted), clear session
             clearSession();
+            hideSplash();
           }
         });
 
@@ -7723,7 +7720,14 @@
       socket.emit('get-all-users', (res) => {
         if (res.ok) {
           adminUsersCache = res.users;
-          // Don't render yet until tab is clicked or initialized
+          // Refresh current tab if it depends on user list
+          const activeTabEl = document.querySelector('.admin-nav-item.active');
+          if (activeTabEl) {
+            const tabId = activeTabEl.id.replace('anav-', '');
+            if (tabId === 'users' || tabId === 'payouts') {
+              window.navAdmin(tabId);
+            }
+          }
         }
       });
       loadAdminLedgerStats();
