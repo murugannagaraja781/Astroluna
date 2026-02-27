@@ -16,8 +16,8 @@ android {
         applicationId = "com.astroluna.test"
         minSdk = 21
         targetSdk = 33
-        versionCode = 6
-        versionName = "5.5.5"
+        versionCode = 7
+        versionName = "6.1.0"
         multiDexEnabled = true
     }
 
