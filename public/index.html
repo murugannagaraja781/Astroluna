@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Astro Luna</title>
   <link
-    href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;800&family=Cinzel+Decorative:wght@400;700&family=Outfit:wght@300;400;500;600;700;800&family=Raleway:wght@400;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -28,6 +28,12 @@
       --font-body: 'Outfit', sans-serif;
       --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
       --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      --radius-xl: 24px;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --border: #E5E7EB;
+      --secondary: #059669;
+      --primary: #D4AF37;
     }
 
     * {
@@ -678,9 +684,9 @@
 
     .astro-card:hover {
       transform: translateY(-8px) scale(1.02);
-      background: var(--glass-heavy);
+      background: rgba(122, 31, 149, 0.1);
       border-color: var(--accent-gold);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(245, 158, 11, 0.1);
+      box-shadow: 0 15px 40px rgba(92, 8, 116, 0.6);
     }
 
     .astro-card::before {
@@ -695,12 +701,7 @@
       transition: var(--transition);
     }
 
-    .astro-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      background: rgba(122, 31, 149, 0.1);
-      border-color: var(--accent-gold);
-      box-shadow: 0 15px 40px rgba(92, 8, 116, 0.6);
-    }
+    /* (duplicate hover merged above) */
 
     .astro-card:hover::before {
       opacity: 1;
@@ -758,8 +759,14 @@
 
     .astro-expertise {
       color: var(--text-muted);
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 400;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     /* Active Profile Image Ring */
@@ -769,10 +776,7 @@
     }
 
     /* Busy/Offline: Red & Static */
-    .status-badge.busy {
-      background: #EF4444;
-      box-shadow: 0 0 0 2px white;
-    }
+    /* (merged with above definition) */
 
     /* Pulse Animation for Border */
     @keyframes pulse-border {
@@ -794,24 +798,9 @@
       flex: 1;
     }
 
-    .astro-name {
-      color: #111827;
-      font-family: 'Cinzel', serif;
-      font-weight: 700;
-      font-size: 1.1rem;
-      margin-bottom: 2px;
-    }
+    /* (duplicate .astro-name merged into primary definition above) */
 
-    .astro-expertise {
-      color: #6B7280;
-      font-size: 0.8rem;
-      margin-bottom: 6px;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      line-clamp: 1;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
+    /* (merged into primary .astro-expertise above) */
 
     .rating-row {
       display: flex;
@@ -901,34 +890,17 @@
     }
 
     .inactive-cta {
-      opacity: 0.3;
+      opacity: 0.5;
       cursor: not-allowed !important;
       filter: grayscale(1);
-    }
-
-    .cta-btn.active-video {
-      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-      border: none;
-      color: white;
-      cursor: pointer;
-      box-shadow: 0 4px 6px -1px rgba(217, 119, 6, 0.2);
-    }
-
-    .cta-btn.active-video:hover {
-      box-shadow: 0 6px 12px -2px rgba(217, 119, 6, 0.4);
-      transform: translateY(-1px);
-    }
-
-    .inactive-cta {
-      opacity: 0.6;
-      background: #f3f4f6 !important;
-      color: #9ca3af !important;
-      border-color: #e5e7eb !important;
-      cursor: not-allowed !important;
+      background: rgba(255, 255, 255, 0.03) !important;
+      color: var(--text-muted) !important;
+      border-color: var(--glass-border) !important;
     }
 
     .astro-dash-header {
-      background: white;
+      background: var(--secondary-bg);
+      border: 1px solid var(--glass-border);
       padding: 15px;
       border-radius: 12px;
       margin-bottom: 15px;
@@ -938,7 +910,8 @@
     }
 
     .toggle-row {
-      background: white;
+      background: var(--secondary-bg);
+      border: 1px solid var(--glass-border);
       border-radius: 12px;
       padding: 15px;
       margin-bottom: 15px;
@@ -997,7 +970,8 @@
     }
 
     .progress-card {
-      background: white;
+      background: var(--secondary-bg);
+      border: 1px solid var(--glass-border);
       border-radius: 12px;
       padding: 15px;
       display: flex;
@@ -1037,12 +1011,12 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: #F3F4F6;
+      background: rgba(124, 58, 237, 0.15);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.2rem;
-      color: #333;
+      color: var(--accent-gold);
     }
 
     .modal-overlay {
@@ -2664,7 +2638,7 @@
       </div>
     </footer>
     <div class="web-footer-bottom">
-      &copy; 2024 TAMIL ARGO INTERNATIONAL. All Rights Reserved. Stars guide you.
+      &copy; 2024-2026 TAMIL ARGO INTERNATIONAL. All Rights Reserved. Stars guide you.
     </div>
   </div> <!-- End of .web-view -->
 
@@ -2729,7 +2703,7 @@
       <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">
         Contact: kalpanajomr@gmail.com | 904785439
       </div>
-      <div class="footer-copy" style="margin-top: 10px; font-size: 0.65rem; opacity: 0.6;">&copy; 2024 TAMIL ARGO
+      <div class="footer-copy" style="margin-top: 10px; font-size: 0.65rem; opacity: 0.6;">&copy; 2024-2026 TAMIL ARGO
         INTERNATIONAL</div>
     </div>
 
