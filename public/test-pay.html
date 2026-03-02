@@ -225,12 +225,12 @@
                     throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}...`);
                 }
 
-                if (result.ok && result.paymentUrl) {
+                if (result.ok && result.payload && result.payload.paymentUrl) {
                     status.style.color = '#10B981';
                     status.innerText = "Redirecting to PhonePe...";
 
                     setTimeout(() => {
-                        window.location.href = result.paymentUrl;
+                        window.location.href = result.payload.paymentUrl;
                     }, 1000);
                 } else {
                     const errorMsg = result.error || result.message || (result.payload && result.payload.error) || "Initiation failed";

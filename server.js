@@ -7,6 +7,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
 const multer = require('multer');
@@ -22,7 +23,7 @@ function logActivity(type, message, details = null) {
     if (typeof details === 'object') {
       logStr += ` | Data: ${JSON.stringify(details)}`;
     } else {
-      logStr += ` | Data: ${details}`;
+      logStr += ` | Data: ${details} `;
     }
   }
   console.log(logStr);
@@ -35,7 +36,6 @@ function logActivity(type, message, details = null) {
   }
 }
 
-// PhonePe Config
 // PhonePe Config
 const PHONEPE_MERCHANT_ID = (process.env.PHONEPE_MERCHANT_ID || "").trim();
 const PHONEPE_SALT_KEY = (process.env.PHONEPE_SALT_KEY || "").trim();
@@ -55,7 +55,7 @@ let phonepeTokenStore = {
 
 async function getPhonePeOAuthToken() {
   try {
-    // Discovery found that some pre-prod credentials work on the production identity manager
+    // Global PhonePe Identity Manager
     let oauthUrl = "https://api.phonepe.com/apis/identity-manager/v1/oauth/token";
 
     // Fallback logic if we want to honor sandbox flag
@@ -175,7 +175,6 @@ async function callPhonePePayV2(merchantOrderId, amount, redirectUrl, userMobile
 
   // Debug Log
   try {
-    const fs = require('fs');
     const logMsg = `\n--- ${new Date().toISOString()} ---\n[v2 INIT] URL: ${endpoint}\nOrderId: ${merchantOrderId}\nAmount: ${amount}\nStatus: ${response.status}\nRes: ${JSON.stringify(data)}\n`;
     fs.appendFileSync('phonepe_debug.log', logMsg);
   } catch (err) { }
@@ -211,11 +210,7 @@ const COMMISSION_L2 = 0.02; // 2%
 const COMMISSION_L3 = 0.01; // 1%
 const CASHBACK_CLIENT = 0.02; // 2% for referred client
 
-// FCM v1 API with Service Account
-const { GoogleAuth } = require('google-auth-library');
-const fs = require('fs');
-
-// FCM v1 Configuration
+// FCM Project and Auth
 const FCM_PROJECT_ID = 'astroluna-d487c';
 let fcmAuth = null;
 
@@ -4363,7 +4358,6 @@ async function checkPhonePeOrderStatus(merchantOrderId) {
 
     // Debug Log
     try {
-      const fs = require('fs');
       const logMsg = `\n--- ${new Date().toISOString()} ---\n[v2 STATUS] OrderId: ${merchantOrderId}\nState: ${data.state}\nRes: ${JSON.stringify(data).substring(0, 500)}\n`;
       fs.appendFileSync('phonepe_debug.log', logMsg);
     } catch (err) { }
