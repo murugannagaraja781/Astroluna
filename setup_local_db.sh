@@ -72,6 +72,12 @@ else
     exit 1
 fi
 
+# Ensure PM2 is installed for restarting app
+if ! command -v pm2 &> /dev/null; then
+    echo "⚙️ PM2 not found. Installing globally..."
+    npm install -g pm2 || sudo npm install -g pm2
+fi
+
 echo "------------------------------------------------"
 echo "🎉 Setup complete. Use 'pm2 restart all' to apply."
 echo "------------------------------------------------"

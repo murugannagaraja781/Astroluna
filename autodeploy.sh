@@ -99,6 +99,14 @@ npm install --production --no-audit --no-fund --prefer-offline || {
     npm install --production --no-audit --no-fund --no-package-lock
 }
 
+# Step 4.5: Ensure PM2 is installed
+if ! command -v pm2 &> /dev/null; then
+    echo "[4.5/6] PM2 not found. Installing globally..."
+    # If not root, you might need 'sudo npm install -g pm2'
+    # But since the script runs setup tasks with sudo, we'll try direct installation
+    npm install -g pm2 || sudo npm install -g pm2
+fi
+
 # Step 5: Setup PM2
 echo "[5/6] Setting up PM2 for $APP_NAME..."
 pm2 delete $APP_NAME 2>/dev/null || true

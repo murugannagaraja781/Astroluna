@@ -2390,12 +2390,94 @@ app.post('/api/city-timezone', async (req, res) => {
 // --- Presence Helpers ---
 async function broadcastAstroUpdate() {
   try {
-    const astros = await User.find({ role: 'astrologer' });
+    // Optimization: Only fetch and send essential fields to reduce memory and bandwidth
+    const astros = await User.find(
+      { role: 'astrologer' },
+      'userId name isOnline isAvailable isBusy price image skills experience rating'
+    ).lean();
+
     if (io) io.emit('astrologer-update', astros);
   } catch (e) {
     console.error('Error broadcasting astro updates:', e);
   }
 }
+
+// --- Phase 2: Session Timer Engine ---
+let tickInterval = null;
+
+function getSlabBySeconds(seconds) {
+  if (seconds <= 300) return 1;
+  if (seconds <= 600) return 2;
+  if (seconds <= 900) return 3;
+  if (seconds <= 1200) return 4;
+  return 4; // Max slab 4+
+}
+
+function tickSessions() {
+  const now = Date.now();
+
+  // Only log active count every 60 seconds to save CPU/Logs
+  if (Math.floor(now / 1000) % 60 === 0 && activeSessions.size > 0) {
+    console.log(`[Ticker] Active Sessions: ${activeSessions.size}`);
+  }
+
+  for (const [sessionId, session] of activeSessions) {
+    // 1. Check if Billing Started
+    if (!session.actualBillingStart || now < session.actualBillingStart) continue;
+
+    const clientSocketId = userSockets.get(session.clientId);
+    const astroSocketId = userSockets.get(session.astrologerId);
+
+    const isClientConnected = !!clientSocketId;
+    const isAstroConnected = !!astroSocketId;
+
+    if (isClientConnected && isAstroConnected) {
+      session.elapsedBillableSeconds = (session.elapsedBillableSeconds || 0) + 1;
+
+      // Phase 3: First Minute Check (at 60s exactly)
+      if (session.elapsedBillableSeconds === 60) {
+        processBillingCharge(sessionId, 60, 1, 'first_60_full');
+      }
+
+      // Phase 4: Check Slab Upgrade
+      if (session.pairMonthId) {
+        const totalSeconds = (session.initialPairSeconds || 0) + session.elapsedBillableSeconds;
+        const calculatedSlab = getSlabBySeconds(totalSeconds);
+        const effectiveSlab = Math.max(calculatedSlab, session.currentSlab || 0);
+
+        if (effectiveSlab > session.currentSlab) {
+          session.currentSlab = effectiveSlab;
+          PairMonth.updateOne({ _id: session.pairMonthId }, { currentSlab: effectiveSlab }).exec();
+        }
+      }
+
+      // Check Minute Boundary (Post-First-Minute)
+      if (session.elapsedBillableSeconds > 60) {
+        const eligibleSeconds = session.elapsedBillableSeconds - 60;
+        const totalShouldBeBilled = 1 + Math.floor(eligibleSeconds / 60);
+
+        if (totalShouldBeBilled > (session.lastBilledMinute || 1)) {
+          processBillingCharge(sessionId, 60, totalShouldBeBilled, 'slab');
+          session.lastBilledMinute = totalShouldBeBilled;
+        }
+      }
+    }
+  }
+}
+
+// Start ticker once
+if (tickInterval) clearInterval(tickInterval);
+tickInterval = setInterval(tickSessions, 1000);
+
+// OTP Cleanup Interval (Every 10 minutes)
+setInterval(() => {
+  const now = Date.now();
+  for (const [phone, data] of otpStore) {
+    if (now > data.expires) {
+      otpStore.delete(phone);
+    }
+  }
+}, 10 * 60 * 1000);
 
 // ===== Socket.IO =====
 io.on('connection', (socket) => {
@@ -3312,92 +3394,6 @@ io.on('connection', (socket) => {
     }
   }
 
-  // --- Phase 2: Session Timer Engine ---
-  if (global.tickInterval) clearInterval(global.tickInterval);
-  global.tickInterval = setInterval(tickSessions, 1000);
-
-  // Phase 4 Helper
-  function getSlabBySeconds(seconds) {
-    if (seconds <= 300) return 1;
-    if (seconds <= 600) return 2;
-    if (seconds <= 900) return 3;
-    if (seconds <= 1200) return 4;
-    return 4; // Max slab 4+
-  }
-
-  function tickSessions() {
-    const now = Date.now();
-    if (Math.floor(now / 1000) % 10 === 0) {
-      console.log(`[Ticker] Active: ${activeSessions.size}`);
-      for (const [sid, s] of activeSessions) {
-        console.log(`  - ${sid}: Billable=${s.elapsedBillableSeconds}, Start=${s.actualBillingStart}, TotalDed=${s.totalDeducted}`);
-      }
-    }
-    for (const [sessionId, session] of activeSessions) {
-      // 1. Check if Billing Started
-      if (!session.actualBillingStart || now < session.actualBillingStart) continue;
-
-      // 2. Check Connections (BOTH must be connected)
-      // We check if the socket ID for the user is present in userSockets AND if that socket is actually connected?
-      // userSockets only has entry if registered.
-      // We assume if they serve 'disconnect' event, they are removed from userSockets/socketToUser?
-      // Checking 'disconnect' handler: it conditionally removes from userSockets.
-      // Yes, if (userSockets.get(userId) === socket.id) userSockets.delete(userId);
-
-      const clientSocketId = userSockets.get(session.clientId);
-      const astroSocketId = userSockets.get(session.astrologerId);
-
-      const isClientConnected = !!clientSocketId;
-      const isAstroConnected = !!astroSocketId;
-
-      if (isClientConnected && isAstroConnected) {
-        session.elapsedBillableSeconds++;
-
-        // DEBUG LOGGING
-        console.log(`[${sessionId}] Tick: ${session.elapsedBillableSeconds}, LastBilled: ${session.lastBilledMinute}, Deducted: ${session.totalDeducted}, Slab: ${session.currentSlab}`);
-
-        if (session.elapsedBillableSeconds % 5 === 0) console.log(`Session ${sessionId}: Tick ${session.elapsedBillableSeconds}s`);
-
-        // Phase 3: First Minute Check (at 60s exactly)
-        if (session.elapsedBillableSeconds === 60) {
-          console.log(`Session ${sessionId}: First 60s completed.`);
-          processBillingCharge(sessionId, 60, 1, 'first_60_full');
-          // Note: lastBilledMinute update is below
-        }
-
-        // Phase 4: Check Slab Upgrade
-        if (session.pairMonthId) {
-          const totalSeconds = (session.initialPairSeconds || 0) + session.elapsedBillableSeconds;
-          const calculatedSlab = getSlabBySeconds(totalSeconds);
-          const effectiveSlab = Math.max(calculatedSlab, session.currentSlab || 0);
-
-          if (effectiveSlab > session.currentSlab) {
-            console.log(`Session ${sessionId}: Slab Upgraded ${session.currentSlab} -> ${effectiveSlab}`);
-            session.currentSlab = effectiveSlab;
-            PairMonth.updateOne({ _id: session.pairMonthId }, { currentSlab: effectiveSlab }).exec();
-          }
-        }
-
-        // Check Minute Boundary (Future Slabs > 1)
-        // Phase 5: Post-First-Minute Billing
-        if (session.elapsedBillableSeconds > 60) {
-          const eligibleSeconds = session.elapsedBillableSeconds - 60;
-          const eligibleMinutes = Math.floor(eligibleSeconds / 60);
-          // Total billed = 1 (first min) + eligibleMinutes
-          const totalShouldBeBilled = 1 + eligibleMinutes;
-
-          if (totalShouldBeBilled > session.lastBilledMinute) {
-            console.log(`Session ${sessionId}: Minute ${totalShouldBeBilled} reached.`);
-            processBillingCharge(sessionId, 60, totalShouldBeBilled, 'slab');
-            session.lastBilledMinute = totalShouldBeBilled;
-          }
-        }
-      } else {
-        // Paused
-        // console.log(`Session ${sessionId} Paused. Client: ${isClientConnected}, Astro: ${isAstroConnected}`);
-      }
-    }
-  }
 
 
   // --- Client Birth Chart Data ---
@@ -3990,8 +3986,7 @@ app.post('/api/astrologer/online', async (req, res) => {
     await User.updateOne({ userId }, update);
 
     // Broadcast update to real-time clients
-    const astros = await User.find({ role: 'astrologer' });
-    io.emit('astrologer-update', astros);
+    await broadcastAstroUpdate();
     res.json({ ok: true });
   } catch (e) {
     console.error("Online Toggle Error:", e);
@@ -4031,8 +4026,7 @@ app.post('/api/astrologer/service-toggle', async (req, res) => {
     await User.updateOne({ userId }, update);
 
     // Broadcast update
-    const astros = await User.find({ role: 'astrologer' });
-    io.emit('astrologer-update', astros);
+    await broadcastAstroUpdate();
 
     console.log(`[Service Toggle] ${userId}: ${service} = ${enabled}`);
     res.json({ ok: true });

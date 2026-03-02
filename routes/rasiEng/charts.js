@@ -117,7 +117,7 @@ router.post('/full', async (req, res) => {
         const moonLon = moon ? moon.longitude : 0;
         const dashaPeriods = getVimshottariDasha(moonLon, dt);
 
-        // Add 4 levels of nesting (Mahadasha > Bhukti > Antara > Pratyantara)
+        // Add 3 levels of nesting (Mahadasha > Bhukti > Antara). Level 4 removed for performance.
         const detailedDasha = dashaPeriods.map(md => {
             const bhuktis = getSubPeriods(md.start, md.end, md.lord, 1);
             return {
@@ -126,13 +126,7 @@ router.post('/full', async (req, res) => {
                     const antaras = getSubPeriods(bh.start, bh.end, bh.lord, 2);
                     return {
                         ...bh,
-                        subPeriods: antaras.map(an => {
-                            const pratyantaras = getSubPeriods(an.start, an.end, an.lord, 3);
-                            return {
-                                ...an,
-                                subPeriods: pratyantaras
-                            };
-                        })
+                        subPeriods: antaras
                     };
                 })
             };
