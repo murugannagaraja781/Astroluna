@@ -1252,129 +1252,68 @@ fun AstrologerCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Handled by shadow modifier
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)) // Subtle SaaS border
+        border = androidx.compose.foundation.BorderStroke(if(astro.isOnline) 3.dp else 0.5.dp, borderColor) // Prominent Online Border
     ) {
-        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                 // 1. Avatar Section
-                 Box(modifier = Modifier.size(72.dp)) {
+        // ... (Content remains similar, simplified for replacement)
+        Row(
+            modifier = Modifier.padding(12.dp).fillMaxWidth(),
+            verticalAlignment = Alignment.Top
+        ) {
+             // Left Column (Avatar)
+             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(80.dp)) {
+                 Box(contentAlignment = Alignment.BottomEnd) {
                     Image(
                         painter = painterResource(id = com.astroluna.R.drawable.ic_person_placeholder),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(72.dp)
+                            .size(70.dp)
                             .clip(CircleShape)
-                            .background(Color.White)
+                            .border(2.dp, if(astro.isBusy) Color.Red else if(astro.isOnline) PeacockGreen else Color.LightGray, CircleShape)
                     )
-                     // Status Badge
-                     Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .size(14.dp)
-                            .background(Color.White, CircleShape)
-                            .padding(2.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(if(astro.isBusy) Color(0xFFF59E0B) else if(astro.isOnline) Color(0xFF10B981) else Color(0xFF94A3B8), CircleShape)
-                        )
-                    }
+                     Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "Verified",
+                        tint = Color(0xFF2196F3),
+                        modifier = Modifier.size(20.dp).background(Color.White, CircleShape).border(1.dp, Color.White, CircleShape)
+                    )
                  }
+                 Spacer(modifier = Modifier.height(8.dp))
+                 Row(verticalAlignment = Alignment.CenterVertically) {
+                     Text("${if(astro.rating > 0) astro.rating else 4.5}", style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold), color = Color.Black)
+                     Icon(Icons.Default.Star, null, tint = Color(0xFFFFD700), modifier = Modifier.size(12.dp))
+                 }
+                 Text("${if(astro.orders>0) astro.orders else 3908} Orders", style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp), color = Color.Gray)
+             }
 
-                 Spacer(modifier = Modifier.width(16.dp))
+             Spacer(modifier = Modifier.width(12.dp))
 
-                 // 2. Info Section
-                 Column(modifier = Modifier.weight(1f)) {
-                     Row(verticalAlignment = Alignment.CenterVertically) {
-                         Text(
-                             text = astro.name,
-                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                             color = Color(0xFF0F172A), // Slate 900
-                             maxLines = 1,
-                             overflow = TextOverflow.Ellipsis,
-                             modifier = Modifier.weight(1f, fill = false)
-                         )
-                         if (astro.isVerified) {
-                             Icon(
-                                 imageVector = Icons.Default.CheckCircle,
-                                 contentDescription = "Verified",
-                                 tint = Color(0xFF6366F1),
-                                 modifier = Modifier.size(16.dp).padding(start = 4.dp)
-                             )
+             // Right Column
+             Column(modifier = Modifier.weight(1f)) {
+                 Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                     Text(astro.name, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = Color.Black, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
+                     Column(horizontalAlignment = Alignment.End) {
+                         Row(verticalAlignment = Alignment.CenterVertically) {
+                             Text("₹ ${astro.price}", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = PriceRed, maxLines = 1)
+                             Spacer(modifier = Modifier.width(4.dp))
+                             Text("${(astro.price*2).toInt()}/Min", style = MaterialTheme.typography.bodySmall.copy(textDecoration = TextDecoration.LineThrough, fontSize = 10.sp), color = Color.Gray, maxLines = 1)
                          }
                      }
-
-                     Text(
-                         text = if(astro.skills.isNotEmpty()) astro.skills.joinToString(", ") else "Vedic Astrology",
-                         style = MaterialTheme.typography.bodySmall,
-                         color = Color(0xFF64748B), // Slate 500
-                         maxLines = 1,
-                         overflow = TextOverflow.Ellipsis
-                     )
-
-                     Row(
-                         verticalAlignment = Alignment.CenterVertically,
-                         modifier = Modifier.padding(top = 4.dp)
-                     ) {
-                         Box(
-                             modifier = Modifier
-                                 .background(Color(0xFFFFFBEB), RoundedCornerShape(4.dp))
-                                 .padding(horizontal = 6.dp, vertical = 2.dp)
-                         ) {
-                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                 Icon(Icons.Default.Star, null, tint = Color(0xFFB45309), modifier = Modifier.size(10.dp))
-                                 Text(" 4.9 ", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = Color(0xFFB45309))
-                             }
-                         }
-                         Text("  ·  ${if(astro.orders>0) astro.orders else 3908} orders", style = MaterialTheme.typography.labelSmall, color = Color(0xFF94A3B8))
-                     }
                  }
-            }
+                 Spacer(modifier = Modifier.height(6.dp))
+                 InfoRow(Icons.Default.Star, if(astro.skills.isNotEmpty()) astro.skills.joinToString(", ") else "Vedic, Vastu")
+                 InfoRow(Icons.Default.Info, "Hindi, English, Tamil")
+                 InfoRow(Icons.Default.Info, "Exp: ${if(astro.experience>0) astro.experience else 5} Years")
 
-            Spacer(modifier = Modifier.height(16.dp))
-            Divider(color = Color(0xFFF1F5F9)) // Slate 100
-            Spacer(modifier = Modifier.height(12.dp))
+                 Spacer(modifier = Modifier.height(12.dp))
 
-            // 3. Footer Section (Price & Actions)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                 Column {
-                     Text("RATE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold, fontSize = 9.sp), color = Color(0xFF94A3B8))
-                     Row(verticalAlignment = Alignment.Bottom) {
-                         Text("₹${astro.price}", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold), color = Color(0xFF0F172A))
-                         Text("/min", style = MaterialTheme.typography.labelSmall, color = Color(0xFF64748B), modifier = Modifier.padding(start=2.dp, bottom=2.dp))
-                     }
+                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End), verticalAlignment = Alignment.CenterVertically) {
+                     // Only show buttons for services the astrologer has enabled
+                     if (showChat && astro.isChatOnline) AstrologerActionButton("Chat", Icons.Default.Send, !astro.isBusy, AquaBlue, { onChatClick(astro) })
+                     if (showVideo && astro.isVideoOnline) AstrologerActionButton("Video", Icons.Default.PlayArrow, !astro.isBusy, PriceRed, { onCallClick(astro, "Video") })
+                     if (showCall && astro.isAudioOnline) AstrologerActionButton("Call", Icons.Default.Phone, !astro.isBusy, PeacockGreen, { onCallClick(astro, "Audio") }
                  }
-
-                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                      if (showChat && astro.isChatOnline) {
-                          AstrologerActionButton(
-                              text = "Chat",
-                              icon = Icons.Default.Send,
-                              isEnabled = !astro.isBusy,
-                              color = Color(0xFF0F172A), // Slate 900 (Professional Primary)
-                              onClick = { onChatClick(astro) }
-                          )
-                      }
-                      if ((showCall && astro.isAudioOnline) || (showVideo && astro.isVideoOnline)) {
-                          AstrologerActionButton(
-                              text = if(showVideo) "Video" else "Call",
-                              icon = if(showVideo) Icons.Default.PlayArrow else Icons.Default.Phone,
-                              isEnabled = !astro.isBusy,
-                              color = Color(0xFF6366F1), // Indigo 600 (Action Primary)
-                              onClick = { onCallClick(astro, if(showVideo) "Video" else "Audio") }
-                          )
-                      }
-                 }
-            }
+             }
         }
     }
 }
@@ -1413,14 +1352,30 @@ fun HomeBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
 
 @Composable
 fun DailyHoroscopeCard(content: String) {
+    // Breathing Animation
+    val infiniteTransition = rememberInfiniteTransition(label = "CardBreath")
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.01f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "CardScale"
+    )
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(16.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            },
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFF1F5F9)) // Slate 100
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, PeacockGreen.copy(alpha = 0.3f))
     ) {
         Column(
             modifier = Modifier
@@ -1429,32 +1384,32 @@ fun DailyHoroscopeCard(content: String) {
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 12.dp)
             ) {
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .background(Color(0xFF6366F1).copy(alpha = 0.1f), CircleShape),
+                        .background(PeacockGreen.copy(alpha = 0.1f), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
-                        tint = Color(0xFF6366F1),
-                        modifier = Modifier.size(20.dp)
+                        tint = PeacockGreen,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
                         text = "Daily Horoscope",
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
-                        color = Color(0xFF0F172A) // Slate 900
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = RoyalMidnightBlue
                     )
                     Text(
-                        text = "Your guidance from the cosmos",
+                        text = "இன்றைய ராசிபலன்",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF94A3B8) // Slate 400
+                        color = PeacockGreen
                     )
                 }
             }
@@ -1463,9 +1418,8 @@ fun DailyHoroscopeCard(content: String) {
                 text = content,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     lineHeight = 22.sp,
-                    letterSpacing = 0.2.sp
-                ),
-                color = Color(0xFF475569) // Slate 600
+                    color = Color.DarkGray
+                )
             )
         }
     }
@@ -1544,36 +1498,33 @@ fun InfoRow(icon: ImageVector, text: String) {
 fun AstrologerActionButton(
     text: String,
     icon: ImageVector,
-    isEnabled: Boolean,
-    color: Color,
+    active: Boolean,
+    borderColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val bgAlpha = if (isEnabled) 1f else 0.4f
-    val elevation = if (isEnabled) 4.dp else 0.dp
+    val finalColor = if (active) borderColor else Color.Gray
+    val containerColor = Color.White
+    val contentColor = finalColor
+    val borderStroke = androidx.compose.foundation.BorderStroke(1.dp, finalColor)
 
-    Surface(
+    Button(
         onClick = onClick,
-        enabled = isEnabled,
-        shape = RoundedCornerShape(12.dp),
-        color = color.copy(alpha = bgAlpha),
-        tonalElevation = elevation,
-        shadowElevation = elevation,
-        modifier = modifier.height(44.dp)
+        enabled = active,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+            disabledContainerColor = containerColor,
+            disabledContentColor = Color.Gray
+        ),
+        border = borderStroke,
+        shape = RoundedCornerShape(50),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+        modifier = modifier.height(32.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                color = Color.White,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+        Icon(icon, contentDescription = null, modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(text = text, style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 

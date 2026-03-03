@@ -816,58 +816,42 @@
     }
 
     /* --- High-Conversion Astro Card --- */
+    /* ─── PREMIUM ASTRO CARD REDESIGN (SaaS Standard) ─── */
     .astro-card {
-      background: var(--secondary-bg);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-      border: 1px solid var(--glass-border);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      margin-bottom: 20px;
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      /* Slate 100 */
+      border-radius: 20px;
+      padding: 20px;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
       gap: 16px;
-      transition: var(--transition);
-      cursor: pointer;
-      position: relative;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
       overflow: hidden;
-      box-shadow: var(--box-shadow);
+      margin-bottom: 20px;
+      cursor: pointer;
     }
 
     .astro-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      background: rgba(122, 31, 149, 0.1);
-      border-color: var(--accent-gold);
-      box-shadow: 0 15px 40px rgba(92, 8, 116, 0.6);
-    }
-
-    .astro-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 4px;
-      height: 100%;
-      background: var(--accent-gold);
-      opacity: 0;
-      transition: var(--transition);
-    }
-
-    /* (duplicate hover merged above) */
-
-    .astro-card:hover::before {
-      opacity: 1;
+      transform: translateY(-4px);
+      border-color: #e2e8f0;
+      box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
     }
 
     .card-top-row {
       display: flex;
-      gap: 15px;
+      align-items: center;
+      gap: 16px;
+      min-width: 0;
     }
 
-    /* Profile Image with Pulsing Status */
     .astro-img-wrapper {
       position: relative;
-      width: 65px;
-      height: 65px;
+      width: 72px;
+      height: 72px;
+      flex-shrink: 0;
     }
 
     .astro-img {
@@ -875,118 +859,119 @@
       height: 100%;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #F59E0B;
+      border: 3px solid #f8fafc;
+      box-shadow: 0 0 0 1px #e2e8f0;
     }
 
     .status-badge {
       position: absolute;
-      bottom: 4px;
-      right: 4px;
-      width: 12px;
-      height: 12px;
-      background: #4B5563;
-      border: 2px solid var(--secondary-bg);
+      bottom: 2px;
+      right: 2px;
+      width: 14px;
+      height: 14px;
       border-radius: 50%;
+      border: 2px solid #fff;
       z-index: 5;
     }
 
     .status-badge.online {
-      background: #10B981;
-      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+      background: #10b981;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
     }
 
     .status-badge.busy {
-      background: #EF4444;
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+      background: #f59e0b;
+    }
+
+    .status-badge.offline {
+      background: #94a3b8;
+    }
+
+    .astro-details {
+      flex: 1;
+      min-width: 0;
     }
 
     .astro-name {
-      font-family: var(--font-heading);
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      color: var(--accent-gold);
+      color: #0f172a;
+      /* Slate 900 */
       margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .astro-expertise {
-      color: var(--text-muted);
-      font-size: 0.82rem;
-      font-weight: 400;
+      color: #64748b;
+      /* Slate 500 */
+      font-size: 0.85rem;
+      font-weight: 500;
       margin-bottom: 6px;
-      display: -webkit-box;
-      -webkit-line-clamp: 1;
-      line-clamp: 1;
-      -webkit-box-orient: vertical;
+      white-space: nowrap;
       overflow: hidden;
+      text-overflow: ellipsis;
     }
-
-    /* Active Profile Image Ring */
-    .astro-img.online-active {
-      border: 2px solid #059669;
-      animation: pulse-border 2s infinite;
-    }
-
-    /* Busy/Offline: Red & Static */
-    /* (merged with above definition) */
-
-    /* Pulse Animation for Border */
-    @keyframes pulse-border {
-      0% {
-        box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7);
-      }
-
-      70% {
-        box-shadow: 0 0 0 6px rgba(5, 150, 105, 0);
-      }
-
-      100% {
-        box-shadow: 0 0 0 0 rgba(5, 150, 105, 0);
-      }
-    }
-
-    /* Info Section */
-    .astro-details {
-      flex: 1;
-    }
-
-    /* (duplicate .astro-name merged into primary definition above) */
-
-    /* (merged into primary .astro-expertise above) */
 
     .rating-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 0.85rem;
-      color: #4B5563;
     }
 
     .star-rating {
-      color: #F59E0B;
-      font-weight: bold;
-    }
-
-    /* Price Tag */
-    .price-tag {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: rgba(212, 175, 55, 0.15);
-      border: 1px solid var(--accent-gold);
-      color: var(--accent-gold);
+      background: #fffbeb;
+      color: #b45309;
+      padding: 2px 8px;
+      border-radius: 6px;
       font-weight: 700;
-      font-size: 0.8rem;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-family: var(--font-body);
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 3px;
     }
 
-    /* Action Buttons Row */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .price-tag {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .price-tag .label {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .price-tag .value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+
+    .price-tag .unit {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #64748b;
+    }
+
     .card-actions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-top: 10px;
+      display: flex;
+      gap: 8px;
     }
 
     .cta-btn {
@@ -1013,51 +998,102 @@
       margin-bottom: 4px;
     }
 
-    .cta-btn:hover {
-      background: rgba(0, 0, 0, 0.04);
-      border-color: rgba(255, 255, 255, 0.2);
+    .cta-btn {
+      height: 44px;
+      padding: 0 20px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      border: none;
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .cta-btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-chat {
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn-chat:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+
+    .btn-call {
+      background: #6366f1;
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+    }
+
+    .btn-call:hover {
+      background: #4f46e5;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-video {
+      background: #0f172a;
+      color: white;
+      box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.2);
+    }
+
+    .btn-video:hover {
+      background: #1e293b;
       transform: translateY(-2px);
     }
 
-    .cta-btn.active-chat {
-      background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-      color: white;
-      border: none;
-      box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2);
+    .btn-active-pulse i {
+      animation: icon-pulse 2s infinite;
+      color: currentColor;
     }
 
-    .cta-btn.active-audio {
-      background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-      color: white;
-      border: none;
-      box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+    @keyframes icon-pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
 
-    .cta-btn.active-video {
-      background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
-      color: white;
-      border: none;
-      box-shadow: 0 5px 15px rgba(245, 158, 11, 0.2);
+    .opacity-50 {
+      opacity: 0.4;
+      filter: grayscale(0.8);
+      background: #e2e8f0 !important;
+      color: #94a3b8 !important;
+      box-shadow: none !important;
     }
 
-    .inactive-cta {
-      opacity: 0.5;
-      cursor: not-allowed !important;
-      filter: grayscale(1);
-      background: rgba(0, 0, 0, 0.03) !important;
-      color: var(--text-muted) !important;
-      border-color: var(--glass-border) !important;
-    }
-
-    .astro-dash-header {
-      background: var(--secondary-bg);
-      border: 1px solid var(--glass-border);
-      padding: 15px;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    background: var(--secondary-bg);
+    border: 1px solid var(--glass-border);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     }
 
     .toggle-row {
@@ -1898,13 +1934,20 @@
 
     .horoscope-card {
       background: #ffffff;
-      border-radius: 24px;
-      padding: 28px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+      border-radius: 16px;
+      padding: 32px;
+      border: 1px solid #f1f5f9;
+      /* Slate 100 */
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
       margin-bottom: 24px;
       position: relative;
       overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .horoscope-card:hover {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+      transform: translateY(-2px);
     }
 
     .horoscope-card::before {
@@ -1912,20 +1955,22 @@
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, #7C3AED, #c5a028, #ec4899);
-      border-radius: 4px 4px 0 0;
+      width: 4px;
+      height: 100%;
+      background: #6366f1;
+      /* Indigo 600 */
+      border-radius: 4px 0 0 4px;
     }
 
     .horoscope-card::after {
-      content: '☽';
+      content: '☼';
       position: absolute;
-      top: 20px;
-      right: 20px;
-      font-size: 2.5rem;
-      opacity: 0.05;
-      color: var(--accent-gold);
+      top: 24px;
+      right: 24px;
+      font-size: 2.2rem;
+      opacity: 0.03;
+      color: #0f172a;
+      /* Slate 900 */
     }
 
     #messagesList {
@@ -2528,6 +2573,43 @@
 
       .service-item-card {
         min-width: unset !important;
+      }
+
+      /* Fix card action buttons overflow on small screens */
+      .card-actions {
+        gap: 6px !important;
+      }
+
+      .cta-btn {
+        padding: 10px 4px !important;
+        font-size: 0.65rem !important;
+      }
+
+      .cta-btn i {
+        font-size: 0.95rem !important;
+      }
+
+      /* Prevent price-tag from overlapping card content */
+      .price-tag {
+        font-size: 0.7rem !important;
+        padding: 3px 8px !important;
+        top: 12px !important;
+        right: 12px !important;
+      }
+
+      /* Ensure astro-card content doesn't overflow */
+      .astro-card {
+        padding: 16px !important;
+      }
+
+      .card-top-row {
+        gap: 10px !important;
+      }
+
+      .astro-img-wrapper {
+        width: 55px !important;
+        height: 55px !important;
+        flex-shrink: 0;
       }
     }
   </style>
@@ -3324,16 +3406,17 @@
           <!-- Horoscope Section -->
           <div id="dailyHoroscopeSection" style="margin-bottom: 28px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-              <div style="display:flex; align-items:center; gap:10px;">
+              <div style="display:flex; align-items:center; gap:12px;">
                 <div
-                  style="width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg, #7C3AED, #A78BFA); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1rem;">
-                  <i class="fas fa-moon"></i>
+                  style="width:40px; height:40px; border-radius:10px; background: rgba(99, 102, 241, 0.1); display:flex; align-items:center; justify-content:center; color:#6366f1; font-size:1.1rem; border: 1px solid rgba(99, 102, 241, 0.15);">
+                  <i class="fas fa-sun"></i>
                 </div>
-                <h3 style="margin:0; font-size:1.15rem; color: var(--text-main); font-family: var(--font-heading);">
+                <h3
+                  style="margin:0; font-size:1.25rem; color: #0f172a; font-family: var(--font-heading); font-weight: 800;">
                   Daily Horoscope</h3>
               </div>
               <span id="horoscopeDate"
-                style="font-size:0.7rem; color: #7C3AED; background: rgba(124, 58, 237, 0.08); padding:5px 14px; border-radius:30px; font-weight:600; letter-spacing:0.3px;">Today</span>
+                style="font-size:0.7rem; color: #6366f1; background: rgba(99, 102, 241, 0.08); padding:6px 16px; border-radius:30px; font-weight:700; letter-spacing:0.3px; border: 1px solid rgba(99, 102, 241, 0.1);">Today</span>
             </div>
 
             <div class="zodiac-scroller" id="zodiacScroller">
@@ -3341,23 +3424,24 @@
             </div>
 
             <div class="horoscope-card" id="horoscopeDisplay">
-              <div id="horoscopeLoading" style="text-align:center; padding:20px; color: var(--accent-gold);">
+              <div id="horoscopeLoading" style="text-align:center; padding:20px; color: #6366f1;">
                 <i class="fas fa-circle-notch fa-spin" style="font-size:1.5rem; margin-bottom:8px; display:block;"></i>
-                <span style="font-size:0.85rem; color:var(--text-muted);">Loading prediction...</span>
+                <span style="font-size:0.85rem; color:#94a3b8;">Loading prediction...</span>
               </div>
               <div id="horoscopeContent" class="hidden">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+                <div style="display:flex; align-items:center; gap:16px; margin-bottom:24px;">
                   <div id="activeSignIcon"
-                    style="font-size:1.8rem; background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(197, 160, 40, 0.1)); width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; border: 1px solid rgba(124, 58, 237, 0.15);">
+                    style="font-size:2rem; background: #f8fafc; width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center; border: 1px solid #e2e8f0; color: #0f172a;">
                     ♈</div>
                   <div>
                     <div
-                      style="font-weight:700; font-size:1.15rem; color: var(--text-main); font-family: var(--font-heading); line-height:1.2;"
+                      style="font-weight:800; font-size:1.3rem; color: #0f172a; font-family: var(--font-heading); line-height:1.2;"
                       id="activeSignName">Aries</div>
-                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">Today's Prediction</div>
+                    <div style="font-size:0.75rem; color:#94a3b8; margin-top:4px; font-weight: 500;">Today's Prediction
+                    </div>
                   </div>
                 </div>
-                <p id="horoscopeText" style="font-size:0.9rem; line-height:1.7; color: var(--text-muted); margin:0;">
+                <p id="horoscopeText" style="font-size:0.95rem; line-height:1.8; color: #475569; margin:0;">
                   Select a sign to see your daily prediction.
                 </p>
               </div>
@@ -3652,54 +3736,55 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(15px);
+      border-top: 1px solid #f1f5f9;
       display: none;
       justify-content: space-around;
-      padding: 12px 0 28px 0;
+      padding: 10px 0 24px 0;
       z-index: 1000;
-      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.03);
     }
 
     .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      color: var(--text-muted);
-      font-size: 0.7rem;
+      color: #94a3b8;
+      /* Slate 400 */
+      font-size: 0.65rem;
+      font-weight: 500;
       cursor: pointer;
       flex: 1;
-      transition: var(--transition);
-      opacity: 0.6;
+      transition: all 0.2s;
+      position: relative;
     }
 
     .nav-item.active {
-      color: var(--accent-gold);
-      opacity: 1;
+      color: #6366f1;
+      /* Indigo 600 */
       font-weight: 700;
-      transform: translateY(-8px);
-    }
-
-    .nav-item.active::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      width: 4px;
-      height: 4px;
-      background: var(--accent-gold);
-      border-radius: 50%;
-      box-shadow: 0 0 10px var(--accent-gold);
     }
 
     .nav-item i {
-      font-size: 1.4rem;
-      margin-bottom: 6px;
-      transition: var(--transition);
+      font-size: 1.3rem;
+      margin-bottom: 4px;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     .nav-item.active i {
-      filter: drop-shadow(0 0 8px rgba(197, 160, 40, 0.6));
+      transform: scale(1.1);
+      filter: drop-shadow(0 2px 4px rgba(99, 102, 241, 0.2));
+    }
+
+    .nav-item.active::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      width: 20px;
+      height: 3px;
+      background: #6366f1;
+      border-radius: 0 0 4px 4px;
     }
   </style>
 
@@ -6643,7 +6728,7 @@
 
       // Home Header
       if (document.getElementById('homeUserName')) {
-        document.getElementById('homeUserName').innerText = user.role === 'guest' ? 'Guest' : user.name.split(' ')[0];
+        document.getElementById('homeUserName').innerText = user.role === 'guest' ? 'Guest' : (user.name || 'User').split(' ')[0];
         updateHomeTime();
         setInterval(updateHomeTime, 60000);
       }
@@ -6665,8 +6750,10 @@
       });
 
       socket.on('wallet-update', (data) => {
-        const bal = Number(data.balance).toFixed(2);
-        document.getElementById('clientWallet').innerText = bal;
+        if (!data || data.balance === undefined || data.balance === null) return;
+        const bal = Number(data.balance || 0).toFixed(2);
+        const clientWalletEl = document.getElementById('clientWallet');
+        if (clientWalletEl) clientWalletEl.innerText = bal;
         if (document.getElementById('dashWalletBalance')) {
           document.getElementById('dashWalletBalance').innerText = bal;
         }
@@ -6994,64 +7081,56 @@
         const isTopChoice = a.isTopChoice; // Optional extra field if added later
 
         div.innerHTML = `
-          ${isTopChoice ? '<div class="ribbon"><span>Top Choice</span></div>' : ''}
+      ${isTopChoice ? '<div class="ribbon"><span>Top Choice</span></div>' : ''}
 
-          <!-- Top Row: Image & Info -->
-          <div class="card-top-row">
-              <div class="astro-img-wrapper">
-                  <img src="${a.image || 'https://ui-avatars.com/api/?name=' + a.name + '&background=random'}"
-                       class="astro-img ${a.isOnline ? 'online-active' : ''}">
-                  <div class="status-badge ${a.isOnline ? 'online' : 'busy'}"></div>
-              </div>
-
-              <div class="astro-details">
-                  <div class="astro-name">
-                    ${a.name}
-                    ${isVerified ? '<i class="fas fa-check-circle" style="color:#3B82F6; font-size:0.9rem; margin-left:4px;" title="Verified Astrologer"></i>' : ''}
-                  </div>
-
-                  <div class="astro-expertise">${a.skills ? a.skills.join(', ') : 'Vedic, Prashana'}</div>
-
-                  <!-- Document Verified Badge (Conditional) -->
-                  ${isDocsVerified ? `
-                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:0.75rem; color:#059669; background:#ECFDF5; padding:2px 6px; border-radius:4px; border:1px solid #D1FAE5; margin-bottom:4px;">
-                    <i class="fas fa-check-circle"></i> Document Verified
-                  </div>` : ''}
-
-                  <div style="font-size:0.8rem; color:#4B5563; margin-bottom:4px;">
-                    <i class="fas fa-language" style="color:#F59E0B;"></i> ${languages.join(', ')}
-                  </div>
-
-                  <div class="rating-row">
-                      <span class="star-rating">★ 4.9</span>
-                      <span style="color:var(--accent-gold); font-size:0.75rem; font-weight:600;">(${orderCount}+ தீர்வுகள்)</span>
-                  </div>
-              </div>
-
-              <div class="price-tag">₹${a.price}/min</div>
+      <!-- Top Row: Avatar & Profile Info -->
+      <div class="card-top-row">
+          <div class="astro-img-wrapper">
+              <img src="${a.image || 'https://ui-avatars.com/api/?name=' + a.name + '&background=random'}"
+                   class="astro-img">
+              <div class="status-badge ${a.isOnline ? 'online' : (a.isBusy ? 'busy' : 'offline')}"></div>
           </div>
 
-          <!-- Bottom Row: Action Buttons -->
+          <div class="astro-details">
+              <div class="astro-name">
+                ${a.name}
+                ${isVerified ? '<i class="fas fa-check-circle" style="color:#6366F1; font-size:0.9rem;" title="Verified"></i>' : ''}
+              </div>
+
+              <div class="astro-expertise">${a.skills ? a.skills.join(', ') : 'Vedic Astrology'}</div>
+
+              <div class="rating-row">
+                  <span class="star-rating"><i class="fas fa-star" style="font-size:0.7rem;"></i> 4.9</span>
+                  <span style="color:#94A3B8; font-size:0.75rem; font-weight:500;">(${orderCount}+ orders)</span>
+              </div>
+          </div>
+      </div>
+
+      <!-- Footer Row: Pricing & Actions -->
+      <div class="card-footer">
+          <div class="price-tag">
+              <span class="label">Rate</span>
+              <div class="value">₹${a.price || 0}<span class="unit">/min</span></div>
+          </div>
+
           <div class="card-actions">
-               <div class="cta-btn ${a.isChatOnline ? 'active-chat' : 'inactive-cta'}"
-                    onclick="event.stopPropagation(); if('${a.isChatOnline}' === 'true') checkGuestAction('chat', '${a.userId}')">
-                   <i class="fas fa-comment-dots"></i>
+               <button class="cta-btn btn-chat ${a.isChatOnline ? '' : 'opacity-50 pointer-events-none'}"
+                    onclick="event.stopPropagation(); checkGuestAction('chat', '${a.userId}')">
                    <span>Chat</span>
-               </div>
+               </button>
 
-               <div class="cta-btn ${a.isAudioOnline ? 'active-audio' : 'inactive-cta'}"
-                    onclick="event.stopPropagation(); if('${a.isAudioOnline}' === 'true') checkGuestAction('call', '${a.userId}')">
-                   <i class="fas fa-phone-alt"></i>
+               <button class="cta-btn btn-call ${a.isAudioOnline ? '' : 'opacity-50 pointer-events-none'}"
+                    onclick="event.stopPropagation(); checkGuestAction('call', '${a.userId}')">
                    <span>Call</span>
-               </div>
+               </button>
 
-               <div class="cta-btn ${a.isVideoOnline ? 'active-video' : 'inactive-cta'}"
-                    onclick="event.stopPropagation(); if('${a.isVideoOnline}' === 'true') checkGuestAction('video', '${a.userId}')">
-                   <i class="fas fa-video"></i>
+               <button class="cta-btn btn-video ${a.isVideoOnline ? '' : 'opacity-50 pointer-events-none'}"
+                    onclick="event.stopPropagation(); checkGuestAction('video', '${a.userId}')">
                    <span>Video</span>
-               </div>
+               </button>
            </div>
-        `;
+      </div>
+    `;
         if (container) container.appendChild(div);
         if (webContainer) {
           const webDiv = div.cloneNode(true);
@@ -7159,7 +7238,8 @@
       // Update Payout Status (if any pending)
       socket.emit('get-payout-status', {}, (res) => {
         const pDiv = document.getElementById('astroPendingWithdrawals');
-        if (res.pendingAmount > 0) {
+        if (!pDiv) return;
+        if (res && res.pendingAmount > 0) {
           pDiv.style.display = 'block';
           pDiv.innerHTML = `<i class="fas fa-clock"></i> Pending Withdrawal: ₹${res.pendingAmount}`;
         } else {
