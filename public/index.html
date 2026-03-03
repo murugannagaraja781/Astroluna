@@ -8826,7 +8826,7 @@
 
     // Load request count on admin startup
     setTimeout(() => {
-      if (savedRole === 'superadmin') {
+      if (state.me && state.me.role === 'superadmin') {
         loadAstrologerRequests(); // Pre-load to show badge
       }
     }, 2000);
