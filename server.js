@@ -600,7 +600,16 @@ const UserSchema = new mongoose.Schema({
   // Astrologer Registration Request
   astrologerRequestStatus: { type: String, enum: ['none', 'pending', 'approved', 'rejected'], default: 'none' },
   astrologerRequestedAt: Date,
-  astrologerExperience: String // Short description from the applicant
+  astrologerExperience: String, // Short description from the applicant
+  astrologerAbout: String, // Bio
+  astrologerSkills: [String], // Array of skills
+  bankDetails: {
+    accountHolder: String,
+    accountNumber: String,
+    bankName: String,
+    ifscCode: String,
+    upiId: String
+  }
 });
 
 const CallRequestSchema = new mongoose.Schema({
@@ -834,41 +843,69 @@ generateTamilHoroscope();
 
 // --- Endpoints ---
 
-// === Astrologer Registration Request API ===
-app.post('/api/astrologer/request', async (req, res) => {
+// === Astrologer Registration (New & Upgrade) ===
+app.post('/api/astrologer/register', async (req, res) => {
   try {
-    const { userId, experience } = req.body;
-    if (!userId) return res.status(400).json({ ok: false, error: 'User ID required' });
+    const { name, phone, experience, about, bankDetails, skills } = req.body;
+    if (!phone) return res.status(400).json({ ok: false, error: 'Phone number required' });
 
-    const user = await User.findOne({ userId });
-    if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
+    let user = await User.findOne({ phone });
+    let isUpgrade = false;
 
-    if (user.role === 'astrologer') {
-      return res.json({ ok: false, error: 'You are already an astrologer' });
+    if (user) {
+      if (user.role === 'astrologer' || user.role === 'superadmin') {
+        return res.status(400).json({ ok: false, error: 'This number is already registered as an Astrologer or Admin' });
+      }
+      if (user.astrologerRequestStatus === 'pending') {
+        return res.status(400).json({ ok: false, error: 'Your registration request is already pending approval' });
+      }
+
+      // Existing Client - Start Upgrade Process
+      isUpgrade = true;
+      user.name = name || user.name;
+      user.astrologerExperience = experience || '';
+      user.astrologerAbout = about || '';
+      user.bankDetails = bankDetails || {};
+      user.astrologerSkills = skills || [];
+      user.astrologerRequestStatus = 'pending';
+      user.astrologerRequestedAt = new Date();
+      await user.save();
+    } else {
+      // New User - Create as Client with Pending Astrologer Status
+      user = await User.create({
+        userId: crypto.randomUUID(),
+        phone,
+        name: name || 'Astro Applicant',
+        role: 'client', // Starts as client till approved
+        walletBalance: 0,
+        astrologerRequestStatus: 'pending',
+        astrologerRequestedAt: new Date(),
+        astrologerExperience: experience || '',
+        astrologerAbout: about || '',
+        bankDetails: bankDetails || {},
+        astrologerSkills: skills || []
+      });
     }
-    if (user.astrologerRequestStatus === 'pending') {
-      return res.json({ ok: false, error: 'Your request is already pending approval' });
-    }
 
-    user.astrologerRequestStatus = 'pending';
-    user.astrologerRequestedAt = new Date();
-    user.astrologerExperience = experience || '';
-    await user.save();
+    console.log(`[Astrologer ${isUpgrade ? 'Upgrade' : 'New'}] ${user.name} (${user.phone}) submitted request`);
+    logActivity('astrologer', isUpgrade ? 'Astrologer Upgrade Request' : 'New Astrologer Request', { userId: user.userId, name: user.name, phone: user.phone });
 
-    console.log(`[Astrologer Request] New request from ${user.name} (${user.phone})`);
-    logActivity('astrologer', 'New Astrologer Request', { userId, name: user.name, phone: user.phone });
+    // Notify Super Admins
+    const notificationText = isUpgrade
+      ? `⭐ New Astrologer Request (Upgrade): ${user.name} (${user.phone})`
+      : `⭐ New Astrologer Request: ${user.name} (${user.phone})`;
 
-    // Notify all Super Admins via socket
     io.to('superadmin').emit('admin-notification', {
       type: 'astrologer_request',
-      text: `⭐ New Astrologer Request: ${user.name} (${user.phone || 'No Phone'})`,
+      text: notificationText,
       data: { userId: user.userId, name: user.name }
     });
 
-    res.json({ ok: true, message: 'Your request has been submitted. You will be notified once approved.' });
+    res.json({ ok: true, message: 'Request submitted successfully. Waiting for admin approval.' });
+
   } catch (err) {
-    console.error('[Astrologer Request] Error:', err.message);
-    res.status(500).json({ ok: false, error: 'Server Error' });
+    console.error('[Astrologer Register] Error:', err.message);
+    res.status(500).json({ ok: false, error: 'Server Error: ' + err.message });
   }
 });
 
