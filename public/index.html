@@ -1834,58 +1834,75 @@
     .zodiac-scroller {
       display: flex;
       overflow-x: auto;
-      gap: 12px;
-      padding: 10px 0;
+      gap: 10px;
+      padding: 12px 4px;
       scrollbar-width: none;
-      /* Firefox */
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .zodiac-scroller::-webkit-scrollbar {
       display: none;
-      /* Chrome/Safari */
     }
 
     .zodiac-item {
       flex: 0 0 auto;
-      width: 75px;
+      width: 72px;
       text-align: center;
-      padding: 12px 5px;
-      border-radius: 16px;
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
+      padding: 14px 6px 10px;
+      border-radius: 18px;
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
       cursor: pointer;
-      transition: var(--transition);
+      transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
       color: var(--text-muted);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .zodiac-item:hover {
+      border-color: var(--accent-gold);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(197, 160, 40, 0.12);
     }
 
     .zodiac-item.active {
-      background: linear-gradient(135deg, var(--brand-purple) 0%, var(--accent-gold) 100%);
+      background: linear-gradient(145deg, #7C3AED 0%, #A78BFA 100%);
       color: white;
-      border-color: var(--accent-gold);
-      transform: translateY(-4px);
-      box-shadow: 0 10px 20px rgba(92, 8, 116, 0.4);
+      border-color: transparent;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(124, 58, 237, 0.3);
+    }
+
+    .zodiac-item.active .zodiac-icon {
+      color: white;
+      filter: none;
+    }
+
+    .zodiac-item.active .zodiac-name {
+      color: rgba(255, 255, 255, 0.9);
     }
 
     .zodiac-icon {
-      font-size: 1.6rem;
-      margin-bottom: 6px;
+      font-size: 1.5rem;
+      margin-bottom: 5px;
       display: block;
       color: var(--accent-gold);
+      transition: all 0.3s ease;
     }
 
     .zodiac-name {
-      font-size: 0.75rem;
-      font-weight: 600;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
     }
 
     .horoscope-card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      border: 1px solid #f3f4f6;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
-      margin-bottom: 20px;
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 28px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+      margin-bottom: 24px;
       position: relative;
       overflow: hidden;
     }
@@ -1897,7 +1914,18 @@
       left: 0;
       right: 0;
       height: 4px;
-      background: linear-gradient(90deg, #F59E0B, #ec4899);
+      background: linear-gradient(90deg, #7C3AED, #c5a028, #ec4899);
+      border-radius: 4px 4px 0 0;
+    }
+
+    .horoscope-card::after {
+      content: '☽';
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 2.5rem;
+      opacity: 0.05;
+      color: var(--accent-gold);
     }
 
     #messagesList {
@@ -3294,32 +3322,42 @@
           </style>
 
           <!-- Horoscope Section -->
-          <div id="dailyHoroscopeSection" style="margin-bottom: 24px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <h3 style="margin:0; font-size:1.1rem; color: var(--accent-gold); font-family: var(--font-heading);">
-                Daily Horoscope</h3>
+          <div id="dailyHoroscopeSection" style="margin-bottom: 28px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div
+                  style="width:36px; height:36px; border-radius:12px; background:linear-gradient(135deg, #7C3AED, #A78BFA); display:flex; align-items:center; justify-content:center; color:#fff; font-size:1rem;">
+                  <i class="fas fa-moon"></i>
+                </div>
+                <h3 style="margin:0; font-size:1.15rem; color: var(--text-main); font-family: var(--font-heading);">
+                  Daily Horoscope</h3>
+              </div>
               <span id="horoscopeDate"
-                style="font-size:0.75rem; color: var(--text-muted); background: var(--brand-purple); padding:4px 12px; border-radius:30px; border: 1px solid var(--glass-border);">Today</span>
+                style="font-size:0.7rem; color: #7C3AED; background: rgba(124, 58, 237, 0.08); padding:5px 14px; border-radius:30px; font-weight:600; letter-spacing:0.3px;">Today</span>
             </div>
 
             <div class="zodiac-scroller" id="zodiacScroller">
               <!-- Dynamic Zodiac Signs -->
             </div>
 
-            <div class="horoscope-card" id="horoscopeDisplay"
-              style="background: var(--glass); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
-              <div id="horoscopeLoading" style="text-align:center; padding:10px; color: var(--accent-gold);">
-                <i class="fas fa-circle-notch fa-spin"></i> Loading...
+            <div class="horoscope-card" id="horoscopeDisplay">
+              <div id="horoscopeLoading" style="text-align:center; padding:20px; color: var(--accent-gold);">
+                <i class="fas fa-circle-notch fa-spin" style="font-size:1.5rem; margin-bottom:8px; display:block;"></i>
+                <span style="font-size:0.85rem; color:var(--text-muted);">Loading prediction...</span>
               </div>
               <div id="horoscopeContent" class="hidden">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
                   <div id="activeSignIcon"
-                    style="font-size:1.5rem; background: var(--brand-purple); width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; border: 1px solid var(--glass-border);">
+                    style="font-size:1.8rem; background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(197, 160, 40, 0.1)); width:52px; height:52px; border-radius:16px; display:flex; align-items:center; justify-content:center; border: 1px solid rgba(124, 58, 237, 0.15);">
                     ♈</div>
-                  <div style="font-weight:700; font-size:1.1rem; color: white; font-family: var(--font-body);"
-                    id="activeSignName">Aries</div>
+                  <div>
+                    <div
+                      style="font-weight:700; font-size:1.15rem; color: var(--text-main); font-family: var(--font-heading); line-height:1.2;"
+                      id="activeSignName">Aries</div>
+                    <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">Today's Prediction</div>
+                  </div>
                 </div>
-                <p id="horoscopeText" style="font-size:0.95rem; line-height:1.6; color: var(--text-muted); margin:0;">
+                <p id="horoscopeText" style="font-size:0.9rem; line-height:1.7; color: var(--text-muted); margin:0;">
                   Select a sign to see your daily prediction.
                 </p>
               </div>
@@ -10219,15 +10257,47 @@
 
       document.getElementById('horoscopeDate').innerText = data.date;
 
-      let html = `<p style="margin-bottom:15px;">${data.horoscope_data}</p>`;
+      let html = `<p style="margin-bottom:18px; font-size:0.9rem; line-height:1.7; color:var(--text-muted);">${data.horoscope_data}</p>`;
 
       if (data.details) {
         html += `
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:15px; border-top:1px solid #eee; padding-top:15px;">
-            <div style="font-size:0.85rem;"><i class="fas fa-briefcase" style="color:#d97706; width:18px;"></i> <b>தொழில்:</b> ${data.details.career_ta}</div>
-            <div style="font-size:0.85rem;"><i class="fas fa-coins" style="color:#059669; width:18px;"></i> <b>நிதி:</b> ${data.details.finance_ta}</div>
-            <div style="font-size:0.85rem;"><i class="fas fa-heartbeat" style="color:#ef4444; width:18px;"></i> <b>ஆரோக்கியம்:</b> ${data.details.health_ta}</div>
-            <div style="font-size:0.85rem;"><i class="fas fa-magic" style="color:#3b82f6; width:18px;"></i> <b>அதிர்ஷ்டம்:</b> ${data.details.lucky_number} (${data.details.lucky_color_ta})</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px; border-top:1px solid #f1f5f9; padding-top:18px;">
+            <div style="background:linear-gradient(135deg, rgba(217,119,6,0.06), rgba(217,119,6,0.02)); padding:14px; border-radius:16px; border:1px solid rgba(217,119,6,0.1);">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <div style="width:28px; height:28px; border-radius:8px; background:rgba(217,119,6,0.12); display:flex; align-items:center; justify-content:center;">
+                  <i class="fas fa-briefcase" style="color:#d97706; font-size:0.75rem;"></i>
+                </div>
+                <span style="font-size:0.7rem; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:0.5px;">தொழில்</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.5;">${data.details.career_ta}</div>
+            </div>
+            <div style="background:linear-gradient(135deg, rgba(5,150,105,0.06), rgba(5,150,105,0.02)); padding:14px; border-radius:16px; border:1px solid rgba(5,150,105,0.1);">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <div style="width:28px; height:28px; border-radius:8px; background:rgba(5,150,105,0.12); display:flex; align-items:center; justify-content:center;">
+                  <i class="fas fa-coins" style="color:#059669; font-size:0.75rem;"></i>
+                </div>
+                <span style="font-size:0.7rem; font-weight:700; color:#065f46; text-transform:uppercase; letter-spacing:0.5px;">நிதி</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.5;">${data.details.finance_ta}</div>
+            </div>
+            <div style="background:linear-gradient(135deg, rgba(239,68,68,0.06), rgba(239,68,68,0.02)); padding:14px; border-radius:16px; border:1px solid rgba(239,68,68,0.1);">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <div style="width:28px; height:28px; border-radius:8px; background:rgba(239,68,68,0.12); display:flex; align-items:center; justify-content:center;">
+                  <i class="fas fa-heartbeat" style="color:#ef4444; font-size:0.75rem;"></i>
+                </div>
+                <span style="font-size:0.7rem; font-weight:700; color:#991b1b; text-transform:uppercase; letter-spacing:0.5px;">ஆரோக்கியம்</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.5;">${data.details.health_ta}</div>
+            </div>
+            <div style="background:linear-gradient(135deg, rgba(124,58,237,0.06), rgba(124,58,237,0.02)); padding:14px; border-radius:16px; border:1px solid rgba(124,58,237,0.1);">
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <div style="width:28px; height:28px; border-radius:8px; background:rgba(124,58,237,0.12); display:flex; align-items:center; justify-content:center;">
+                  <i class="fas fa-star" style="color:#7C3AED; font-size:0.75rem;"></i>
+                </div>
+                <span style="font-size:0.7rem; font-weight:700; color:#5b21b6; text-transform:uppercase; letter-spacing:0.5px;">அதிர்ஷ்டம்</span>
+              </div>
+              <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.5;">${data.details.lucky_number} • ${data.details.lucky_color_ta}</div>
+            </div>
           </div>
         `;
       }
