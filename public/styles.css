@@ -160,15 +160,14 @@ h4 {
     transform: translateY(-5px);
     border-color: rgba(212, 175, 55, 0.3);
     box-shadow:
-      0 15px 35px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      0 15px 35px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
   }
 
-  /* Dashboard Header Mobile */
   #admin-sect-home h2 {
     font-family: 'Cinzel', serif;
     font-size: 1.5rem;
-    color: #f8fafc;
+    color: var(--text-main);
     margin-bottom: 24px;
     text-align: center;
     position: relative;
@@ -224,7 +223,6 @@ h4 {
     color: var(--text-main) !important;
     text-align: center;
     font-family: 'Outfit', sans-serif;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
 
   /* Bottom Navigation Enhanced */
@@ -399,7 +397,7 @@ h4 {
   .header-left h2 {
     font-family: 'Cinzel', serif;
     font-size: 1.8rem;
-    color: #f8fafc;
+    color: var(--text-main);
     margin: 0;
   }
 
@@ -417,8 +415,8 @@ h4 {
 
   .date-selector {
     padding: 10px 20px;
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(197, 160, 40, 0.2);
     border-radius: 12px;
     color: var(--text-main);
     cursor: pointer;
@@ -430,7 +428,7 @@ h4 {
 
   .date-selector:hover {
     border-color: var(--primary);
-    background: rgba(30, 41, 59, 1);
+    background: rgba(0, 0, 0, 0.06);
   }
 
   /* Dashboard Grid Desktop */
@@ -468,8 +466,8 @@ h4 {
     transform: translateY(-8px);
     border-color: rgba(212, 175, 55, 0.3);
     box-shadow:
-      0 20px 40px rgba(0, 0, 0, 0.3),
-      0 0 30px rgba(212, 175, 55, 0.1);
+      0 20px 40px rgba(0, 0, 0, 0.08),
+      0 0 30px rgba(212, 175, 55, 0.06);
   }
 
   .stat-card-modern::before {
@@ -539,7 +537,6 @@ h4 {
     color: var(--text-main) !important;
     text-align: center;
     font-family: 'Outfit', sans-serif;
-    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
 
   /* Hide mobile nav on desktop */
