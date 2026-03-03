@@ -2797,8 +2797,8 @@
           <ul>
             <li><a href="#web-about">About Us</a></li>
             <li><a href="privacy-policy.html">Ethical Guidelines</a></li>
-            <li><a href="#" onclick="switchToApp('login')">Partners</a></li>
-            <li><a href="#" onclick="switchToApp('login')">Careers</a></li>
+            <li><a href="#" onclick="openAstroSignup()">Partners</a></li>
+            <li><a href="#" onclick="openAstroSignup()">Careers</a></li>
           </ul>
         </div>
         <div class="footer-col" style="grid-column: span 1;">
@@ -5561,6 +5561,72 @@
     </div>
   </div>
 
+  <!-- Screen: Astrologer Signup -->
+  <div id="screen-astro-signup" class="modal-overlay hidden">
+    <div class="premium-modal" style="height: auto; max-height: 90vh; overflow-y: auto; width: 95%; max-width: 500px;">
+      <div class="modal-header"
+        style="background: linear-gradient(135deg, #7C3AED, #5b21b6); border-radius: 20px 20px 0 0; padding: 20px;">
+        <span style="color: white; font-weight: 700; font-size: 1.1rem;"><i class="fas fa-user-plus"
+            style="margin-right:8px;"></i> Join as Astrologer</span>
+        <button onclick="document.getElementById('screen-astro-signup').classList.add('hidden')" class="close-btn"
+          style="color: white; opacity: 0.8;"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" style="padding: 24px; background: white;">
+        <p style="color: #64748b; font-size: 0.85rem; margin: 0 0 20px;">Register to become an expert on AstroLuna. If
+          you already have a client account, your account will be upgraded.</p>
+
+        <div style="display: grid; gap: 15px;">
+          <div>
+            <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:#475569; font-weight: 600;">Full
+              Name *</label>
+            <input id="astroRegName" type="text" class="cosmic-input" placeholder="Enter your full name"
+              style="background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0; width:100%; padding: 12px; border-radius: 10px;">
+          </div>
+          <div>
+            <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:#475569; font-weight: 600;">Phone
+              Number *</label>
+            <input id="astroRegPhone" type="tel" class="cosmic-input" placeholder="e.g. 9876543210"
+              style="background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0; width:100%; padding: 12px; border-radius: 10px;">
+          </div>
+          <div>
+            <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:#475569; font-weight: 600;">Total
+              Experience (Years) *</label>
+            <input id="astroRegExp" type="number" class="cosmic-input" placeholder="e.g. 5"
+              style="background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0; width:100%; padding: 12px; border-radius: 10px;">
+          </div>
+          <div>
+            <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:#475569; font-weight: 600;">About /
+              Bio</label>
+            <textarea id="astroRegBio" class="cosmic-input" placeholder="Describe your expertise..."
+              style="background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0; width:100%; padding: 12px; height: 80px; border-radius: 10px;"></textarea>
+          </div>
+
+          <div style="margin-top: 10px; padding: 15px; background: #f1f5f9; border-radius: 12px;">
+            <div
+              style="font-size: 0.8rem; font-weight: 700; color: #1e293b; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+              <i class="fas fa-university" style="color: #6366f1;"></i> Payout Details (Bank)
+            </div>
+            <div style="display: grid; gap: 10px;">
+              <input id="astroRegBankHolder" type="text" placeholder="Account Holder Name"
+                style="width:100%; padding: 10px; border-radius: 8px; border:1px solid #cbd5e1; font-size: 0.85rem; background: white;">
+              <input id="astroRegBankAcc" type="text" placeholder="Account Number"
+                style="width:100%; padding: 10px; border-radius: 8px; border:1px solid #cbd5e1; font-size: 0.85rem; background: white;">
+              <input id="astroRegBankIFSC" type="text" placeholder="IFSC Code"
+                style="width:100%; padding: 10px; border-radius: 8px; border:1px solid #cbd5e1; font-size: 0.85rem; background: white;">
+              <input id="astroRegUPI" type="text" placeholder="UPI ID (Optional)"
+                style="width:100%; padding: 10px; border-radius: 8px; border:1px solid #cbd5e1; font-size: 0.85rem; background: white;">
+            </div>
+          </div>
+        </div>
+
+        <button id="btnAstroSubmit" onclick="submitAstroRegistration()" class="cosmic-btn"
+          style="margin-top:25px; background: linear-gradient(135deg, #7C3AED, #5b21b6); padding: 18px; font-weight: 700; border-radius: 15px; width: 100%;">
+          Submit Application
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Screen: Session -->
   <div id="screen-session" class="hidden"
     style="background: var(--primary-bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
@@ -5573,8 +5639,10 @@
           style="width: 40px; height: 40px; border-radius: 50%; background: var(--accent-gold); display: flex; align-items: center; justify-content: center; color: black; font-weight: bold;"
           id="sessionPartnerInitial">A</div>
         <div>
-          <div id="sessionPartnerName" style="font-weight: 700; color: white; font-size: 0.95rem;">Astrologer</div>
-          <div id="sessionTimer" style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 600;">00:00</div>
+          <div id="sessionPartnerName" style="font-weight: 700; color: white; font-size: 0.95rem;">Astrologer
+          </div>
+          <div id="sessionTimer" style="font-size: 0.75rem; color: var(--accent-gold); font-weight: 600;">00:00
+          </div>
         </div>
       </div>
       <div style="display: flex; gap: 10px;">
@@ -5715,7 +5783,8 @@
               <input type="hidden" id="chartLon" value="80.2707">
               <input type="hidden" id="chartTz" value="5.5">
             </div>
-            <button class="cosmic-btn" onclick="fetchChart()" style="margin-top: 15px; width: 100%;">Analyze Celestial
+            <button class="cosmic-btn" onclick="fetchChart()" style="margin-top: 15px; width: 100%;">Analyze
+              Celestial
               Map</button>
           </div>
 
@@ -10595,7 +10664,8 @@
         <i class="fas fa-exclamation-triangle"></i>
       </div>
       <div class="lb-title">Low Balance!</div>
-      <div class="lb-message" id="lbMessage">Your wallet balance is running low. Recharge now to continue your cosmic
+      <div class="lb-message" id="lbMessage">Your wallet balance is running low. Recharge now to continue your
+        cosmic
         consultation uninterrupted.</div>
 
       <div class="current-bal-box">
@@ -10885,6 +10955,66 @@
 
     // Initialize for Landing Page
     fetchAstrologers();
+
+    // --- Astrologer Signup Logic ---
+    function openAstroSignup() {
+      const modal = document.getElementById('screen-astro-signup');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    async function submitAstroRegistration() {
+      const btn = document.getElementById('btnAstroSubmit');
+      const name = document.getElementById('astroRegName').value.trim();
+      const phone = document.getElementById('astroRegPhone').value.trim();
+      const exp = document.getElementById('astroRegExp').value.trim();
+      const bio = document.getElementById('astroRegBio').value.trim();
+
+      const bank = {
+        accountHolder: document.getElementById('astroRegBankHolder').value.trim(),
+        accountNumber: document.getElementById('astroRegBankAcc').value.trim(),
+        ifscCode: document.getElementById('astroRegBankIFSC').value.trim(),
+        upiId: document.getElementById('astroRegUPI').value.trim()
+      };
+
+      if (!name || !phone || !exp) {
+        alert("Please fill in all required fields (*)");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Submitting...';
+
+      try {
+        const response = await fetch('/api/astrologer/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, phone, experience: exp, about: bio, bankDetails: bank })
+        });
+        const data = await response.json();
+
+        if (data.ok) {
+          alert("✨ Success! Your application has been submitted. Our team will verify your details and notify you soon.");
+          document.getElementById('screen-astro-signup').classList.add('hidden');
+          // Clear form
+          document.getElementById('astroRegName').value = '';
+          document.getElementById('astroRegPhone').value = '';
+          document.getElementById('astroRegExp').value = '';
+          document.getElementById('astroRegBio').value = '';
+          document.getElementById('astroRegBankHolder').value = '';
+          document.getElementById('astroRegBankAcc').value = '';
+          document.getElementById('astroRegBankIFSC').value = '';
+          document.getElementById('astroRegUPI').value = '';
+        } else {
+          alert("❌ Error: " + data.error);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("⚠️ Submission failed. Please try again later.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Submit Application';
+      }
+    }
   </script>
 
   <!-- Session Summary Modal -->
@@ -10894,7 +11024,8 @@
       style="background:white; border-radius:15px; width:90%; max-width:350px; text-align:center; padding:30px; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
       <h2 style="color:#111; margin-bottom:10px;">Session Summary</h2>
       <!-- <div id="summaryText" style="font-size:1.2rem; color:#4B5563; margin-bottom:20px;"></div> -->
-      <div class="summary-amount" style="font-size:2rem; font-weight:bold; color: #059669; margin-bottom:30px;"></div>
+      <div class="summary-amount" style="font-size:2rem; font-weight:bold; color: #059669; margin-bottom:30px;">
+      </div>
       <button onclick="closeSummaryModal()" class="btn-primary"
         style="width:100%; padding: 12px; font-size:1rem; border-radius:10px; border:none; background:#2563EB; color:white; font-weight:bold;">Okay</button>
     </div>
