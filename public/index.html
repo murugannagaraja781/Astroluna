@@ -78,9 +78,8 @@
       justify-content: center;
       z-index: 2000;
       background-image:
-        radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.2) 0%, transparent 40%),
-        radial-gradient(circle at 85% 85%, rgba(245, 158, 11, 0.1) 0%, transparent 40%),
-        url('https://www.transparenttextures.com/patterns/stardust.png');
+        radial-gradient(circle at 15% 15%, rgba(124, 58, 237, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(197, 160, 40, 0.05) 0%, transparent 40%);
     }
 
     .form-box {
@@ -92,7 +91,7 @@
       width: 90%;
       max-width: 420px;
       text-align: center;
-      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.08);
       position: relative;
     }
 
@@ -126,18 +125,18 @@
       width: 100%;
       padding: 14px 18px;
       margin-bottom: 16px;
-      background: rgba(255, 255, 255, 0.03);
+      background: #f1f5f9;
       border: 1px solid var(--glass-border);
       border-radius: 12px;
-      color: white;
+      color: var(--text-main);
       font-size: 1rem;
       transition: var(--transition);
     }
 
     .cosmic-input:focus {
       border-color: var(--accent-gold);
-      background: rgba(255, 255, 255, 0.08);
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+      background: #ffffff;
+      box-shadow: 0 0 20px rgba(197, 160, 40, 0.12);
     }
 
     .cosmic-btn {
@@ -184,29 +183,160 @@
       .mobile-view {
         display: none;
         width: 100%;
-        max-width: 1280px;
+        max-width: 100%;
         margin: 0 auto;
         position: relative;
-        min-height: 18vh;
+        min-height: 100vh;
         background: var(--primary-bg);
         z-index: 10;
-        box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
       }
 
       body {
         overflow-y: auto;
       }
 
-      /* Desktop: center the bottom nav if it ever shows */
+      /* Desktop: HIDE ALL bottom nav */
       .doc-bottom-nav {
-        max-width: 520px;
-        left: 50% !important;
-        transform: translateX(-50%);
+        display: none !important;
       }
 
       /* Desktop: drawer overlay full screen */
       .drawer-overlay {
         position: fixed;
+      }
+
+      /* Desktop App Header - full width with centered content */
+      .desktop-app-topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 40px;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        position: sticky;
+        top: 0;
+        z-index: 500;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04);
+      }
+
+      .desktop-app-topbar .topbar-logo {
+        font-family: var(--font-heading);
+        font-size: 1.5rem;
+        color: var(--accent-gold);
+        font-weight: 700;
+        letter-spacing: 2px;
+        cursor: pointer;
+      }
+
+      .desktop-app-topbar .topbar-nav {
+        display: flex;
+        gap: 8px;
+      }
+
+      .desktop-app-topbar .topbar-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 12px;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        background: transparent;
+        font-family: var(--font-body);
+      }
+
+      .desktop-app-topbar .topbar-nav-item:hover {
+        background: rgba(0, 0, 0, 0.04);
+        color: var(--text-main);
+      }
+
+      .desktop-app-topbar .topbar-nav-item.active {
+        background: var(--accent-gold);
+        color: #000;
+        box-shadow: 0 4px 15px rgba(197, 160, 40, 0.25);
+      }
+
+      .desktop-app-topbar .topbar-nav-item i {
+        font-size: 1rem;
+      }
+
+      .desktop-app-topbar .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .desktop-app-topbar .topbar-wallet {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 18px;
+        background: rgba(197, 160, 40, 0.08);
+        border: 1px solid rgba(197, 160, 40, 0.2);
+        border-radius: 30px;
+        font-weight: 700;
+        color: var(--accent-gold);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .desktop-app-topbar .topbar-wallet:hover {
+        background: rgba(197, 160, 40, 0.15);
+      }
+
+      .desktop-app-topbar .topbar-logout {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.04);
+        border: none;
+        color: var(--text-muted);
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+      }
+
+      .desktop-app-topbar .topbar-logout:hover {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+
+      /* Desktop content area - full width */
+      .dashboard-container {
+        max-width: 100% !important;
+      }
+
+      .content-area {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 32px 48px !important;
+        padding-bottom: 40px !important;
+      }
+
+      /* Desktop: hide mobile-only app header */
+      #globalAppHeader {
+        display: none !important;
+      }
+
+      /* Desktop: Astrologer grid 3 columns */
+      #astroList {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 24px !important;
+      }
+    }
+
+    /* Mobile: show bottom nav, hide desktop topbar */
+    @media (max-width: 1023px) {
+      .desktop-app-topbar {
+        display: none !important;
       }
     }
 
@@ -342,7 +472,7 @@
     .web-hero {
       padding: 180px 80px 120px;
       text-align: center;
-      background: radial-gradient(circle at center, rgba(124, 58, 237, 0.1) 0%, var(--primary-bg) 100%);
+      background: radial-gradient(circle at center, rgba(124, 58, 237, 0.04) 0%, var(--primary-bg) 100%);
       position: relative;
     }
 
@@ -497,7 +627,7 @@
     .web-testimonial-section h2 {
       font-family: var(--font-heading);
       font-size: 3rem;
-      color: #FFFFFF;
+      color: var(--text-main);
       margin-bottom: 24px;
       position: relative;
       z-index: 1;
@@ -532,7 +662,7 @@
 
     .web-footer {
       padding: 80px;
-      background: #080312;
+      background: #f1f5f9;
       border-top: 1px solid var(--brand-purple);
       display: grid;
       grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -568,7 +698,7 @@
 
     .web-footer-bottom {
       padding: 30px 80px;
-      background: #060912;
+      background: #e2e8f0;
       border-top: 1px solid rgba(255, 255, 255, 0.03);
       text-align: center;
       color: var(--text-muted);
@@ -634,7 +764,7 @@
     }
 
     .app-header {
-      background: rgba(11, 15, 26, 0.8);
+      background: rgba(255, 255, 255, 0.85);
       backdrop-filter: blur(15px);
       border-bottom: 1px solid var(--glass-border);
       padding: 12px 20px;
@@ -668,6 +798,7 @@
     /* --- High-Conversion Astro Card --- */
     .astro-card {
       background: var(--secondary-bg);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
       border: 1px solid var(--glass-border);
       border-radius: var(--radius-lg);
       padding: 24px;
@@ -863,7 +994,7 @@
     }
 
     .cta-btn:hover {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(0, 0, 0, 0.04);
       border-color: rgba(255, 255, 255, 0.2);
       transform: translateY(-2px);
     }
@@ -893,7 +1024,7 @@
       opacity: 0.5;
       cursor: not-allowed !important;
       filter: grayscale(1);
-      background: rgba(255, 255, 255, 0.03) !important;
+      background: rgba(0, 0, 0, 0.03) !important;
       color: var(--text-muted) !important;
       border-color: var(--glass-border) !important;
     }
@@ -2357,13 +2488,13 @@
 <body>
   <!-- Splash Loading Screen -->
   <div id="splashLoader"
-    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0B0F1A; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease;">
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f8fafc; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease;">
     <div
-      style="font-family: 'Cinzel Decorative', serif; font-size: 2rem; color: #D4AF37; font-weight: 700; letter-spacing: 3px; margin-bottom: 20px;">
+      style="font-family: 'Cinzel Decorative', serif; font-size: 2rem; color: #c5a028; font-weight: 700; letter-spacing: 3px; margin-bottom: 20px;">
       ASTROLUNA</div>
-    <div style="font-size: 0.8rem; color: #9CA3AF; margin-bottom: 30px;">Guided by Stars</div>
+    <div style="font-size: 0.8rem; color: #64748b; margin-bottom: 30px;">Guided by Stars</div>
     <div
-      style="width: 40px; height: 40px; border: 3px solid rgba(212,175,55,0.2); border-top-color: #D4AF37; border-radius: 50%; animation: splashSpin 0.8s linear infinite;">
+      style="width: 40px; height: 40px; border: 3px solid rgba(197,160,40,0.2); border-top-color: #c5a028; border-radius: 50%; animation: splashSpin 0.8s linear infinite;">
     </div>
     <style>
       @keyframes splashSpin {
@@ -2495,7 +2626,7 @@
     </section>
 
     <section class="web-astro-section animate-up" id="web-astrologers"
-      style="padding: 100px 40px; background: #0B0F1A; animation-delay: 0.5s;">
+      style="padding: 100px 40px; background: var(--primary-bg); animation-delay: 0.5s;">
       <div class="web-container">
         <div style="text-align: center; margin-bottom: 50px;">
           <h2 style="color: var(--accent-gold); font-size: 2.2rem; font-family: var(--font-heading);">Consult with Our
@@ -2524,7 +2655,8 @@
       </div>
     </section>
 
-    <section class="web-about-pricing animate-up" id="web-about" style="padding: 100px 40px; background: #0B0F1A;">
+    <section class="web-about-pricing animate-up" id="web-about"
+      style="padding: 100px 40px; background: var(--primary-bg);">
       <div class="web-container">
         <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 60px; align-items: center;">
           <div>
@@ -2553,13 +2685,13 @@
             </div>
           </div>
           <div id="web-pricing"
-            style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(11, 15, 26, 0.8)); padding: 50px 40px; border-radius: 30px; border: 1px solid var(--accent-gold); max-width: 450px; margin: 0 auto; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+            style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.06), rgba(255,255,255,0.9)); padding: 50px 40px; border-radius: 30px; border: 1px solid var(--accent-gold); max-width: 450px; margin: 0 auto; box-shadow: 0 20px 50px rgba(0,0,0,0.06);">
             <h3
               style="color: var(--accent-gold); font-size: 2rem; text-align: center; margin-bottom: 30px; font-family: var(--font-heading);">
               Simple
               Pricing</h3>
             <div style="text-align: center; margin-bottom: 40px;">
-              <div style="font-size: 3.5rem; font-weight: 800; color: white;">₹5<span
+              <div style="font-size: 3.5rem; font-weight: 800; color: var(--text-main);">₹5<span
                   style="font-size: 1.2rem; color: var(--text-muted); margin-left: 5px;">/ min onwards</span></div>
             </div>
             <ul style="list-style: none; padding: 0; color: var(--text-muted); margin-bottom: 40px; font-size: 1rem;">
@@ -2715,7 +2847,7 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        background: rgba(11, 15, 26, 0.9);
+        background: rgba(255, 255, 255, 0.92);
         backdrop-filter: blur(10px);
         padding: 15px 10px;
         text-align: center;
@@ -2776,12 +2908,12 @@
         left: -280px;
         width: 270px;
         height: 100%;
-        background: linear-gradient(180deg, #1a1028 0%, #0B0F1A 100%);
+        background: #ffffff;
         z-index: 9999;
         transition: left 0.3s ease;
         overflow-y: auto;
-        box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 5px 0 30px rgba(0, 0, 0, 0.08);
+        border-right: 1px solid rgba(0, 0, 0, 0.06);
       }
 
       .side-drawer.open {
@@ -2793,8 +2925,8 @@
         align-items: center;
         justify-content: space-between;
         padding: 20px 18px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        background: rgba(92, 8, 116, 0.15);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        background: rgba(124, 58, 237, 0.06);
       }
 
       .drawer-menu {
@@ -2806,7 +2938,7 @@
         align-items: center;
         gap: 14px;
         padding: 13px 22px;
-        color: rgba(255, 255, 255, 0.8);
+        color: var(--text-main);
         text-decoration: none;
         font-size: 0.9rem;
         font-weight: 500;
@@ -2829,7 +2961,7 @@
 
       .drawer-divider {
         height: 1px;
-        background: rgba(255, 255, 255, 0.06);
+        background: rgba(0, 0, 0, 0.04);
         margin: 8px 18px;
       }
 
@@ -2887,7 +3019,7 @@
             <i class="fas fa-moon"></i>
           </div>
           <div>
-            <div style="font-weight: 700; font-size: 1.1rem; color: #fff;">Astro Luna</div>
+            <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-main);">Astro Luna</div>
             <div style="font-size: 0.7rem; color: var(--text-muted);">Guided by Stars</div>
           </div>
         </div>
@@ -2914,6 +3046,36 @@
       </div>
     </div>
 
+    <!-- Desktop App Navigation Topbar (only visible on desktop, replaces bottom nav) -->
+    <div class="desktop-app-topbar" id="desktopAppTopbar" style="display: none;">
+      <div class="topbar-logo" onclick="window.location.href='index.html'">ASTROLUNA</div>
+      <div class="topbar-nav">
+        <button class="topbar-nav-item active" id="dtNav-home" onclick="desktopNavSwitch('home')">
+          <i class="fas fa-home"></i> Home
+        </button>
+        <button class="topbar-nav-item" id="dtNav-dash" onclick="desktopNavSwitch('dash')">
+          <i class="fas fa-th-large"></i> Dashboard
+        </button>
+        <button class="topbar-nav-item" id="dtNav-call" onclick="desktopNavSwitch('call')">
+          <i class="fas fa-phone-alt"></i> Call
+        </button>
+        <button class="topbar-nav-item" id="dtNav-chat" onclick="desktopNavSwitch('chat')">
+          <i class="fas fa-comment-dots"></i> Chat
+        </button>
+        <button class="topbar-nav-item" id="dtNav-profile" onclick="desktopNavSwitch('profile')">
+          <i class="fas fa-history"></i> History
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-wallet" onclick="refreshWallet()">
+          <i class="fas fa-wallet"></i> ₹<span id="desktopWallet">0</span>
+        </div>
+        <button class="topbar-logout" onclick="clearSession()" title="Logout">
+          <i class="fas fa-sign-out-alt"></i>
+        </button>
+      </div>
+    </div>
+
     <!-- Screen: Client Dashboard -->
     <div id="screen-client" class="dashboard-container hidden">
 
@@ -2922,12 +3084,12 @@
         <div id="section-home">
           <!-- Mobile Hero Section -->
           <div
-            style="text-align: center; padding: 30px 20px 20px; background: linear-gradient(180deg, rgba(92, 8, 116, 0.3) 0%, transparent 100%); border-radius: 0 0 24px 24px; margin-bottom: 20px;">
+            style="text-align: center; padding: 30px 20px 20px; background: linear-gradient(180deg, rgba(124, 58, 237, 0.06) 0%, transparent 100%); border-radius: 0 0 24px 24px; margin-bottom: 20px;">
             <div
-              style="display: inline-block; padding: 4px 14px; border: 1px solid var(--accent-gold); border-radius: 20px; color: var(--accent-gold); font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; background: rgba(212, 175, 55, 0.05);">
+              style="display: inline-block; padding: 4px 14px; border: 1px solid var(--accent-gold); border-radius: 20px; color: var(--accent-gold); font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px; background: rgba(197, 160, 40, 0.06);">
               Guided by Stars</div>
             <h2
-              style="font-family: var(--font-heading); font-size: 1.8rem; color: #fff; margin: 0 0 12px; font-weight: 700;">
+              style="font-family: var(--font-heading); font-size: 1.8rem; color: var(--text-main); margin: 0 0 12px; font-weight: 700;">
               ஜோதிடம்</h2>
             <p
               style="color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; margin: 0 auto 20px; max-width: 340px;">
@@ -2935,15 +3097,15 @@
               உருவான ஒரு பாரம்பரிய அறிவியல் முறையாகும்.</p>
             <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
               <button onclick="checkGuestAction('chat')"
-                style="background: var(--brand-purple); color: #fff; border: none; padding: 10px 22px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 15px rgba(92, 8, 116, 0.3); border: 1px solid rgba(255,255,255,0.1);">
+                style="background: var(--brand-purple); color: #fff; border: none; padding: 10px 22px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; cursor: pointer; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.2); border: 1px solid transparent;">
                 <i class="fas fa-comments" style="margin-right: 6px;"></i>Chat
               </button>
               <button onclick="checkGuestAction('call')"
-                style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 10px 22px; border-radius: 50px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+                style="background: rgba(0,0,0,0.04); color: var(--text-main); border: 1px solid rgba(0,0,0,0.1); padding: 10px 22px; border-radius: 50px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
                 <i class="fas fa-phone-alt" style="margin-right: 6px;"></i>Call
               </button>
               <button onclick="checkGuestAction('video')"
-                style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.15); padding: 10px 22px; border-radius: 50px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
+                style="background: rgba(0,0,0,0.04); color: var(--text-main); border: 1px solid rgba(0,0,0,0.1); padding: 10px 22px; border-radius: 50px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">
                 <i class="fas fa-video" style="margin-right: 6px;"></i>Video
               </button>
             </div>
@@ -3432,14 +3594,14 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      background: rgba(11, 15, 26, 0.85);
+      background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(20px);
-      border-top: 1px solid var(--glass-border);
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
       display: none;
       justify-content: space-around;
       padding: 12px 0 28px 0;
       z-index: 1000;
-      box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
     }
 
     .nav-item {
@@ -3479,7 +3641,7 @@
     }
 
     .nav-item.active i {
-      filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.8));
+      filter: drop-shadow(0 0 8px rgba(197, 160, 40, 0.6));
     }
   </style>
 
@@ -6025,6 +6187,9 @@
       if (globalFooter) globalFooter.style.display = 'none';
       const appFooter = document.querySelector('.app-footer');
       if (appFooter) appFooter.style.display = 'none';
+
+      // Hide desktop topbar on login
+      showDesktopTopbar(false);
     }
 
     function switchToApp(screen) {
@@ -6301,6 +6466,10 @@
       const header = document.getElementById('globalAppHeader');
       if (header) header.style.display = 'flex';
 
+      // Show Desktop Topbar (for desktop view)
+      showDesktopTopbar(true);
+      syncDesktopWallet(user.walletBalance);
+
       if (user.role === 'guest') {
         const walletEl = document.getElementById('clientWallet');
         // Replace wallet icon/text with Login Button
@@ -6374,6 +6543,7 @@
         if (document.getElementById('dashWalletBalance')) {
           document.getElementById('dashWalletBalance').innerText = bal;
         }
+        syncDesktopWallet(data.balance);
         state.me.walletBalance = data.balance;
         saveSession(state.me);
 
@@ -6550,6 +6720,32 @@
         showHistory();
       }
     };
+
+    // Desktop Navigation - calls navSwitch and syncs desktop topbar active states
+    function desktopNavSwitch(tab) {
+      document.querySelectorAll('.topbar-nav-item').forEach(el => el.classList.remove('active'));
+      const dtBtn = document.getElementById('dtNav-' + tab);
+      if (dtBtn) dtBtn.classList.add('active');
+      navSwitch(tab);
+    }
+
+    // Show/Hide Desktop Topbar
+    function showDesktopTopbar(show) {
+      const topbar = document.getElementById('desktopAppTopbar');
+      if (!topbar) return;
+      const isDesktop = window.innerWidth >= 1024;
+      if (isDesktop && show) {
+        topbar.style.display = 'flex';
+      } else {
+        topbar.style.display = 'none';
+      }
+    }
+
+    // Sync desktop wallet display
+    function syncDesktopWallet(amount) {
+      const el = document.getElementById('desktopWallet');
+      if (el) el.innerText = Number(amount || 0).toFixed(0);
+    }
 
     window.filterAstros = function (type) {
       // Simple mock filter

@@ -42,28 +42,9 @@ body {
   overflow-x: hidden;
 }
 
-/* Constellation Background Effect */
+/* Constellation Background Effect - Hidden for light theme */
 body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image:
-    radial-gradient(1px 1px at 10% 20%, rgba(212, 175, 55, 0.6) 1px, transparent 0),
-    radial-gradient(1px 1px at 20% 35%, rgba(212, 175, 55, 0.5) 1px, transparent 0),
-    radial-gradient(1.5px 1.5px at 35% 15%, rgba(212, 175, 55, 0.7) 1px, transparent 0),
-    radial-gradient(1px 1px at 45% 50%, rgba(212, 175, 55, 0.4) 1px, transparent 0),
-    radial-gradient(1.2px 1.2px at 55% 75%, rgba(212, 175, 55, 0.6) 1px, transparent 0),
-    radial-gradient(1px 1px at 65% 90%, rgba(212, 175, 55, 0.5) 1px, transparent 0),
-    radial-gradient(1.5px 1.5px at 75% 25%, rgba(212, 175, 55, 0.6) 1px, transparent 0),
-    radial-gradient(1px 1px at 85% 40%, rgba(212, 175, 55, 0.4) 1px, transparent 0),
-    radial-gradient(1.2px 1.2px at 95% 60%, rgba(212, 175, 55, 0.5) 1px, transparent 0);
-  background-size: 400px 400px;
-  opacity: 0.3;
-  pointer-events: none;
-  z-index: 1;
+  display: none;
 }
 
 /* Typography */
@@ -683,7 +664,7 @@ h4 {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 41, 0.5);
+  background: #f1f5f9;
   border-radius: 4px;
 }
 
