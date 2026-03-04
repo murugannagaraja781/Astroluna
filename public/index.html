@@ -1021,39 +1021,39 @@
     }
 
     .btn-chat {
-      background: #f8fafc;
-      color: #0f172a;
-      border: 1px solid #e2e8f0;
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #10b981;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
 
     .btn-chat:hover {
-      background: #f1f5f9;
-      border-color: #cbd5e1;
+      background: #d1fae5;
       transform: translateY(-1px);
     }
 
     .btn-call {
-      background: #6366f1;
+      background: #10b981;
       color: white;
-      box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2);
+      box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
     }
 
     .btn-call:hover {
-      background: #4f46e5;
+      background: #059669;
       transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
+      box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
     }
 
     .btn-video {
-      background: #0f172a;
+      background: #065f46;
       color: white;
-      box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.2);
+      box-shadow: 0 4px 6px -1px rgba(6, 95, 70, 0.2);
     }
 
     .btn-video:hover {
-      background: #1e293b;
-      transform: translateY(-2px);
+      background: #064e3b;
+      transform: translateY(-1px);
+    }
     }
 
     .btn-active-pulse i {
@@ -1135,8 +1135,8 @@
     }
 
     .toggle-switch.active {
-      background: var(--accent-gold);
-      border-color: var(--accent-gold);
+      background: #10b981;
+      border-color: #10b981;
     }
 
     .toggle-switch.active::after {
@@ -4102,8 +4102,6 @@
           <div class="grid-icon"><i class="fas fa-chart-pie"></i></div> Birth Chart
         </div> -->
   </div>
-  </div>
-  </div>
 
   <!-- Screen: Client Birth Chart Form Modal -->
   <div id="screen-client-birth-chart" class="modal-overlay hidden" style="align-items: center; z-index: 99999;">
@@ -5562,7 +5560,6 @@
       </div>
     </div>
   </div>
-  </div>
 
   <!-- Screen: Referral Dashboard -->
   <div id="screen-referral" class="modal-overlay hidden">
@@ -5672,6 +5669,20 @@
               Number *</label>
             <input id="astroRegPhone" type="tel" class="cosmic-input" placeholder="e.g. 9876543210"
               style="background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0; width:100%; padding: 12px; border-radius: 10px;">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+              <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:#475569; font-weight: 600;">Date
+                of Birth *</label>
+              <input id="astroRegDob" type="date" class="cosmic-input"
+                style="background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0; width:100%; padding: 12px; border-radius: 10px;">
+            </div>
+            <div>
+              <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:#475569; font-weight: 600;">Time
+                of Birth *</label>
+              <input id="astroRegTob" type="time" class="cosmic-input"
+                style="background:#f8fafc; color:#1e293b; border:1px solid #e2e8f0; width:100%; padding: 12px; border-radius: 10px;">
+            </div>
           </div>
           <div>
             <label style="display:block; margin-bottom:5px; font-size:0.85rem; color:#475569; font-weight: 600;">Total
@@ -7114,17 +7125,17 @@
           </div>
 
           <div class="card-actions">
-               <button class="cta-btn btn-chat ${a.isChatOnline ? '' : 'opacity-50 pointer-events-none'}"
+               <button class="cta-btn btn-chat "
                     onclick="event.stopPropagation(); checkGuestAction('chat', '${a.userId}')">
                    <span>Chat</span>
                </button>
 
-               <button class="cta-btn btn-call ${a.isAudioOnline ? '' : 'opacity-50 pointer-events-none'}"
+               <button class="cta-btn btn-call "
                     onclick="event.stopPropagation(); checkGuestAction('call', '${a.userId}')">
                    <span>Call</span>
                </button>
 
-               <button class="cta-btn btn-video ${a.isVideoOnline ? '' : 'opacity-50 pointer-events-none'}"
+               <button class="cta-btn btn-video "
                     onclick="event.stopPropagation(); checkGuestAction('video', '${a.userId}')">
                    <span>Video</span>
                </button>
@@ -11046,6 +11057,8 @@
       const btn = document.getElementById('btnAstroSubmit');
       const name = document.getElementById('astroRegName').value.trim();
       const phone = document.getElementById('astroRegPhone').value.trim();
+      const dob = document.getElementById('astroRegDob').value.trim();
+      const tob = document.getElementById('astroRegTob').value.trim();
       const exp = document.getElementById('astroRegExp').value.trim();
       const bio = document.getElementById('astroRegBio').value.trim();
 
@@ -11056,7 +11069,7 @@
         upiId: document.getElementById('astroRegUPI').value.trim()
       };
 
-      if (!name || !phone || !exp) {
+      if (!name || !phone || !dob || !tob || !exp) {
         alert("Please fill in all required fields (*)");
         return;
       }
@@ -11068,7 +11081,7 @@
         const response = await fetch('/api/astrologer/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, phone, experience: exp, about: bio, bankDetails: bank })
+          body: JSON.stringify({ name, phone, dob, tob, experience: exp, about: bio, bankDetails: bank })
         });
         const data = await response.json();
 
@@ -11078,6 +11091,8 @@
           // Clear form
           document.getElementById('astroRegName').value = '';
           document.getElementById('astroRegPhone').value = '';
+          document.getElementById('astroRegDob').value = '';
+          document.getElementById('astroRegTob').value = '';
           document.getElementById('astroRegExp').value = '';
           document.getElementById('astroRegBio').value = '';
           document.getElementById('astroRegBankHolder').value = '';

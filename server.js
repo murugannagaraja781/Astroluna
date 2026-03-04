@@ -846,7 +846,7 @@ generateTamilHoroscope();
 // === Astrologer Registration (New & Upgrade) ===
 app.post('/api/astrologer/register', async (req, res) => {
   try {
-    const { name, phone, experience, about, bankDetails, skills } = req.body;
+    const { name, phone, dob, tob, experience, about, bankDetails, skills } = req.body;
     if (!phone) return res.status(400).json({ ok: false, error: 'Phone number required' });
 
     let user = await User.findOne({ phone });
@@ -867,6 +867,9 @@ app.post('/api/astrologer/register', async (req, res) => {
       user.astrologerAbout = about || '';
       user.bankDetails = bankDetails || {};
       user.astrologerSkills = skills || [];
+      if (dob || tob) {
+        user.birthDetails = { ...user.birthDetails, dob: dob || '', tob: tob || '' };
+      }
       user.astrologerRequestStatus = 'pending';
       user.astrologerRequestedAt = new Date();
       await user.save();
@@ -883,7 +886,8 @@ app.post('/api/astrologer/register', async (req, res) => {
         astrologerExperience: experience || '',
         astrologerAbout: about || '',
         bankDetails: bankDetails || {},
-        astrologerSkills: skills || []
+        astrologerSkills: skills || [],
+        birthDetails: { dob: dob || '', tob: tob || '', pob: '' }
       });
     }
 

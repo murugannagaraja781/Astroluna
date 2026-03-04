@@ -1355,24 +1355,20 @@ fun AstrologerCard(
                  }
 
                  Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                      if (showChat && astro.isChatOnline) {
-                          AstrologerActionButton(
-                              text = "Chat",
-                              icon = Icons.Default.Send,
-                              isEnabled = !astro.isBusy,
-                              color = Color(0xFF0F172A), // Slate 900 (Professional Primary)
-                              onClick = { onChatClick(astro) }
-                          )
-                      }
-                      if ((showCall && astro.isAudioOnline) || (showVideo && astro.isVideoOnline)) {
-                          AstrologerActionButton(
-                              text = if(showVideo) "Video" else "Call",
-                              icon = if(showVideo) Icons.Default.PlayArrow else Icons.Default.Phone,
-                              isEnabled = !astro.isBusy,
-                              color = Color(0xFF6366F1), // Indigo 600 (Action Primary)
-                              onClick = { onCallClick(astro, if(showVideo) "Video" else "Audio") }
-                          )
-                      }
+                      AstrologerActionButton(
+                          text = "Chat",
+                          icon = Icons.Default.Send,
+                          isEnabled = true,
+                          color = Color(0xFF10B981), // Emerald 500
+                          onClick = { onChatClick(astro) }
+                      )
+                      AstrologerActionButton(
+                          text = if(showVideo) "Video" else "Call",
+                          icon = if(showVideo) Icons.Default.PlayArrow else Icons.Default.Phone,
+                          isEnabled = true,
+                          color = Color(0xFF10B981), // Emerald 500
+                          onClick = { onCallClick(astro, if(showVideo) "Video" else "Audio") }
+                      )
                  }
             }
         }
