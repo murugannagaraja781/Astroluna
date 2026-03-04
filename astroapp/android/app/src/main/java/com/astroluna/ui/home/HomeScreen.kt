@@ -852,13 +852,19 @@ fun ReferAndEarnSection(code: String, stats: com.astroluna.data.model.ReferralSt
 
                     Button(
                         onClick = {
-                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_SUBJECT, "Download Astro Luna")
-                                val shareUrl = "https://astroluna.in?ref=$code"
-                                putExtra(Intent.EXTRA_TEXT, "Join me on Astro Luna! Get expert astrology consultations, daily horoscope and more! \n\nRegister via my link to get a join bonus: $shareUrl \n\nReferral Code: $code")
+                            try {
+                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_SUBJECT, "Download Astro Luna")
+                                    val shareUrl = "https://astroluna.in?ref=$code"
+                                    putExtra(Intent.EXTRA_TEXT, "Join me on Astro Luna! Get expert astrology consultations, daily horoscope and more! \n\nRegister via my link to get a join bonus: $shareUrl \n\nReferral Code: $code")
+                                }
+                                val chooser = Intent.createChooser(shareIntent, "Share Referral Code")
+                                chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                context.startActivity(chooser)
+                            } catch (e: Exception) {
+                                android.widget.Toast.makeText(context, "Unable to open share menu", android.widget.Toast.LENGTH_SHORT).show()
                             }
-                            context.startActivity(Intent.createChooser(shareIntent, "Share Referral Code"))
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                         shape = RoundedCornerShape(8.dp),
@@ -1032,11 +1038,19 @@ fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
                     when (item) {
                         "Terms & Conditions" -> {
                             onClose()
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.in/terms-condition.html")))
+                            try {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.in/terms-condition.html")).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+                            } catch (e: Exception) {
+                                android.widget.Toast.makeText(context, "Cannot open link", android.widget.Toast.LENGTH_SHORT).show()
+                            }
                         }
                         "Privacy Policy" -> {
                             onClose()
-                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.in/privacy-policy.html")))
+                            try {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.in/privacy-policy.html")).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) })
+                            } catch (e: Exception) {
+                                android.widget.Toast.makeText(context, "Cannot open link", android.widget.Toast.LENGTH_SHORT).show()
+                            }
                         }
                         else -> onItemClick(item)
                     }

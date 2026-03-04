@@ -15,6 +15,18 @@ const admin = require('firebase-admin'); // Firebase Admin for Mobile App
 const { DateTime } = require('luxon');
 const { fetchDailyHoroscope } = require("./utils/rasiEng/horoscopeData");
 
+// --- Global Error Safety Nets ---
+// Prevent Node.js from cleanly exiting on unhandled errors, ensuring the backend stays alive
+process.on('uncaughtException', (err) => {
+  console.error('[CRITICAL] Uncaught Exception:', err);
+  // Optional: Send alert to developers here
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[CRITICAL] Unhandled Rejection at:', promise, 'reason:', reason);
+});
+// --------------------------------
+
 // Activity Logger Helper
 function logActivity(type, message, details = null) {
   const timestamp = new Date().toISOString();

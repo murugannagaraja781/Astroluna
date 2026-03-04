@@ -3792,7 +3792,7 @@
     <div class="content-area" style="padding-top: 20px;">
       <!-- Premium Header -->
       <div class="astro-profile-banner" style="margin-top: 0; min-height: 140px;">
-        <img src="" id="astroAvatar" class="astro-banner-img">
+        <img src="https://via.placeholder.com/150" alt="Avatar" id="astroAvatar" class="astro-banner-img">
         <div class="astro-banner-info">
           <h2 id="astroName" style="margin: 0; font-size: 1.5rem;">Astrologer Name</h2>
           <p style="margin: 5px 0;">Expert Astrologer • ID: <span id="astroId">...</span></p>
@@ -4434,7 +4434,7 @@
         <input type="hidden" id="adminEditUserId">
 
         <div style="text-align:center; margin-bottom:15px;">
-          <img id="adminEditAvatar" src=""
+          <img id="adminEditAvatar" src="https://via.placeholder.com/150" alt="Avatar"
             style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid #ddd; margin-bottom:10px;">
           <br>
           <input type="file" id="adminFileAvatar" style="display:none" onchange="uploadAvatar(this, true)">
@@ -5447,7 +5447,7 @@
           </div>
         </div>
         <div style="text-align:center; margin-top:-50px; padding:0 20px 20px;">
-          <img id="detailAstroImg" src=""
+          <img id="detailAstroImg" src="https://via.placeholder.com/150" alt="Avatar"
             style="width:100px; height:100px; border-radius:50%; border:4px solid var(--secondary-bg); object-fit:cover; margin-bottom:12px; box-shadow:0 10px 20px rgba(0,0,0,0.3);">
           <h2 id="detailAstroTitle" style="color:var(--accent-gold); margin:0;">Name</h2>
           <div id="detailAstroSkills" style="color:var(--text-muted); font-size:0.9rem; margin-top:5px;">Skills</div>
@@ -5514,7 +5514,7 @@
       <div class="modal-body" style="padding: 24px;">
 
         <div style="text-align:center; margin-bottom:20px;">
-          <img id="editAvatar" src=""
+          <img id="editAvatar" src="https://via.placeholder.com/150" alt="Avatar"
             style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid #ddd; margin-bottom:10px;">
           <br>
           <input type="file" id="fileAvatar" style="display:none" onchange="uploadAvatar(this)">
@@ -5853,55 +5853,55 @@
         </div>
         <div class="modal-body" style="padding: 20px;">
           <!-- Repurposed from original structure but cleaned -->
-          <div id="chartInputSection">
+          <div id="inlineChartInputSection">
             <div class="input-card"
               style="background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 15px; border-radius: 15px;">
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                 <div>
                   <label style="font-size: 0.75rem; opacity: 0.7;">Date of Birth</label>
-                  <input type="date" id="chartDate" class="app-input"
+                  <input type="date" id="inlineChartDate" class="app-input"
                     style="width:100%; background:transparent; border-bottom: 1px solid #444;">
                 </div>
                 <div>
                   <label style="font-size: 0.75rem; opacity: 0.7;">Time of Birth</label>
-                  <input type="time" id="chartTime" class="app-input"
+                  <input type="time" id="inlineChartTime" class="app-input"
                     style="width:100%; background:transparent; border-bottom: 1px solid #444;">
                 </div>
               </div>
               <div style="margin-top: 15px;">
                 <label style="font-size: 0.75rem; opacity: 0.7;">City / Location</label>
-                <input type="text" id="citySearch" class="app-input" placeholder="Search Place..."
+                <input type="text" id="inlineCitySearch" class="app-input" placeholder="Search Place..."
                   style="width:100%; background:transparent; border-bottom: 1px solid #444;">
-                <div id="cityResults" class="city-results-dropdown"
+                <div id="inlineCityResults" class="city-results-dropdown"
                   style="display:none; position: static; margin-top: 5px;"></div>
               </div>
-              <input type="hidden" id="chartLat" value="13.0827">
-              <input type="hidden" id="chartLon" value="80.2707">
-              <input type="hidden" id="chartTz" value="5.5">
+              <input type="hidden" id="inlineChartLat" value="13.0827">
+              <input type="hidden" id="inlineChartLon" value="80.2707">
+              <input type="hidden" id="inlineChartTz" value="5.5">
             </div>
             <button class="cosmic-btn" onclick="fetchChart()" style="margin-top: 15px; width: 100%;">Analyze
               Celestial
               Map</button>
           </div>
 
-          <div id="chartResults" style="display: none; height: 400px; flex-direction: column;">
+          <div id="inlineChartResults" style="display: none; height: 400px; flex-direction: column;">
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-bottom: 15px;">
-              <button onclick="switchChartTab('rasi')" class="p-tab active" id="tab-rasi"
+              <button onclick="switchChartTab('rasi')" class="p-tab active" id="inline-tab-rasi"
                 style="padding: 8px 5px; font-size: 0.7rem;">Rasi</button>
-              <button onclick="switchChartTab('basic')" class="p-tab" id="tab-basic"
+              <button onclick="switchChartTab('basic')" class="p-tab" id="inline-tab-basic"
                 style="padding: 8px 5px; font-size: 0.7rem;">Planets</button>
-              <button onclick="switchChartTab('dasha')" class="p-tab" id="tab-dasha"
+              <button onclick="switchChartTab('dasha')" class="p-tab" id="inline-tab-dasha"
                 style="padding: 8px 5px; font-size: 0.7rem;">Dasha</button>
             </div>
-            <div id="chart-tab-content-container" style="flex:1; overflow-y:auto;">
-              <div id="content-rasi" class="chart-tab-content">
-                <div id="southChart" class="south-indian-chart" style="margin: 0 auto;"></div>
+            <div id="inline-chart-tab-content-container" style="flex:1; overflow-y:auto;">
+              <div id="inline-content-rasi" class="chart-tab-content">
+                <div id="inline-southChart" class="south-indian-chart" style="margin: 0 auto;"></div>
               </div>
-              <div id="content-basic" class="chart-tab-content hidden">
-                <div id="planetsList" style="font-size: 0.85rem;"></div>
+              <div id="inline-content-basic" class="chart-tab-content hidden">
+                <div id="inline-planetsList" style="font-size: 0.85rem;"></div>
               </div>
-              <div id="content-dasha" class="chart-tab-content hidden">
-                <div id="dashaList" style="font-size: 0.85rem;"></div>
+              <div id="inline-content-dasha" class="chart-tab-content hidden">
+                <div id="inline-dashaList" style="font-size: 0.85rem;"></div>
               </div>
             </div>
           </div>
@@ -7895,7 +7895,8 @@
       if (state.localStream) {
         state.localStream.getTracks().forEach(t => t.stop());
         state.localStream = null;
-        document.getElementById('localVideo').srcObject = null;
+        const lv = document.getElementById('localVideo');
+        if (lv) lv.srcObject = null;
       }
       sSes.classList.add('hidden');
       state.session = null;
@@ -7911,9 +7912,14 @@
         remoteVideo.srcObject = null;
       }
 
-      document.querySelector('.video-area').style.cssText = '';
-      document.getElementById('localVideo').srcObject = null;
-      document.querySelector('.controls').classList.remove('hidden');
+      const videoArea = document.querySelector('.video-area');
+      if (videoArea) videoArea.style.cssText = '';
+
+      const lv2 = document.getElementById('localVideo');
+      if (lv2) lv2.srcObject = null;
+
+      const controls = document.querySelector('.controls');
+      if (controls) controls.classList.remove('hidden');
     }
 
     // Chat Logic
