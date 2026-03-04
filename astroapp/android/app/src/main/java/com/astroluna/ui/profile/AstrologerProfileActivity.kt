@@ -235,36 +235,29 @@ fun AstrologerProfileScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Only show buttons for services the astrologer has enabled
-                    if (isChatOnline) {
-                        ActionButton(
-                            icon = Icons.Default.Send,
-                            label = "Chat",
-                            color = Color(0xFF00BCD4),
-                            isEnabled = true,
-                            onClick = { onAction("chat") }
-                        )
-                    }
+                    ActionButton(
+                        icon = Icons.Default.Send,
+                        label = "Chat",
+                        color = Color(0xFF00BCD4),
+                        isEnabled = isChatOnline,
+                        onClick = { onAction("chat") }
+                    )
 
-                    if (isAudioOnline) {
-                        ActionButton(
-                            icon = Icons.Default.Phone,
-                            label = "Call",
-                            color = Color(0xFF00796B),
-                            isEnabled = true,
-                            onClick = { onAction("audio") }
-                        )
-                    }
+                    ActionButton(
+                        icon = Icons.Default.Phone,
+                        label = "Call",
+                        color = Color(0xFF00796B),
+                        isEnabled = isAudioOnline,
+                        onClick = { onAction("audio") }
+                    )
 
-                    if (isVideoOnline) {
-                        ActionButton(
-                            icon = Icons.Default.PlayArrow,
-                            label = "Video",
-                            color = Color(0xFFD32F2F),
-                            isEnabled = true,
-                            onClick = { onAction("video") }
-                        )
-                    }
+                    ActionButton(
+                        icon = Icons.Default.PlayArrow,
+                        label = "Video",
+                        color = Color(0xFFD32F2F),
+                        isEnabled = isVideoOnline,
+                        onClick = { onAction("video") }
+                    )
                 }
 
                 // Reviews Section Placeholder

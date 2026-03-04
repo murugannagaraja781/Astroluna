@@ -1369,18 +1369,20 @@ fun AstrologerCard(
                  }
 
                  Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                      val isChatEnabled = astro.isChatOnline
                       AstrologerActionButton(
                           text = "Chat",
                           icon = Icons.Default.Send,
-                          isEnabled = true,
-                          color = Color(0xFF10B981), // Emerald 500
+                          isEnabled = isChatEnabled,
+                          color = if (isChatEnabled) Color(0xFF10B981) else Color.Gray,
                           onClick = { onChatClick(astro) }
                       )
+                      val isCallOrVideoEnabled = if(showVideo) astro.isVideoOnline else astro.isAudioOnline
                       AstrologerActionButton(
                           text = if(showVideo) "Video" else "Call",
                           icon = if(showVideo) Icons.Default.PlayArrow else Icons.Default.Phone,
-                          isEnabled = true,
-                          color = Color(0xFF10B981), // Emerald 500
+                          isEnabled = isCallOrVideoEnabled,
+                          color = if (isCallOrVideoEnabled) Color(0xFF10B981) else Color.Gray,
                           onClick = { onCallClick(astro, if(showVideo) "Video" else "Audio") }
                       )
                  }

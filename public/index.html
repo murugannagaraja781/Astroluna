@@ -6536,18 +6536,29 @@
       document.getElementById('detailExperience').innerText = (a.experience || 5) + ' Yrs';
 
       // Update buttons mapping
-      document.getElementById('detailChatBtn').onclick = () => {
+      const chatBtn = document.getElementById('detailChatBtn');
+      chatBtn.onclick = () => {
         document.getElementById('screen-astro-detail').classList.add('hidden');
         checkGuestAction('chat', a.userId);
       };
-      document.getElementById('detailCallBtn').onclick = () => {
+      chatBtn.disabled = !a.isChatOnline;
+      chatBtn.style.cssText = !a.isChatOnline ? 'background: gray; border-color: gray; opacity: 0.6; cursor: not-allowed;' : '';
+
+      const callBtn = document.getElementById('detailCallBtn');
+      callBtn.onclick = () => {
         document.getElementById('screen-astro-detail').classList.add('hidden');
         checkGuestAction('call', a.userId);
       };
-      document.getElementById('detailVideoBtn').onclick = () => {
+      callBtn.disabled = !a.isAudioOnline;
+      callBtn.style.cssText = !a.isAudioOnline ? 'background: gray; border-color: gray; opacity: 0.6; cursor: not-allowed;' : '';
+
+      const videoBtn = document.getElementById('detailVideoBtn');
+      videoBtn.onclick = () => {
         document.getElementById('screen-astro-detail').classList.add('hidden');
         checkGuestAction('video', a.userId);
       };
+      videoBtn.disabled = !a.isVideoOnline;
+      videoBtn.style.cssText = !a.isVideoOnline ? 'background: gray; border-color: gray; opacity: 0.6; cursor: not-allowed;' : '';
       document.getElementById('screen-astro-detail').classList.remove('hidden');
     }
 
@@ -7126,17 +7137,20 @@
 
           <div class="card-actions">
                <button class="cta-btn btn-chat "
-                    onclick="event.stopPropagation(); checkGuestAction('chat', '${a.userId}')">
+                    onclick="event.stopPropagation(); checkGuestAction('chat', '${a.userId}')"
+                    ${!a.isChatOnline ? 'disabled style="background: gray; border-color: gray; opacity: 0.6; cursor: not-allowed;"' : ''}>
                    <span>Chat</span>
                </button>
 
                <button class="cta-btn btn-call "
-                    onclick="event.stopPropagation(); checkGuestAction('call', '${a.userId}')">
+                    onclick="event.stopPropagation(); checkGuestAction('call', '${a.userId}')"
+                    ${!a.isAudioOnline ? 'disabled style="background: gray; border-color: gray; opacity: 0.6; cursor: not-allowed;"' : ''}>
                    <span>Call</span>
                </button>
 
                <button class="cta-btn btn-video "
-                    onclick="event.stopPropagation(); checkGuestAction('video', '${a.userId}')">
+                    onclick="event.stopPropagation(); checkGuestAction('video', '${a.userId}')"
+                    ${!a.isVideoOnline ? 'disabled style="background: gray; border-color: gray; opacity: 0.6; cursor: not-allowed;"' : ''}>
                    <span>Video</span>
                </button>
            </div>
