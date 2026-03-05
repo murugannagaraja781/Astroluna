@@ -5,6 +5,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 
     id("kotlin-kapt")
 }
@@ -15,7 +16,7 @@ android {
     defaultConfig {
         applicationId = "com.astroluna.test"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 7
         versionName = "6.1.0"
         multiDexEnabled = true
@@ -96,6 +97,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
 
     // Networking
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

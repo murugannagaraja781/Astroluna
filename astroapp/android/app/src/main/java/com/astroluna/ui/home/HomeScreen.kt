@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Share
@@ -860,7 +861,6 @@ fun ReferAndEarnSection(code: String, stats: com.astroluna.data.model.ReferralSt
                                     putExtra(Intent.EXTRA_TEXT, "Join me on Astro Luna! Get expert astrology consultations, daily horoscope and more! \n\nRegister via my link to get a join bonus: $shareUrl \n\nReferral Code: $code")
                                 }
                                 val chooser = Intent.createChooser(shareIntent, "Share Referral Code")
-                                chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 context.startActivity(chooser)
                             } catch (e: Exception) {
                                 android.widget.Toast.makeText(context, "Unable to open share menu", android.widget.Toast.LENGTH_SHORT).show()

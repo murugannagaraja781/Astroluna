@@ -104,7 +104,20 @@ fun AstrologerProfileScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {}) {
+                    val context = androidx.compose.ui.platform.LocalContext.current
+                    IconButton(onClick = {
+                        try {
+                            val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(android.content.Intent.EXTRA_SUBJECT, "Astro Luna - $name")
+                                putExtra(android.content.Intent.EXTRA_TEXT, "Consult $name on Astro Luna! The best astrologer with $exp years of experience in $skills.\n\nCheck out their profile on the app!")
+                            }
+                            val chooser = android.content.Intent.createChooser(shareIntent, "Share Profile")
+                            context.startActivity(chooser)
+                        } catch (e: Exception) {
+                            android.widget.Toast.makeText(context, "Share failed", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }) {
                         Icon(Icons.Default.Share, "Share", tint = Color.White)
                     }
                 },

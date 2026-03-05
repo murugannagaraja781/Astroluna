@@ -971,11 +971,15 @@ fun openFileInExplorer(context: android.content.Context, file: File) {
 fun shareRecording(context: android.content.Context, file: File) {
     try {
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = "audio/*"
-        intent.putExtra(Intent.EXTRA_STREAM, uri)
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        context.startActivity(Intent.createChooser(intent, "Share Recording"))
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "audio/*"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            clipData = android.content.ClipData.newRawUri("", uri)
+        }
+        val chooser = Intent.createChooser(intent, "Share Recording")
+        chooser.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        context.startActivity(chooser)
     } catch (e: Exception) {
         Toast.makeText(context, "Share failed: ${e.message}", Toast.LENGTH_SHORT).show()
     }

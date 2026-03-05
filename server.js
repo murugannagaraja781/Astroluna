@@ -2441,7 +2441,7 @@ async function broadcastAstroUpdate() {
     // Optimization: Only fetch and send essential fields to reduce memory and bandwidth
     const astros = await User.find(
       { role: 'astrologer' },
-      'userId name isOnline isAvailable isBusy price image skills experience rating'
+      'userId name isOnline isAvailable isBusy isChatOnline isAudioOnline isVideoOnline price image skills experience rating'
     ).lean();
 
     if (io) io.emit('astrologer-update', astros);
