@@ -865,12 +865,14 @@ class CallActivity : ComponentActivity() {
                     else -> "Duration: $durationStr\nDeducted: ₹${String.format("%.2f", deducted)}"
                 }
 
-                androidx.appcompat.app.AlertDialog.Builder(this)
-                    .setTitle(if (reason == "insufficient_funds") "⚠️ Low Balance" else "📞 Call Summary")
-                    .setMessage(message)
-                    .setPositiveButton("OK") { _, _ -> finish() }
-                    .setCancelable(false)
-                    .show()
+                if (!isFinishing && !isDestroyed) {
+                    androidx.appcompat.app.AlertDialog.Builder(this@CallActivity)
+                        .setTitle(if (reason == "insufficient_funds") "⚠️ Low Balance" else "📞 Call Summary")
+                        .setMessage(message)
+                        .setPositiveButton("OK") { _, _ -> finish() }
+                        .setCancelable(false)
+                        .show()
+                }
             }
         }
 

@@ -194,12 +194,14 @@ class ChatActivity : ComponentActivity() {
             val minutes = summary.duration / 60
             val seconds = summary.duration % 60
             val durationStr = String.format("%02d:%02d", minutes, seconds)
-            androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Chat Summary")
-                .setMessage("Duration: $durationStr\nDeducted: ₹${String.format("%.2f", summary.deducted)}")
-                .setPositiveButton("OK") { _, _ -> finish() }
-                .setCancelable(false)
-                .show()
+            if (!isFinishing && !isDestroyed) {
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Chat Summary")
+                    .setMessage("Duration: $durationStr\nDeducted: ₹${String.format("%.2f", summary.deducted)}")
+                    .setPositiveButton("OK") { _, _ -> finish() }
+                    .setCancelable(false)
+                    .show()
+            }
         }
         viewModel.sessionEnded.observe(this) { ended ->
             if (ended && viewModel.sessionSummary.value == null) {

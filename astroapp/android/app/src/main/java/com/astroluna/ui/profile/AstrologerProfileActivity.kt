@@ -258,7 +258,7 @@ fun AstrologerProfileScreen(
 
                     ActionButton(
                         icon = Icons.Default.Phone,
-                        label = "Call",
+                        label = "Audio",
                         color = Color(0xFF00796B),
                         isEnabled = isAudioOnline,
                         onClick = { onAction("audio") }

@@ -238,7 +238,7 @@ suspend fun updateServiceStatus(userId: String, service: String, enabled: Boolea
             }.toString()
         )
         val request = okhttp3.Request.Builder()
-            .url("https://astroluna.com/api/astrologer/service-toggle")
+            .url("${com.astroluna.utils.Constants.SERVER_URL}/api/astrologer/service-toggle")
             .post(body)
             .build()
         client.newCall(request).execute()
@@ -276,7 +276,7 @@ fun AstrologerDashboardScreen(
     val services = remember {
         mutableStateListOf(
             ServiceData("Chat", true, Icons.Default.Send),
-            ServiceData("Call", true, Icons.Default.Phone),
+            ServiceData("Audio", true, Icons.Default.Phone),
             ServiceData("Video", true, Icons.Default.Person)
         )
     }
@@ -698,7 +698,7 @@ fun AstrologerDashboardScreen(
 
             // 4. Action Grid - Custom Row-based Layout to work inside verticalScroll
             val actions = listOf(
-                "Call" to Icons.Default.Phone,
+                "Audio" to Icons.Default.Phone,
                 "Chat" to Icons.Default.Send,
                 "Earnings" to Icons.Default.AddCircle,
                 "Reviews" to Icons.Default.Star,
@@ -727,7 +727,7 @@ fun AstrologerDashboardScreen(
                                      )
                                      .clickable {
                                          when (label) {
-                                             "Call" -> showRecordingsDialog(context)
+                                             "Audio" -> showRecordingsDialog(context)
                                              "Profile" -> context.startActivity(Intent(context, com.astroluna.ui.settings.SettingsActivity::class.java))
                                              "History" -> context.startActivity(Intent(context, com.astroluna.ui.astro.AstrologerHistoryActivity::class.java))
                                              "Earnings" -> Toast.makeText(context, "Fetching Data...", Toast.LENGTH_SHORT).show()

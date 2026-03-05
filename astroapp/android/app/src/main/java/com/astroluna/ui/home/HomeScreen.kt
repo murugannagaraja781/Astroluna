@@ -1379,7 +1379,7 @@ fun AstrologerCard(
                       )
                       val isCallOrVideoEnabled = if(showVideo) astro.isVideoOnline else astro.isAudioOnline
                       AstrologerActionButton(
-                          text = if(showVideo) "Video" else "Call",
+                          text = if(showVideo) "Video" else "Audio",
                           icon = if(showVideo) Icons.Default.PlayArrow else Icons.Default.Phone,
                           isEnabled = isCallOrVideoEnabled,
                           color = if (isCallOrVideoEnabled) Color(0xFF10B981) else Color.Gray,
@@ -1401,7 +1401,7 @@ fun HomeBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
             Triple("Home", androidx.compose.material.icons.Icons.Default.Home, 0),
             Triple("Chat", androidx.compose.material.icons.Icons.Default.Send, 1),
             Triple("Refer", androidx.compose.material.icons.Icons.Default.Person, 5),
-            Triple("Call", androidx.compose.material.icons.Icons.Default.Phone, 3),
+            Triple("Audio", androidx.compose.material.icons.Icons.Default.Phone, 3),
             Triple("Profile", androidx.compose.material.icons.Icons.Default.Person, 4)
         )
 

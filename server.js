@@ -2855,6 +2855,7 @@ io.on('connection', (socket) => {
       activeSessions.set(sessionId, {
         type,
         users: [fromUserId, toUserId],
+        status: 'ringing',
         startedAt: Date.now(),
         clientId,
         astrologerId,
@@ -2998,6 +2999,9 @@ io.on('connection', (socket) => {
 
       if (!accept) {
         endSessionRecord(sessionId);
+      } else {
+        const s = activeSessions.get(sessionId);
+        if (s) s.status = 'answered';
       }
 
       // Emit to Room (userId) - works even after reconnect!
@@ -3071,6 +3075,7 @@ io.on('connection', (socket) => {
       const targetSocketId = userSockets.get(fromUserId);
 
       if (accept) {
+        session.status = 'answered';
         if (targetSocketId) {
           io.to(targetSocketId).emit('session-answered', {
             sessionId,

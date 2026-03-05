@@ -338,7 +338,7 @@ fun IncomingCallScreen(
             val typeLabel = when(callType) {
                 "chat" -> "Incoming Chat Request"
                 "video" -> "Incoming Video Call"
-                else -> "Incoming call"
+                else -> "Incoming Audio Call"
             }
 
             Text(typeLabel, color = Color.Gray, fontSize = 16.sp)
