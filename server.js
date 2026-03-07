@@ -343,16 +343,18 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://code.jquery.com", "https://cdn.socket.io", "https://unpkg.com"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://code.jquery.com"],
-      imgSrc: ["'self'", "data:", "https:", "http:"],
-      connectSrc: ["'self'", "wss:", "ws:", "https:", "http:"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://code.jquery.com", "https://cdn.socket.io", "https://unpkg.com", "https://cdnjs.cloudflare.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://code.jquery.com", "https://cdnjs.cloudflare.com"],
+      imgSrc: ["'self'", "data:", "https:", "http:", "https://images.unsplash.com", "https://ui-avatars.com", "https://via.placeholder.com", "https://www.transparenttextures.com"],
+      connectSrc: ["'self'", "wss:", "ws:", "https:", "http:", "https://nominatim.openstreetmap.org"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com"],
+      mediaSrc: ["'self'", "https://assets.mixkit.co", "blob:"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },
   },
 })); // Sets various HTTP headers for security
+
 
 
 // Custom Security Middleware: Combined XSS and NoSQL Injection Prevention
