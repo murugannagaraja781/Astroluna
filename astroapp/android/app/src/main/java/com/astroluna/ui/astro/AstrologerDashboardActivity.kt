@@ -10,8 +10,14 @@ import android.net.Uri
 import androidx.core.content.FileProvider
 import android.os.Bundle
 import android.widget.Toast
+import android.provider.Settings
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -671,30 +677,91 @@ fun AstrologerDashboardScreen(
                 }
             }
 
-            // 3b. Service Toggles (Separate for Chat, Audio, Video)
-            ServiceTogglesCard(
-                isChatOnline = isChatOnline,
-                isAudioOnline = isAudioOnline,
-                isVideoOnline = isVideoOnline,
-                onChatToggle = { enabled ->
-                    isChatOnline = enabled
-                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                        updateServiceStatus(sessionId, "chat", enabled)
-                    }
-                },
-                onAudioToggle = { enabled ->
-                    isAudioOnline = enabled
-                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                        updateServiceStatus(sessionId, "audio", enabled)
-                    }
-                },
-                onVideoToggle = { enabled ->
-                    isVideoOnline = enabled
-                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
-                        updateServiceStatus(sessionId, "video", enabled)
-                    }
+    // Permission request logic
+    val audioPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            isAudioOnline = true
+            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                updateServiceStatus(sessionId, "audio", true)
+            }
+        } else {
+            Toast.makeText(context, "Microphone permission is required for Audio Calls", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val videoPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { perms ->
+        val mic = perms[Manifest.permission.RECORD_AUDIO] == true
+        val cam = perms[Manifest.permission.CAMERA] == true
+        if (mic && cam) {
+            isVideoOnline = true
+            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                updateServiceStatus(sessionId, "video", true)
+            }
+        } else {
+            Toast.makeText(context, "Camera and Microphone permissions are required for Video Calls", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    // 3b. Service Toggles
+    ServiceTogglesCard(
+        isChatOnline = isChatOnline,
+        isAudioOnline = isAudioOnline,
+        isVideoOnline = isVideoOnline,
+        onChatToggle = { enabled ->
+            if (enabled && !Settings.canDrawOverlays(context)) {
+                Toast.makeText(context, "Please enable 'Display over other apps' to receive calls", Toast.LENGTH_LONG).show()
+                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
+                context.startActivity(intent)
+                return@ServiceTogglesCard
+            }
+            isChatOnline = enabled
+            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                updateServiceStatus(sessionId, "chat", enabled)
+            }
+        },
+        onAudioToggle = { enabled ->
+            if (enabled) {
+                if (!Settings.canDrawOverlays(context)) {
+                    Toast.makeText(context, "Please enable 'Display over other apps' to receive calls", Toast.LENGTH_LONG).show()
+                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
+                    context.startActivity(intent)
+                    return@ServiceTogglesCard
                 }
-            )
+                if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                    audioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                    return@ServiceTogglesCard
+                }
+            }
+            isAudioOnline = enabled
+            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                updateServiceStatus(sessionId, "audio", enabled)
+            }
+        },
+        onVideoToggle = { enabled ->
+            if (enabled) {
+                if (!Settings.canDrawOverlays(context)) {
+                    Toast.makeText(context, "Please enable 'Display over other apps' to receive calls", Toast.LENGTH_LONG).show()
+                    val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:${context.packageName}"))
+                    context.startActivity(intent)
+                    return@ServiceTogglesCard
+                }
+                val hasCam = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                val hasMic = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+                if (!hasCam || !hasMic) {
+                    videoPermissionLauncher.launch(arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO))
+                    return@ServiceTogglesCard
+                }
+            }
+            isVideoOnline = enabled
+            scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                updateServiceStatus(sessionId, "video", enabled)
+            }
+        }
+    )
 
             // 4. Action Grid - Custom Row-based Layout to work inside verticalScroll
             val actions = listOf(
