@@ -5,6 +5,7 @@ csc.db
 firebase-service-account.json
 
 # Android Build Artifacts (Keep source)
+astroapp
 astroapp/android/app/build/
 astroapp/android/build/
 astroapp/android/.gradle/
