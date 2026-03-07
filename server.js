@@ -16,8 +16,9 @@ const { DateTime } = require('luxon');
 const { fetchDailyHoroscope } = require("./utils/rasiEng/horoscopeData");
 const { GoogleAuth } = require('google-auth-library');
 const helmet = require('helmet');
-const xss = require('xss-clean');
+const xss = require('xss');
 const rateLimit = require('express-rate-limit');
+
 const mongoSanitize = require('express-mongo-sanitize');
 
 
@@ -340,8 +341,20 @@ const cors = require("cors");
 const compression = require('compression');
 
 app.use(helmet()); // Sets various HTTP headers for security
-app.use(xss()); // Prevent XSS attacks
 app.use(mongoSanitize()); // Prevent NoSQL injection
+
+// Custom XSS Sanitization Middleware
+app.use((req, res, next) => {
+  if (req.body) {
+    for (let key in req.body) {
+      if (typeof req.body[key] === 'string') {
+        req.body[key] = xss(req.body[key]);
+      }
+    }
+  }
+  next();
+});
+
 
 
 // Rate limiting to prevent brute-force attacks
