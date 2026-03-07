@@ -2131,12 +2131,29 @@ async function endSessionRecord(sessionId) {
 }
 
 // --- Phase 3: Billing Helper ---
-const SLAB_RATES = {
+let SLAB_RATES = {
   1: 0.30, // 30% to Astro
   2: 0.35, // 35%
   3: 0.40, // 40%
   4: 0.50  // 50%
 };
+
+// Global Settings Model
+const GlobalSettingsSchema = new mongoose.Schema({
+  key: { type: String, unique: true },
+  value: mongoose.Schema.Types.Mixed
+});
+const GlobalSettings = mongoose.model('GlobalSettings', GlobalSettingsSchema);
+
+// Load Settings from DB
+async function loadSlabRates() {
+  const settings = await GlobalSettings.findOne({ key: 'slab_rates' });
+  if (settings && settings.value) {
+    SLAB_RATES = settings.value;
+    console.log('[Admin] Slab Rates loaded from DB:', SLAB_RATES);
+  }
+}
+loadSlabRates();
 
 async function processBillingCharge(sessionId, durationSeconds, minuteIndex, type) {
   try {
@@ -2929,6 +2946,16 @@ io.on('connection', (socket) => {
           userActiveSession.delete(toUserId);
           activeSessions.delete(sessionId);
           await Session.updateOne({ sessionId }, { status: 'missed', endTime: Date.now() }).catch(() => { });
+
+          // NEW: If astrologer misses a call, mark them as Offline automatically
+          await User.updateOne({ userId: toUserId, role: 'astrologer' }, {
+            isAvailable: false,
+            isOnline: false,
+            isChatOnline: false,
+            isAudioOnline: false,
+            isVideoOnline: false
+          }).catch(() => { });
+          broadcastAstroUpdate();
         }
       }, 25000);
     } catch (err) {
@@ -3509,34 +3536,61 @@ io.on('connection', (socket) => {
   socket.on('get-all-users', async (cb) => {
     if (!await checkAdmin(socket.id)) return cb({ ok: false });
     try {
-      const usersRaw = await User.find({}).sort({ role: 1, name: 1 }).lean();
-
-      // Enhance users with referral counts (L1, L2, L3)
-      // This is slightly heavy but requested for tracking
-      const allUsers = await Promise.all(usersRaw.map(async (u) => {
-        const l1 = await User.find({ referredBy: u.userId }).select('userId').lean();
-        const l1Ids = l1.map(x => x.userId);
-
-        const l2 = await User.find({ referredBy: { $in: l1Ids } }).select('userId').lean();
-        const l2Ids = l2.map(x => x.userId);
-
-        const l3 = await User.find({ referredBy: { $in: l2Ids } }).select('userId').lean();
-
-        return {
-          ...u,
-          refStats: {
-            l1: l1.length,
-            l2: l2.length,
-            l3: l3.length,
-            total: l1.length + l2.length + l3.length
-          }
-        };
-      }));
-
-      cb({ ok: true, users: allUsers });
+      const usersRaw = await User.find({ role: { $ne: 'superadmin' } }).sort({ role: 1, name: 1 }).lean();
+      cb({ ok: true, users: usersRaw });
     } catch (e) {
-      console.error("[Admin] Error fetching all users:", e);
-      cb({ ok: false });
+      console.error("[Admin] Error fetching users:", e);
+      cb({ ok: false, users: [] });
+    }
+  });
+
+  // --- Commission Slab Handlers ---
+  socket.on('get-slab-rates', async (cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    cb({ ok: true, rates: SLAB_RATES });
+  });
+
+  socket.on('update-slab-rates', async (rates, cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    try {
+      if (!rates || typeof rates !== 'object') return cb({ ok: false, error: 'Invalid data format' });
+      await GlobalSettings.updateOne({ key: 'slab_rates' }, { value: rates }, { upsert: true });
+      SLAB_RATES = rates;
+      console.log('[Admin] Slab Rates updated:', SLAB_RATES);
+      cb({ ok: true });
+    } catch (e) {
+      cb({ ok: false, error: e.message });
+    }
+  });
+
+  // --- FCM Broadcast Handler ---
+  socket.on('admin-send-bulk-fcm', async (data, cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    try {
+      const { title, body, imageUrl, allUsers, userIds } = data;
+      let query = {};
+      if (allUsers) {
+        query = { fcmToken: { $exists: true, $ne: '' } };
+      } else {
+        if (!userIds || userIds.length === 0) return cb({ ok: false, error: 'No users selected' });
+        query = { userId: { $in: userIds } };
+      }
+
+      const users = await User.find(query, 'userId fcmToken').lean();
+      const validUsers = users.filter(u => (u.fcmToken && u.fcmToken.length > 5));
+
+      let successCount = 0;
+      for (const u of validUsers) {
+        const res = await sendFcmV1Push(
+          u.fcmToken,
+          { type: 'broadcast', title, body, image: imageUrl || '' },
+          { title, body, image: imageUrl || '' }
+        );
+        if (res.success) successCount++;
+      }
+      cb({ ok: true, sentCount: successCount });
+    } catch (e) {
+      cb({ ok: false, error: e.message });
     }
   });
 
