@@ -15,6 +15,11 @@ const admin = require('firebase-admin'); // Firebase Admin for Mobile App
 const { DateTime } = require('luxon');
 const { fetchDailyHoroscope } = require("./utils/rasiEng/horoscopeData");
 const { GoogleAuth } = require('google-auth-library');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
+const mongoSanitize = require('mongo-sanitize');
+
 
 // --- Global Error Safety Nets ---
 // Prevent Node.js from cleanly exiting on unhandled errors, ensuring the backend stays alive
@@ -333,12 +338,23 @@ const io = new Server(server);
 const cors = require("cors");
 const compression = require('compression');
 
-app.use(compression());
-app.use(cors({ origin: "*" }));
+app.use(helmet()); // Sets various HTTP headers for security
+app.use(xss()); // Prevent XSS attacks
+app.use(mongoSanitize()); // Prevent NoSQL injection
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Rate limiting to prevent brute-force attacks
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // Limit each IP to 1000 requests per window
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+app.use('/api/', limiter); // Apply limiter only to API routes
+
+app.use(express.json({ limit: '10kb' })); // Body limit to prevent DoS
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(express.static('public'));  // Serve static files
+
 
 // Policy Page Routes
 app.get('/privacy-policy', (req, res) => res.sendFile(path.join(__dirname, 'public', 'privacy-policy.html')));
