@@ -18,7 +18,8 @@ const { GoogleAuth } = require('google-auth-library');
 const helmet = require('helmet');
 const xss = require('xss-clean');
 const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('mongo-sanitize');
+const mongoSanitize = require('express-mongo-sanitize');
+
 
 
 // --- Global Error Safety Nets ---
@@ -341,6 +342,7 @@ const compression = require('compression');
 app.use(helmet()); // Sets various HTTP headers for security
 app.use(xss()); // Prevent XSS attacks
 app.use(mongoSanitize()); // Prevent NoSQL injection
+
 
 // Rate limiting to prevent brute-force attacks
 const limiter = rateLimit({
