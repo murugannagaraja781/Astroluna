@@ -1,5 +1,7 @@
 package com.astroluna.ui.intake
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -689,112 +691,77 @@ fun IntakeScreen(
                             }
 
                             Text("Date of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedTextField(
-                                    value = day,
-                                    onValueChange = { if (it.length <= 2) day = it },
-                                    label = { Text("DD") },
-                                    modifier = Modifier.weight(1f),
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = PeacockGreen,
-                                        focusedLabelColor = PeacockGreen,
-                                        cursorColor = PeacockGreen
-                                    )
+                            OutlinedTextField(
+                                value = if (day.isNotEmpty() && month.isNotEmpty() && year.isNotEmpty()) "$day/$month/$year" else "",
+                                onValueChange = {},
+                                label = { Text("Select Date") },
+                                readOnly = true,
+                                enabled = false,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        val cal = Calendar.getInstance()
+                                        DatePickerDialog(context, { _, y, m, d ->
+                                            day = d.toString()
+                                            month = (m + 1).toString()
+                                            year = y.toString()
+                                        }, year.toIntOrNull() ?: cal.get(Calendar.YEAR),
+                                           (month.toIntOrNull() ?: (cal.get(Calendar.MONTH) + 1)) - 1,
+                                           day.toIntOrNull() ?: cal.get(Calendar.DAY_OF_MONTH)).show()
+                                    },
+                                shape = RoundedCornerShape(12.dp),
+                                trailingIcon = { Icon(Icons.Default.Edit, "Pick Date", tint = PeacockGreen) },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    disabledTextColor = RoyalMidnightBlue,
+                                    disabledBorderColor = Color.Gray,
+                                    disabledLabelColor = RoyalMidnightBlue,
+                                    disabledContainerColor = Color.Transparent
                                 )
-                                OutlinedTextField(
-                                    value = month,
-                                    onValueChange = { if (it.length <= 2) month = it },
-                                    label = { Text("MM") },
-                                    modifier = Modifier.weight(1f),
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = PeacockGreen,
-                                        focusedLabelColor = PeacockGreen,
-                                        cursorColor = PeacockGreen
-                                    )
-                                )
-                                OutlinedTextField(
-                                    value = year,
-                                    onValueChange = { if (it.length <= 4) year = it },
-                                    label = { Text("YYYY") },
-                                    modifier = Modifier.weight(1.5f),
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = PeacockGreen,
-                                        focusedLabelColor = PeacockGreen,
-                                        cursorColor = PeacockGreen
-                                    )
-                                )
-                            }
+                            )
 
                             Text("Time of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                OutlinedTextField(
-                                    value = hour,
-                                    onValueChange = { if (it.length <= 2) hour = it },
-                                    label = { Text("Hour") },
-                                    modifier = Modifier.weight(1f),
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = PeacockGreen,
-                                        focusedLabelColor = PeacockGreen,
-                                        cursorColor = PeacockGreen
-                                    )
-                                )
-                                Text(":", fontWeight = FontWeight.Bold, color = RoyalMidnightBlue, fontSize = 20.sp)
-                                OutlinedTextField(
-                                    value = minute,
-                                    onValueChange = { if (it.length <= 2) minute = it },
-                                    label = { Text("Min") },
-                                    modifier = Modifier.weight(1f),
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = PeacockGreen,
-                                        focusedLabelColor = PeacockGreen,
-                                        cursorColor = PeacockGreen
-                                    )
-                                )
+                            OutlinedTextField(
+                                value = if (hour.isNotEmpty() && minute.isNotEmpty()) {
+                                    val h = hour.toIntOrNull() ?: 0
+                                    val m = minute.toIntOrNull() ?: 0
+                                    String.format("%02d:%02d %s", if (h == 0 || h == 12) 12 else h % 12, m, amPm)
+                                } else "",
+                                onValueChange = {},
+                                label = { Text("Select Time") },
+                                readOnly = true,
+                                enabled = false,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        val cal = Calendar.getInstance()
+                                        val currentHour24 = if (hour.isEmpty()) cal.get(Calendar.HOUR_OF_DAY) else {
+                                            var h = hour.toIntOrNull() ?: 0
+                                            if (amPm == "PM" && h < 12) h += 12
+                                            else if (amPm == "AM" && h == 12) h = 0
+                                            h
+                                        }
+                                        val currentMin = if (minute.isEmpty()) cal.get(Calendar.MINUTE) else minute.toIntOrNull() ?: 0
 
-                                Row(
-                                    modifier = Modifier
-                                        .weight(1.5f)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(Color(0xFFF0F0F0))
-                                        .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-                                ) {
-                                    Text(
-                                        "AM",
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .clickable { amPm = "AM" }
-                                            .background(if (amPm == "AM") PeacockGreen else Color.Transparent)
-                                            .padding(12.dp),
-                                        textAlign = TextAlign.Center,
-                                        color = if (amPm == "AM") Color.White else RoyalMidnightBlue,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Text(
-                                        "PM",
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .clickable { amPm = "PM" }
-                                            .background(if (amPm == "PM") PeacockGreen else Color.Transparent)
-                                            .padding(12.dp),
-                                        textAlign = TextAlign.Center,
-                                        color = if (amPm == "PM") Color.White else RoyalMidnightBlue,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
+                                        TimePickerDialog(context, { _, h24, m ->
+                                            minute = String.format("%02d", m)
+                                            if (h24 >= 12) {
+                                                amPm = "PM"
+                                                hour = (if (h24 == 12) 12 else h24 - 12).toString()
+                                            } else {
+                                                amPm = "AM"
+                                                hour = (if (h24 == 0) 12 else h24).toString()
+                                            }
+                                        }, currentHour24, currentMin, false).show()
+                                    },
+                                shape = RoundedCornerShape(12.dp),
+                                trailingIcon = { Icon(Icons.Default.Edit, "Pick Time", tint = PeacockGreen) },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    disabledTextColor = RoyalMidnightBlue,
+                                    disabledBorderColor = Color.Gray,
+                                    disabledLabelColor = RoyalMidnightBlue,
+                                    disabledContainerColor = Color.Transparent
+                                )
+                            )
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Checkbox(
                                     checked = unknownTime,
@@ -804,44 +771,15 @@ fun IntakeScreen(
                                 Text("Don't know exact time", color = RoyalMidnightBlue)
                             }
 
-                            Text("Place of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
+                                Text("Place of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
+                            // Country and State hidden as per user request
+                            /*
                             OutlinedTextField(
                                 value = countryName,
-                                onValueChange = {},
-                                label = { Text("Country") },
-                                readOnly = true,
-                                enabled = false,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { launchLocationPicker() },
-                                trailingIcon = { Icon(Icons.Default.Place, "Pick", tint = PeacockGreen) },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    disabledTextColor = RoyalMidnightBlue,
-                                    disabledBorderColor = Color.Gray,
-                                    disabledLabelColor = RoyalMidnightBlue,
-                                    disabledContainerColor = Color.Transparent
-                                )
+                                ...
                             )
+                            */
 
-                            OutlinedTextField(
-                                value = stateName,
-                                onValueChange = {},
-                                label = { Text("State") },
-                                readOnly = true,
-                                enabled = false,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { launchLocationPicker() },
-                                trailingIcon = { Icon(Icons.Default.Place, "Pick", tint = PeacockGreen) },
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    disabledTextColor = RoyalMidnightBlue,
-                                    disabledBorderColor = Color.Gray,
-                                    disabledLabelColor = RoyalMidnightBlue,
-                                    disabledContainerColor = Color.Transparent
-                                )
-                            )
 
                             OutlinedTextField(
                                 value = cityName,
@@ -964,152 +902,91 @@ fun IntakeScreen(
                                     )
                                 )
                                 Text("Partner DOB", fontWeight = FontWeight.Bold, color = RoyalMidnightBlue)
-                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                    OutlinedTextField(
-                                        value = pDay,
-                                        onValueChange = { if (it.length <= 2) pDay = it },
-                                        label = { Text("DD") },
-                                        modifier = Modifier.weight(1f),
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = PeacockGreen,
-                                            focusedLabelColor = PeacockGreen,
-                                            cursorColor = PeacockGreen
-                                        )
+                                OutlinedTextField(
+                                    value = if (pDay.isNotEmpty() && pMonth.isNotEmpty() && pYear.isNotEmpty()) "$pDay/$pMonth/$pYear" else "",
+                                    onValueChange = {},
+                                    label = { Text("Select Partner Date") },
+                                    readOnly = true,
+                                    enabled = false,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            val cal = Calendar.getInstance()
+                                            DatePickerDialog(context, { _, y, m, d ->
+                                                pDay = d.toString()
+                                                pMonth = (m + 1).toString()
+                                                pYear = y.toString()
+                                            }, pYear.toIntOrNull() ?: cal.get(Calendar.YEAR),
+                                               (pMonth.toIntOrNull() ?: (cal.get(Calendar.MONTH) + 1)) - 1,
+                                               pDay.toIntOrNull() ?: cal.get(Calendar.DAY_OF_MONTH)).show()
+                                        },
+                                    shape = RoundedCornerShape(12.dp),
+                                    trailingIcon = { Icon(Icons.Default.Edit, "Pick Date", tint = PeacockGreen) },
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        disabledTextColor = RoyalMidnightBlue,
+                                        disabledBorderColor = Color.Gray,
+                                        disabledLabelColor = RoyalMidnightBlue,
+                                        disabledContainerColor = Color.Transparent
                                     )
-                                    OutlinedTextField(
-                                        value = pMonth,
-                                        onValueChange = { if (it.length <= 2) pMonth = it },
-                                        label = { Text("MM") },
-                                        modifier = Modifier.weight(1f),
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = PeacockGreen,
-                                            focusedLabelColor = PeacockGreen,
-                                            cursorColor = PeacockGreen
-                                        )
-                                    )
-                                    OutlinedTextField(
-                                        value = pYear,
-                                        onValueChange = { if (it.length <= 4) pYear = it },
-                                        label = { Text("YYYY") },
-                                        modifier = Modifier.weight(1.5f),
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = PeacockGreen,
-                                            focusedLabelColor = PeacockGreen,
-                                            cursorColor = PeacockGreen
-                                        )
-                                    )
-                                }
-                                Text("Partner Time", fontWeight = FontWeight.Bold, color = RoyalMidnightBlue)
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    OutlinedTextField(
-                                        value = pHour,
-                                        onValueChange = { if (it.length <= 2) pHour = it },
-                                        label = { Text("Hour") },
-                                        modifier = Modifier.weight(1f),
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = PeacockGreen,
-                                            focusedLabelColor = PeacockGreen,
-                                            cursorColor = PeacockGreen
-                                        )
-                                    )
-                                    Text(":", fontWeight = FontWeight.Bold, color = RoyalMidnightBlue)
-                                    OutlinedTextField(
-                                        value = pMinute,
-                                        onValueChange = { if (it.length <= 2) pMinute = it },
-                                        label = { Text("Min") },
-                                        modifier = Modifier.weight(1f),
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                        shape = RoundedCornerShape(12.dp),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = PeacockGreen,
-                                            focusedLabelColor = PeacockGreen,
-                                            cursorColor = PeacockGreen
-                                        )
-                                    )
+                                )
 
-                                    Row(
-                                        modifier = Modifier
-                                            .weight(1.5f)
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .background(Color(0xFFF0F0F0))
-                                            .border(1.dp, Color(0xFFE0E0E0), RoundedCornerShape(12.dp))
-                                    ) {
-                                        Text(
-                                            "AM",
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .clickable { pAmPm = "AM" }
-                                                .background(if (pAmPm == "AM") PeacockGreen else Color.Transparent)
-                                                .padding(12.dp),
-                                            textAlign = TextAlign.Center,
-                                            color = if (pAmPm == "AM") Color.White else RoyalMidnightBlue,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        Text(
-                                            "PM",
-                                            modifier = Modifier
-                                                .weight(1f)
-                                                .clickable { pAmPm = "PM" }
-                                                .background(if (pAmPm == "PM") PeacockGreen else Color.Transparent)
-                                                .padding(12.dp),
-                                            textAlign = TextAlign.Center,
-                                            color = if (pAmPm == "PM") Color.White else RoyalMidnightBlue,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                    }
-                                }
+                                Text("Partner Time", fontWeight = FontWeight.Bold, color = RoyalMidnightBlue)
+                                OutlinedTextField(
+                                    value = if (pMinute.isNotEmpty() && pHour.isNotEmpty()) {
+                                        val h = pHour.toIntOrNull() ?: 0
+                                        val m = pMinute.toIntOrNull() ?: 0
+                                        String.format("%02d:%02d %s", if (h == 0 || h == 12) 12 else h % 12, m, pAmPm)
+                                    } else "",
+                                    onValueChange = {},
+                                    label = { Text("Select Partner Time") },
+                                    readOnly = true,
+                                    enabled = false,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            val cal = Calendar.getInstance()
+                                            val currentHour24 = if (pHour.isEmpty()) cal.get(Calendar.HOUR_OF_DAY) else {
+                                                var h = pHour.toIntOrNull() ?: 0
+                                                if (pAmPm == "PM" && h < 12) h += 12
+                                                else if (pAmPm == "AM" && h == 12) h = 0
+                                                h
+                                            }
+                                            val currentMin = if (pMinute.isEmpty()) cal.get(Calendar.MINUTE) else pMinute.toIntOrNull() ?: 0
+
+                                            TimePickerDialog(context, { _, h24, m ->
+                                                pMinute = String.format("%02d", m)
+                                                if (h24 >= 12) {
+                                                    pAmPm = "PM"
+                                                    pHour = (if (h24 == 12) 12 else h24 - 12).toString()
+                                                } else {
+                                                    pAmPm = "AM"
+                                                    pHour = (if (h24 == 0) 12 else h24).toString()
+                                                }
+                                            }, currentHour24, currentMin, false).show()
+                                        },
+                                    shape = RoundedCornerShape(12.dp),
+                                    trailingIcon = { Icon(Icons.Default.Edit, "Pick Time", tint = PeacockGreen) },
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        disabledTextColor = RoyalMidnightBlue,
+                                        disabledBorderColor = Color.Gray,
+                                        disabledLabelColor = RoyalMidnightBlue,
+                                        disabledContainerColor = Color.Transparent
+                                    )
+                                )
+
                                 Text(
                                     "Partner Place of Birth",
                                     fontWeight = FontWeight.Bold,
                                     color = RoyalMidnightBlue
                                 )
-                                OutlinedTextField(
-                                    value = pCountryName,
-                                    onValueChange = {},
-                                    label = { Text("Country") },
-                                    readOnly = true,
-                                    enabled = false,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable { launchPartnerLocationPicker() },
-                                    trailingIcon = { Icon(Icons.Default.Place, "Pick", tint = PeacockGreen) },
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        disabledTextColor = RoyalMidnightBlue,
-                                        disabledBorderColor = Color.Gray,
-                                        disabledLabelColor = RoyalMidnightBlue,
-                                        disabledContainerColor = Color.Transparent
-                                    )
-                                )
-                                OutlinedTextField(
-                                    value = pStateName,
-                                    onValueChange = {},
-                                    label = { Text("State") },
-                                    readOnly = true,
-                                    enabled = false,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable { launchPartnerLocationPicker() },
-                                    trailingIcon = { Icon(Icons.Default.Place, "Pick", tint = PeacockGreen) },
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        disabledTextColor = RoyalMidnightBlue,
-                                        disabledBorderColor = Color.Gray,
-                                        disabledLabelColor = RoyalMidnightBlue,
-                                        disabledContainerColor = Color.Transparent
-                                    )
-                                )
+                                // Country and State hidden as per user request
+                            /*
+                            OutlinedTextField(
+                                value = pCountryName,
+                                ...
+                            )
+                            */
+
                                 OutlinedTextField(
                                     value = pCityName,
                                     onValueChange = {},
