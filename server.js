@@ -19,7 +19,6 @@ const helmet = require('helmet');
 const xss = require('xss');
 const rateLimit = require('express-rate-limit');
 
-const mongoSanitize = require('express-mongo-sanitize');
 
 
 
@@ -341,19 +340,28 @@ const cors = require("cors");
 const compression = require('compression');
 
 app.use(helmet()); // Sets various HTTP headers for security
-app.use(mongoSanitize()); // Prevent NoSQL injection
 
-// Custom XSS Sanitization Middleware
+// Custom Security Middleware: Combined XSS and NoSQL Injection Prevention
 app.use((req, res, next) => {
-  if (req.body) {
-    for (let key in req.body) {
-      if (typeof req.body[key] === 'string') {
-        req.body[key] = xss(req.body[key]);
+  const sanitize = (obj) => {
+    if (obj instanceof Object) {
+      for (let key in obj) {
+        if (key.startsWith('$') || key.includes('.')) {
+          delete obj[key]; // Block NoSQL Injection keys
+        } else if (typeof obj[key] === 'string') {
+          obj[key] = xss(obj[key]); // Cleanup XSS
+        } else if (obj[key] instanceof Object) {
+          sanitize(obj[key]); // Recursive for nested objects
+        }
       }
     }
-  }
+  };
+
+  if (req.body) sanitize(req.body);
+  // Note: We don't sanitize req.query directly because it's read-only in some environments
   next();
 });
+
 
 
 
