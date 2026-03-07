@@ -42,8 +42,10 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.astroluna.ui.theme.CosmicAppTheme
 import kotlinx.coroutines.delay
+import com.astroluna.data.local.TokenManager
 import com.astroluna.data.remote.SocketManager
 import com.astroluna.utils.CallState
+import org.json.JSONObject
 
 /**
  * IncomingCallActivity - Full-screen incoming call UI
@@ -272,6 +274,26 @@ class IncomingCallActivity : ComponentActivity() {
         Log.d(TAG, "Call rejected: $callId")
         stopRingtoneAndVibration()
         handler.removeCallbacks(timeoutRunnable)
+
+        // --- NEW: Emit rejection to server ---
+        val myUserId = TokenManager(this).getUserSession()?.userId
+        if (myUserId != null && callId.isNotEmpty()) {
+            try {
+                // Ensure socket is active
+                SocketManager.init()
+                SocketManager.registerUser(myUserId) {
+                    val payload = JSONObject().apply {
+                        put("sessionId", callId)
+                        put("toUserId", callerId)
+                        put("accept", false)
+                    }
+                    SocketManager.getSocket()?.emit("answer-session", payload)
+                    Log.d(TAG, "Emitted rejection for session: $callId to $callerId")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to emit rejection", e)
+            }
+        }
 
         // Stop foreground service
         stopService(Intent(this, CallForegroundService::class.java))

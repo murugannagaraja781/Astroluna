@@ -14,6 +14,7 @@ const multer = require('multer');
 const admin = require('firebase-admin'); // Firebase Admin for Mobile App
 const { DateTime } = require('luxon');
 const { fetchDailyHoroscope } = require("./utils/rasiEng/horoscopeData");
+const { GoogleAuth } = require('google-auth-library');
 
 // --- Global Error Safety Nets ---
 // Prevent Node.js from cleanly exiting on unhandled errors, ensuring the backend stays alive
