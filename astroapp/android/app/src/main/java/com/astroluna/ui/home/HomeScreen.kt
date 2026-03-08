@@ -1060,7 +1060,7 @@ fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
                         }
                         "Referral" -> {
                             onClose()
-                            onTabSelected(3) // Switch to Referral Tab
+                            onItemClick("Referral") // Use callback instead of unresolved ref
                         }
                         else -> onItemClick(item)
                     }
