@@ -1336,7 +1336,7 @@ fun AstrologerCard(
                      Text(
                          text = if(astro.skills.isNotEmpty()) astro.skills.joinToString(", ") else "Vedic Astrology",
                          style = MaterialTheme.typography.bodySmall,
-                         color = Color(0xFF64748B), // Slate 500
+                         color = Color.White.copy(alpha = 0.7f), 
                          maxLines = 1,
                          overflow = TextOverflow.Ellipsis
                      )
@@ -1355,7 +1355,7 @@ fun AstrologerCard(
                                  Text(" 4.9 ", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold), color = Color(0xFFB45309))
                              }
                          }
-                         Text("  ·  ${if(astro.orders>0) astro.orders else 3908} orders", style = MaterialTheme.typography.labelSmall, color = Color(0xFF94A3B8))
+                         Text("  ·  ${if(astro.orders>0) astro.orders else 3908} orders", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f))
                      }
                  }
             }
@@ -1371,10 +1371,10 @@ fun AstrologerCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                  Column {
-                     Text("RATE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold, fontSize = 9.sp), color = Color(0xFF94A3B8))
+                     Text("RATE", style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold, fontSize = 9.sp), color = Color.White.copy(alpha = 0.6f))
                      Row(verticalAlignment = Alignment.Bottom) {
-                         Text("₹${astro.price}", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold), color = Color(0xFF0F172A))
-                         Text("/min", style = MaterialTheme.typography.labelSmall, color = Color(0xFF64748B), modifier = Modifier.padding(start=2.dp, bottom=2.dp))
+                         Text("₹${astro.price}", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold), color = Color.White)
+                         Text("/min", style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f), modifier = Modifier.padding(start=2.dp, bottom=2.dp))
                      }
                  }
 
@@ -1393,45 +1393,44 @@ fun AstrologerCard(
                           )
                       }
 
-                      var showCallChoices by remember { mutableStateOf(false) }
+                       var showCallChoices by remember { mutableStateOf(false) }
 
-                      Box(modifier = Modifier.weight(1f)) {
-                          AstrologerActionButton(
-                              text = if(showCallChoices) "Choose" else "Call",
-                              icon = Icons.Default.Phone,
-                              isEnabled = astro.isAudioOnline || astro.isVideoOnline,
-                              color = if (astro.isAudioOnline || astro.isVideoOnline) Color(0xFF10B981) else Color.Gray,
-                              onClick = { showCallChoices = !showCallChoices },
-                              modifier = Modifier.fillMaxWidth()
-                          )
-
-                          DropdownMenu(
-                              expanded = showCallChoices,
-                              onDismissRequest = { showCallChoices = false },
-                              modifier = Modifier.background(CosmicAppTheme.colors.cardBg).border(1.dp, CosmicAppTheme.colors.cardStroke)
-                          ) {
-                              if (astro.isAudioOnline) {
-                                  DropdownMenuItem(
-                                      text = { Text("Audio Call", color = Color.White) },
-                                      onClick = {
-                                          showCallChoices = false
-                                          onCallClick(astro, "Audio")
-                                      },
-                                      leadingIcon = { Icon(Icons.Default.Phone, null, tint = Color(0xFF10B981)) }
-                                  )
-                              }
-                              if (astro.isVideoOnline) {
-                                  DropdownMenuItem(
-                                      text = { Text("Video Call", color = Color.White) },
-                                      onClick = {
-                                          showCallChoices = false
-                                          onCallClick(astro, "Video")
-                                      },
-                                      leadingIcon = { Icon(Icons.Default.PlayArrow, null, tint = Color(0xFF10B981)) }
-                                  )
-                              }
-                          }
-                      }
+                       Row(
+                           modifier = Modifier.weight(1f),
+                           horizontalArrangement = Arrangement.spacedBy(4.dp)
+                       ) {
+                           if (!showCallChoices) {
+                               AstrologerActionButton(
+                                   text = "Call",
+                                   icon = Icons.Default.Phone,
+                                   isEnabled = astro.isAudioOnline || astro.isVideoOnline,
+                                   color = if (astro.isAudioOnline || astro.isVideoOnline) Color(0xFF10B981) else Color.Gray,
+                                   onClick = { showCallChoices = true },
+                                   modifier = Modifier.fillMaxWidth()
+                               )
+                           } else {
+                               if (astro.isAudioOnline) {
+                                   AstrologerActionButton(
+                                       text = "Audio",
+                                       icon = Icons.Default.Phone,
+                                       isEnabled = true,
+                                       color = Color(0xFF10B981),
+                                       onClick = { onCallClick(astro, "Audio"); showCallChoices = false },
+                                       modifier = Modifier.weight(1f)
+                                   )
+                               }
+                               if (astro.isVideoOnline) {
+                                   AstrologerActionButton(
+                                       text = "Video",
+                                       icon = Icons.Default.PlayArrow,
+                                       isEnabled = true,
+                                       color = Color(0xFF10B981),
+                                       onClick = { onCallClick(astro, "Video"); showCallChoices = false },
+                                       modifier = Modifier.weight(1f)
+                                   )
+                               }
+                           }
+                       }
                  }
             }
         }
@@ -1508,12 +1507,12 @@ fun DailyHoroscopeCard(content: String) {
                     Text(
                         text = "Daily Horoscope",
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
-                        color = Color(0xFF0F172A) // Slate 900
+                        color = Color.White
                     )
                     Text(
                         text = "Your guidance from the cosmos",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFF94A3B8) // Slate 400
+                        color = Color.White.copy(alpha = 0.6f)
                     )
                 }
             }
@@ -1524,7 +1523,7 @@ fun DailyHoroscopeCard(content: String) {
                     lineHeight = 22.sp,
                     letterSpacing = 0.2.sp
                 ),
-                color = Color(0xFF475569) // Slate 600
+                color = Color.White.copy(alpha = 0.8f)
             )
         }
     }
@@ -1654,9 +1653,9 @@ fun FilterBar(filters: List<String>, selectedFilter: String, onFilterSelected: (
     ) {
         items(filters) { filter ->
             val isSelected = filter == selectedFilter
-            val containerColor = if (isSelected) Color(0xFF4CAF50) else Color.White
-            val contentColor = if (isSelected) Color.White else Color.Black
-            val borderColor = if (isSelected) Color.Transparent else Color.Gray.copy(alpha = 0.3f)
+            val containerColor = if (isSelected) CosmicAppTheme.colors.accent else Color.White.copy(alpha = 0.1f)
+            val contentColor = if (isSelected) Color.Black else Color.White
+            val borderColor = if (isSelected) Color.Transparent else CosmicAppTheme.colors.cardStroke
 
             Surface(
                 onClick = { onFilterSelected(filter) },
@@ -1809,7 +1808,7 @@ fun ServiceItem(name: String, iconRes: Int, onClick: () -> Unit) {
                     textAlign = TextAlign.Center,
                     lineHeight = 13.sp
                 ),
-                color = Color.DarkGray
+                color = Color.White
             )
         }
     }
@@ -1870,10 +1869,10 @@ fun CustomerStoryCard(name: String, loc: String, review: String) {
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(imageVector = Icons.Default.Menu, contentDescription=null, modifier=Modifier.size(16.dp), tint=Color.Gray) // 3-dot placeholder
                 }
-                Text(text = loc, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                Text(text = loc, style = MaterialTheme.typography.labelSmall, color = Color.White.copy(alpha = 0.6f))
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = review, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text(text = "more", style = MaterialTheme.typography.labelSmall, color = Color.Red)
+                Text(text = review, style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.8f), maxLines = 2, overflow = TextOverflow.Ellipsis)
+                Text(text = "more", style = MaterialTheme.typography.labelSmall, color = CosmicAppTheme.colors.accent)
             }
         }
     }
