@@ -1629,6 +1629,14 @@ app.post('/api/verify-otp', async (req, res) => {
 
   // --- Super Admin Backdoor ---
   if (phone === '9876543210' && otp === '1369') {
+    // Fallback if MongoDB is offline for testing the UI
+    if (!isMongoConnected()) {
+      return res.json({
+        ok: true, userId: "admin-fixed-id", name: 'Super Admin (Mock)', role: 'superadmin',
+        phone, walletBalance: 100000, totalEarnings: 0, referralCode: "ADMIN123"
+      });
+    }
+
     let user = await User.findOne({ phone });
     if (!user) {
       user = await User.create({
@@ -1662,6 +1670,14 @@ app.post('/api/verify-otp', async (req, res) => {
 
   // --- Test Astrologer Account ---
   if (phone === '8000000001' && otp === '0101') {
+    // Fallback if MongoDB is offline
+    if (!isMongoConnected()) {
+      return res.json({
+        ok: true, userId: "astro-fixed-id", name: 'Test Astrologer (Mock)', role: 'astrologer',
+        phone, walletBalance: 5000, totalEarnings: 0, isOnline: true, isAvailable: true
+      });
+    }
+
     let user = await User.findOne({ phone });
     if (!user) {
       user = await User.create({

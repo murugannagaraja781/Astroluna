@@ -2109,7 +2109,7 @@
       overflow-y: auto;
       padding: 20px;
       padding-bottom: 100px;
-      background: #f8fafc;
+      background: var(--primary-bg);
       width: 100%;
     }
 
@@ -2145,12 +2145,13 @@
     }
 
     .stat-card-modern {
-      background: white;
+      background: var(--secondary-bg);
       border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      border: 1px solid #f0f0f0;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--glass-border);
       transition: all 0.3s ease;
+      color: white;
     }
 
     .stat-card-modern:hover {
@@ -4561,6 +4562,38 @@
     </div>
 
     <!-- Screen: Super Admin Dashboard -->
+    <!-- Super Admin Navigation (Desktop Sidebar / Mobile Bottom) -->
+    <div class="admin-nav hidden">
+      <div class="admin-nav-item active" id="anav-home" onclick="navAdmin('home')">
+        <i class="fas fa-home"></i>
+        <span>Overview</span>
+      </div>
+      <div class="admin-nav-item" id="anav-users" onclick="navAdmin('users')">
+        <i class="fas fa-users-cog"></i>
+        <span>Users</span>
+      </div>
+      <div class="admin-nav-item" id="anav-payouts" onclick="navAdmin('payouts')">
+        <i class="fas fa-hand-holding-usd"></i>
+        <span>Astrologers</span>
+      </div>
+      <div class="admin-nav-item" id="anav-requests" onclick="navAdmin('requests')">
+        <i class="fas fa-user-clock"></i>
+        <span>Requests</span>
+      </div>
+      <div class="admin-nav-item" id="anav-academy" onclick="navAdmin('academy')">
+        <i class="fas fa-graduation-cap"></i>
+        <span>Academy</span>
+      </div>
+      <div class="admin-nav-item" id="anav-slider" onclick="navAdmin('slider')">
+        <i class="fas fa-images"></i>
+        <span>Banners</span>
+      </div>
+      <div class="admin-nav-item" id="anav-referrals" onclick="navAdmin('referrals')">
+        <i class="fas fa-share-alt"></i>
+        <span>Referrals</span>
+      </div>
+    </div>
+
     <div id="screen-admin" class="dashboard-container hidden">
       <!-- Admin Edit User Modal -->
       <div id="adminEditModal" class="modal-overlay hidden"
@@ -5519,6 +5552,26 @@
             </div>
           </div>
         </div> <!-- End of .mobile-view -->
+
+        <!-- Super Admin Footer (System Info) -->
+        <footer class="admin-footer">
+          <div class="admin-footer-content">
+            <div class="admin-footer-section">
+              <div class="admin-footer-item">
+                <i class="fas fa-server"></i> Server: <span style="color: var(--accent-green);">ONLINE</span>
+              </div>
+              <div class="admin-footer-divider"></div>
+              <div class="admin-footer-item">
+                <i class="fas fa-clock"></i> <span id="adminFooterTime">--:--:--</span>
+              </div>
+            </div>
+            <div class="admin-footer-section">
+              <div class="admin-footer-item" style="opacity: 0.6; font-size: 0.75rem;">
+                v2.4.0-COSMIC
+              </div>
+            </div>
+          </div>
+        </footer>
 
 
         <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
