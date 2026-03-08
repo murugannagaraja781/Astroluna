@@ -265,10 +265,10 @@ fun AstrologerProfileScreen(
                     )
 
                     ActionButton(
-                        icon = Icons.Default.PlayArrow,
+                        icon = Icons.Filled.Videocam,
                         label = "Video",
                         color = Color(0xFFD32F2F),
-                        isEnabled = isVideoOnline,
+                        isEnabled = true, // Always enabled
                         onClick = { onAction("video") }
                     )
                 }
