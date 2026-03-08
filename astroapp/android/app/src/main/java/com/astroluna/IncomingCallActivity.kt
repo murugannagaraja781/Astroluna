@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -98,6 +97,8 @@ class IncomingCallActivity : ComponentActivity() {
             finish()
             return
         }
+
+        CallState.markActive(callId)
 
         setupWindowFlags()
 

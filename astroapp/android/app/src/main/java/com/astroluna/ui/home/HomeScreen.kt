@@ -308,10 +308,17 @@ fun HomeScreen(
         }
     }
 
-    // Logic to filter astrologers based on selection
-    val filteredAstros = remember(selectedFilter, astrologers) {
-        if (selectedFilter == "All") astrologers
-        else astrologers.filter { astro ->
+    // Logic to filter and SORT astrologers based on selection
+    val filteredAstros = remember(selectedFilter, selectedTab, astrologers) {
+        val list = when(selectedTab) {
+            1 -> astrologers.sortedWith(compareByDescending<Astrologer> { it.isChatOnline }.thenByDescending { it.experience })
+            2 -> astrologers.sortedWith(compareByDescending<Astrologer> { it.isVideoOnline }.thenByDescending { it.experience })
+            3 -> astrologers.sortedWith(compareByDescending<Astrologer> { it.isAudioOnline }.thenByDescending { it.experience })
+            else -> astrologers
+        }
+
+        if (selectedFilter == "All") list
+        else list.filter { astro ->
              // Match skill or name
              astro.skills.any { it.contains(selectedFilter, ignoreCase = true) } ||
              astro.name.contains(selectedFilter, ignoreCase = true)
@@ -1368,23 +1375,42 @@ fun AstrologerCard(
                      }
                  }
 
-                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                      val isChatEnabled = astro.isChatOnline
-                      AstrologerActionButton(
-                          text = "Chat",
-                          icon = Icons.Default.Send,
-                          isEnabled = isChatEnabled,
-                          color = if (isChatEnabled) Color(0xFF10B981) else Color.Gray,
-                          onClick = { onChatClick(astro) }
-                      )
-                      val isCallOrVideoEnabled = if(showVideo) astro.isVideoOnline else astro.isAudioOnline
-                      AstrologerActionButton(
-                          text = if(showVideo) "Video" else "Audio",
-                          icon = if(showVideo) Icons.Default.PlayArrow else Icons.Default.Phone,
-                          isEnabled = isCallOrVideoEnabled,
-                          color = if (isCallOrVideoEnabled) Color(0xFF10B981) else Color.Gray,
-                          onClick = { onCallClick(astro, if(showVideo) "Video" else "Audio") }
-                      )
+                 Row(
+                     modifier = Modifier.fillMaxWidth(),
+                     horizontalArrangement = Arrangement.spacedBy(4.dp)
+                 ) {
+                      if (showChat) {
+                          AstrologerActionButton(
+                              text = "Chat",
+                              icon = Icons.Default.Send,
+                              isEnabled = astro.isChatOnline,
+                              color = if (astro.isChatOnline) Color(0xFF10B981) else Color.Gray,
+                              onClick = { onChatClick(astro) },
+                              modifier = Modifier.weight(1f)
+                          )
+                      }
+
+                      if (showCall) {
+                          AstrologerActionButton(
+                              text = "Audio",
+                              icon = Icons.Default.Phone,
+                              isEnabled = astro.isAudioOnline,
+                              color = if (astro.isAudioOnline) Color(0xFF10B981) else Color.Gray,
+                              onClick = { onCallClick(astro, "Audio") },
+                              modifier = Modifier.weight(1f)
+                          )
+                      }
+
+                      if (showVideo) {
+                          AstrologerActionButton(
+                              text = "Video",
+                              icon = Icons.Default.PlayArrow,
+                              isEnabled = astro.isVideoOnline,
+                              color = if (astro.isVideoOnline) Color(0xFF10B981) else Color.Gray,
+                              onClick = { onCallClick(astro, "Video") },
+                              modifier = Modifier.weight(1f)
+                          )
+                      }
                  }
             }
         }
@@ -1400,7 +1426,7 @@ fun HomeBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
         val items = listOf(
             Triple("Home", androidx.compose.material.icons.Icons.Default.Home, 0),
             Triple("Chat", androidx.compose.material.icons.Icons.Default.Send, 1),
-            Triple("Refer", androidx.compose.material.icons.Icons.Default.Person, 5),
+            Triple("Video", androidx.compose.material.icons.Icons.Default.PlayArrow, 2),
             Triple("Audio", androidx.compose.material.icons.Icons.Default.Phone, 3),
             Triple("Profile", androidx.compose.material.icons.Icons.Default.Person, 4)
         )
@@ -1574,13 +1600,20 @@ fun AstrologerActionButton(
         modifier = modifier.height(44.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = text,
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp),
                 color = Color.White,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis

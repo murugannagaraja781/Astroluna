@@ -203,9 +203,8 @@ class CallActivity : ComponentActivity() {
             partnerId = savedInstanceState.getString("partnerId")
         }
 
-        // --- GLOBAL STATE FIX: Mark call as active to prevent duplicate starts ---
-        CallState.isCallActive = true
-        CallState.currentSessionId = intent.getStringExtra("sessionId")
+        // --- GLOBAL STATE FIX: Mark chat as active to prevent incoming calls during session ---
+        com.astroluna.utils.CallState.markActive(sessionId)
 
         // Initialize WebRTC Views Programmatically
         localView = SurfaceViewRenderer(this)
@@ -1004,8 +1003,7 @@ class CallActivity : ComponentActivity() {
 
     override fun finish() {
         // Ensure state is cleared even if finished via system back or other means
-        CallState.isCallActive = false
-        CallState.currentSessionId = null
+        CallState.markInactive()
         stopBackgroundService()
         super.finish()
     }

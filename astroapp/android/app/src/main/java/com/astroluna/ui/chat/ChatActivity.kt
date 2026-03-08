@@ -94,8 +94,7 @@ class ChatActivity : ComponentActivity() {
         handleIntent(intent)
 
         // --- GLOBAL STATE FIX: Mark chat as active to prevent incoming calls during session ---
-        com.astroluna.utils.CallState.isCallActive = true
-        com.astroluna.utils.CallState.currentSessionId = sessionId
+        com.astroluna.utils.CallState.markActive(sessionId)
         setContent {
             CosmicAppTheme {
                 ChatScreen(
@@ -294,8 +293,7 @@ class ChatActivity : ComponentActivity() {
 
     override fun finish() {
         // Reset CallState
-        com.astroluna.utils.CallState.isCallActive = false
-        com.astroluna.utils.CallState.currentSessionId = null
+        com.astroluna.utils.CallState.markInactive()
         super.finish()
     }
 

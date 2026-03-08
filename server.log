@@ -1,29 +1,34 @@
-[dotenv@17.2.4] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+
+> simple-peer@1.0.0 dev
+> node server.js
+
+[dotenv@17.2.4] injecting env (12) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
 ✓ Call App: Firebase Admin SDK initialized
 [FCM v1] Initialized with service account
-node:events:502
-      throw er; // Unhandled 'error' event
-      ^
+Server running on http://0.0.0.0:3000
+📡 Mongoose connected to MongoDB
+✅ MongoDB Connected to: cluster0.dplzwsl.mongodb.net/
 
-Error: listen EADDRINUSE: address already in use :::3000
-    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
-    at listenInCluster (node:net:1965:12)
-    at Server.listen (node:net:2067:7)
-    at Object.<anonymous> (/Users/wohozo/Documents/Astro-luna/astroluna.in/server.js:4360:10)
-    at Module._compile (node:internal/modules/cjs/loader:1521:14)
-    at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
-    at Module.load (node:internal/modules/cjs/loader:1266:32)
-    at Module._load (node:internal/modules/cjs/loader:1091:12)
-    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)
-    at node:internal/main/run_main_module:28:49
-Emitted 'error' event on Server instance at:
-    at emitErrorNT (node:net:1944:8)
-    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
-  code: 'EADDRINUSE',
-  errno: -48,
-  syscall: 'listen',
-  address: '::',
-  port: 3000
-}
+[2026-03-08T16:44:52.081Z] [ACTIVITY] [SOCKET] New connection: ZNU7K84eZiC4keOOAAAB
 
-Node.js v20.19.6
+[2026-03-08T16:45:04.618Z] [ACTIVITY] [SOCKET] Socket disconnected | Data: {"socketId":"ZNU7K84eZiC4keOOAAAB"}
+Socket disconnected (no user): ZNU7K84eZiC4keOOAAAB
+
+[2026-03-08T16:45:16.591Z] [ACTIVITY] [SOCKET] New connection: rVfGQ9RoV3ml37s-AAAD
+
+[2026-03-08T16:45:20.045Z] [ACTIVITY] [SOCKET] New connection: Sabce1wcQkzcEV04AAAF
+
+[2026-03-08T16:45:29.237Z] [ACTIVITY] [SOCKET] Socket disconnected | Data: {"socketId":"Sabce1wcQkzcEV04AAAF"}
+Socket disconnected (no user): Sabce1wcQkzcEV04AAAF
+
+[2026-03-08T16:45:33.270Z] [ACTIVITY] [SOCKET] New connection: QrzNI-1-3JfWXv_0AAAH
+
+[2026-03-08T16:46:08.728Z] [ACTIVITY] [SOCKET] Socket disconnected | Data: {"socketId":"QrzNI-1-3JfWXv_0AAAH"}
+Socket disconnected (no user): QrzNI-1-3JfWXv_0AAAH
+
+[2026-03-08T16:46:09.245Z] [ACTIVITY] [SOCKET] New connection: R63SL09XOtvzl7CVAAAJ
+
+[2026-03-08T16:55:47.262Z] [ACTIVITY] [SOCKET] New connection: aOH4N0E65DntB4WvAAAL
+
+[2026-03-08T16:55:55.608Z] [ACTIVITY] [SOCKET] Socket disconnected | Data: {"socketId":"aOH4N0E65DntB4WvAAAL"}
+Socket disconnected (no user): aOH4N0E65DntB4WvAAAL
