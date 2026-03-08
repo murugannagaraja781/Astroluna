@@ -2933,35 +2933,30 @@ io.on('connection', (socket) => {
       if (!fromUserId) return cb({ ok: false, error: 'Not registered' });
       if (!toUserId || !type) return cb({ ok: false, error: 'Missing fields' });
 
-      // Get target user from DB
-      const toUser = await User.findOne({ userId: toUserId });
-      const fromUser = await User.findOne({ userId: fromUserId });
-
-      if (!toUser) {
-        return cb({ ok: false, error: 'User not found' });
+      // Check target is connected via socket first (in-memory, no DB needed)
+      const toSocketId = userSockets.get(toUserId);
+      if (!toSocketId) {
+        return cb({ ok: false, error: 'User not online' });
       }
 
-      // Check if astrologer is available (MANUAL ONLY)
-      const isAvailable = toUser.isAvailable === true;
-
-      // ALLOW CALL even if offline -> Logic will fall back to FCM below
-      // if (!isAvailable) {
-      //   return cb({ ok: false, error: 'Astrologer is offline' });
-      // }
+      // DB-dependent lookups (skip gracefully when offline)
+      let toUser = null;
+      let fromUser = null;
+      if (isMongoConnected()) {
+        toUser = await User.findOne({ userId: toUserId });
+        fromUser = await User.findOne({ userId: fromUserId });
+        if (!toUser) return cb({ ok: false, error: 'User not found' });
+      }
 
       if (userActiveSession.has(toUserId)) {
         const existingSessionId = userActiveSession.get(toUserId);
         const existingSession = activeSessions.get(existingSessionId);
-
         if (!existingSession) {
-          // Ghost session cleanup
-          console.log(`[Session] Ghost session ${existingSessionId} detected for ${toUserId}. Auto-cleaning.`);
           userActiveSession.delete(toUserId);
-        }
-        else if (existingSession.users.includes(fromUserId)) {
-          // Same caller retrying
-          console.log(`[Session] Stale session ${existingSessionId} detected between ${fromUserId} and ${toUserId}. Auto-cleaning.`);
-          await endSessionRecord(existingSessionId);
+        } else if (existingSession.users.includes(fromUserId)) {
+          console.log(`[Session] Stale session detected, auto-cleaning.`);
+          if (isMongoConnected()) await endSessionRecord(existingSessionId);
+          else { activeSessions.delete(existingSessionId); userActiveSession.delete(toUserId); }
         } else {
           return cb({ ok: false, error: 'User busy' });
         }
@@ -2978,10 +2973,14 @@ io.on('connection', (socket) => {
       if (toUser && toUser.role === 'client') clientId = toUserId;
       if (toUser && toUser.role === 'astrologer') astrologerId = toUserId;
 
-      await Session.create({
-        sessionId, fromUserId, toUserId, type, startTime: Date.now(),
-        clientId, astrologerId
-      });
+
+      // Persist session to DB (only if online)
+      if (isMongoConnected()) {
+        await Session.create({
+          sessionId, fromUserId, toUserId, type, startTime: Date.now(),
+          clientId, astrologerId
+        }).catch(e => console.warn('[Session] DB create warn:', e.message));
+      }
 
       activeSessions.set(sessionId, {
         type,
@@ -2999,53 +2998,42 @@ io.on('connection', (socket) => {
       userActiveSession.set(fromUserId, sessionId);
       userActiveSession.set(toUserId, sessionId);
 
-      // Try socket notification (might fail if in background - that's OK!)
-      let socketSent = false;
+      // Send incoming-session via Socket room (works for both web and app)
       io.to(toUserId).emit('incoming-session', {
         sessionId,
         fromUserId,
-        callerName: fromUser?.name || 'Client',  // FIX: Add caller name for display
+        callerName: fromUser?.name || 'User',
         type,
         birthData: birthData || null
       });
-      socketSent = true;
-      console.log(`[Session] Socket notification sent to room: ${toUserId}`);
+      console.log(`[Session] incoming-session emitted to room: ${toUserId}`);
 
-      // IMPROVED: Send FCM Push Notification as BACKUP (even if socket sent)
-      // This ensures the call reaches the user if socket message is missed/dropped
-      // The Android app handles duplicate by showing only one IncomingCallActivity
+      // Send FCM push as backup (only if we have user data from DB)
       if (toUser && toUser.fcmToken) {
         const fcmData = {
           type: 'INCOMING_CALL',
           sessionId: sessionId,
           callType: type,
-          callerName: fromUser?.name || 'Client',
-          callerId: fromUserId, // Fixed: callerUserId -> callerId
+          callerName: fromUser?.name || 'User',
+          callerId: fromUserId,
           timestamp: Date.now().toString(),
           birthData: JSON.stringify(birthData || {})
         };
-
         const fcmNotification = {
           title: '📞 Incoming Call',
           body: `${fromUser?.name || 'Someone'} is calling you`
         };
-
         sendFcmV1Push(toUser.fcmToken, fcmData, fcmNotification)
           .then(result => {
-            console.log(`[FCM v1] Session Push to ${toUserId}: Success=${result.success} (socketSent=${socketSent})`);
+            console.log(`[FCM v1] Push to ${toUserId}: Success=${result.success}`);
             if (!result.success && (result.error?.includes('Requested entity was not found') || result.error === 'UNREGISTERED')) {
-              // Token is stale/invalid
-              User.updateOne({ userId: toUserId }, { $unset: { fcmToken: 1 } })
-                .then(() => console.log(`[FCM v1] Invalid token removed for ${toUserId}`))
-                .catch(e => console.error('Token removal error', e));
+              if (isMongoConnected()) User.updateOne({ userId: toUserId }, { $unset: { fcmToken: 1 } }).catch(() => { });
             }
           })
-          .catch(err => {
-            console.error('[FCM v1] Session Push Error:', err.message);
-          });
+          .catch(err => { console.error('[FCM v1] Push Error:', err.message); });
       }
 
-      console.log(`Session request: ${sessionId} (${type})`);
+      console.log(`[Session] Request: ${sessionId} (${type}) from ${fromUserId} to ${toUserId}`);
       cb({ ok: true, sessionId });
 
       // --- MISSED CALL TIMEOUT (25s) ---
@@ -3055,20 +3043,16 @@ io.on('connection', (socket) => {
           console.log(`[Session] Ringing timeout for ${sessionId}. Marking as MISSED.`);
           io.to(fromUserId).emit('session-ended', { sessionId, reason: 'no_answer' });
           io.to(toUserId).emit('session-ended', { sessionId, reason: 'missed' });
-
           userActiveSession.delete(fromUserId);
           userActiveSession.delete(toUserId);
           activeSessions.delete(sessionId);
-          await Session.updateOne({ sessionId }, { status: 'missed', endTime: Date.now() }).catch(() => { });
-
-          // NEW: If astrologer misses a call, mark them as Offline automatically
-          await User.updateOne({ userId: toUserId, role: 'astrologer' }, {
-            isAvailable: false,
-            isOnline: false,
-            isChatOnline: false,
-            isAudioOnline: false,
-            isVideoOnline: false
-          }).catch(() => { });
+          if (isMongoConnected()) {
+            await Session.updateOne({ sessionId }, { status: 'missed', endTime: Date.now() }).catch(() => { });
+            await User.updateOne({ userId: toUserId, role: 'astrologer' }, {
+              isAvailable: false, isOnline: false, isChatOnline: false,
+              isAudioOnline: false, isVideoOnline: false
+            }).catch(() => { });
+          }
           broadcastAstroUpdate();
         }
       }, 25000);
