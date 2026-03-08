@@ -1,6 +1,7 @@
 
-Task :app:compileReleaseKotlin
-e: file:///Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/java/com/astroluna/ui/home/HomeScreen.kt:1063:29 Unresolved reference: onTabSelected
+> Task :app:compileReleaseKotlin
+e: file:///Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/java/com/astroluna/ui/home/HomeScreen.kt:1406:28 This material API is experimental and is likely to change or to be removed in the future.
+e: file:///Users/wohozo/Documents/Astroluna/astroapp/android/app/src/main/java/com/astroluna/ui/home/HomeScreen.kt:1668:56 Unresolved reference: alpha
 
 > Task :app:compileReleaseKotlin FAILED
 
@@ -25,8 +26,5 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/8.12/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD FAILED in 27s
-42 actionable tasks: 9 executed, 33 up-to-date
-wohozo@wohozo android %
-
-
+BUILD FAILED in 29s
+42 actionable tasks: 10 execut
