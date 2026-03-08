@@ -126,8 +126,9 @@ dependencies {
     // PhonePe (Keep slightly older or check compatibility)
     implementation("phonepe.intentsdk.android.release:IntentSDK:5.3.0")
 
-    // Icons (Using core only to save 10MB+)
+    // Icons (Added extended for Videocam)
     implementation("androidx.compose.material:material-icons-core:1.6.8")
+    implementation("androidx.compose.material:material-icons-extended:1.6.8")
 
     // Jetpack Compose (BOM 2024.06.00)
     implementation(platform("androidx.compose:compose-bom:2024.06.00"))

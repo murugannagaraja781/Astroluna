@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -57,6 +58,8 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import com.astroluna.utils.Localization
 import com.astroluna.data.model.Astrologer
 import kotlinx.coroutines.launch
@@ -995,7 +998,7 @@ fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(CosmicAppTheme.colors.bgStart) 
+                .background(CosmicAppTheme.colors.bgStart)
                 .padding(24.dp)
         ) {
             // Close Button Row
@@ -1216,7 +1219,7 @@ fun RasiItemView(item: ComposeRasiItem, onClick: (ComposeRasiItem) -> Unit) {
         Text(
             text = Localization.get(item.name.lowercase(), true),
             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            color = Color.White, 
+            color = Color.White,
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -1225,6 +1228,7 @@ fun RasiItemView(item: ComposeRasiItem, onClick: (ComposeRasiItem) -> Unit) {
 }
 
 // --- 4. ASTROLOGER CARD (Green Border, Animation, Shadow) ---
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AstrologerCard(
     astro: Astrologer,
@@ -1335,7 +1339,7 @@ fun AstrologerCard(
                       Text(
                           text = if(astro.skills.isNotEmpty()) astro.skills.joinToString(", ") else "Vedic Astrology",
                           style = MaterialTheme.typography.bodySmall,
-                          color = Color.White.copy(alpha = 0.7f), 
+                          color = Color.White.copy(alpha = 0.7f),
                           maxLines = 1,
                           overflow = TextOverflow.Ellipsis
                       )
@@ -1396,8 +1400,8 @@ fun AstrologerCard(
                        AstrologerActionButton(
                            text = "Call",
                            icon = Icons.Default.Phone,
-                           isEnabled = astro.isAudioOnline || astro.isVideoOnline,
-                           color = Color.Transparent,
+                            isEnabled = true, // Enabled Call button
+                            color = Color.Transparent,
                            onClick = { showCallSheet = true },
                            modifier = Modifier.weight(1f)
                        )
@@ -1445,18 +1449,18 @@ fun AstrologerCard(
                                                modifier = Modifier.weight(1f)
                                            )
                                        }
-                                       if (astro.isVideoOnline) {
-                                           CallOptionItem(
-                                               title = "Video Call",
-                                               icon = Icons.Default.PlayArrow,
-                                               gradient = Brush.linearGradient(listOf(Color(0xFF7C3AED), Color(0xFF6D28D9))),
-                                               onClick = {
-                                                   onCallClick(astro, "Video")
-                                                   showCallSheet = false
-                                               },
-                                               modifier = Modifier.weight(1f)
-                                           )
-                                       }
+                                        if (true) { // Enabled video call option
+                                            CallOptionItem(
+                                                title = "Video Call",
+                                                icon = androidx.compose.material.icons.Icons.Filled.Videocam,
+                                                gradient = Brush.linearGradient(listOf(Color(0xFF7C3AED), Color(0xFF6D28D9))),
+                                                onClick = {
+                                                    onCallClick(astro, "Video")
+                                                    showCallSheet = false
+                                                },
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                        }
                                    }
                                }
                            }
@@ -1512,7 +1516,7 @@ fun DailyHoroscopeCard(content: String) {
             ),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFF161B2E)),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.08f)) 
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.08f))
     ) {
         Column(
             modifier = Modifier
@@ -1643,7 +1647,7 @@ fun AstrologerActionButton(
 ) {
     val bgAlpha = if (isEnabled) 1f else 0.4f
     val elevation = if (isEnabled) 6.dp else 0.dp
-    
+
     val gradient = if (isEnabled) {
         when (text) {
             "Chat" -> Brush.linearGradient(listOf(Color(0xFF7C3AED), Color(0xFFC026D3))) // Purple to Magenta
@@ -1996,7 +2000,7 @@ fun StickyFooterButtons(
                  if (isGuest) {
                     onLoginClick()
                 } else {
-                onTabSelected(2) // Tab 2 = Call
+                    onTabSelected(2) // Tab 2 = Call
                 }
             },
             colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = com.astroluna.R.color.marketplace_yellow), contentColor = Color.Black),
@@ -2008,6 +2012,30 @@ fun StickyFooterButtons(
             Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = "Talk to Astro",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        // Video Button
+        Button(
+            onClick = {
+                 if (isGuest) {
+                    onLoginClick()
+                } else {
+                    onTabSelected(2) // Tab 2 = Call
+                }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63), contentColor = Color.White),
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.weight(1f).height(46.dp),
+            contentPadding = PaddingValues(horizontal = 4.dp)
+        ) {
+            Icon(imageVector = androidx.compose.material.icons.Icons.Filled.Videocam, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.White)
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "Video Call",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, fontSize = 11.sp),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
