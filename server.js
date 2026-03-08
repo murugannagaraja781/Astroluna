@@ -1155,6 +1155,7 @@ app.post('/api/withdraw-referral', async (req, res) => {
 
 // Astrologer List API (Used by Mobile App)
 app.get('/api/astrology/astrologers', async (req, res) => {
+  if (!isMongoConnected()) return res.json({ ok: true, astrologers: [] });
   try {
     const astrologers = await User.find({ role: 'astrologer' })
       .select('userId name phone skills price isOnline isChatOnline isAudioOnline isVideoOnline experience isVerified image walletBalance totalEarnings')
@@ -1719,6 +1720,12 @@ app.post('/api/verify-otp', async (req, res) => {
 
   // --- Test Client Account ---
   if (phone === '9000000001' && otp === '0101') {
+    if (!isMongoConnected()) {
+      return res.json({
+        ok: true, userId: 'client-fixed-id', name: 'Test Client (Mock)', role: 'client',
+        phone, walletBalance: 1000, totalEarnings: 0
+      });
+    }
     let user = await User.findOne({ phone });
     if (!user) {
       user = await User.create({
@@ -1756,6 +1763,19 @@ app.post('/api/verify-otp', async (req, res) => {
   if (Date.now() > entry.expires) return res.json({ ok: false, error: 'Expired' });
   if (entry.otp !== otp) return res.json({ ok: false, error: 'Invalid OTP' });
   otpStore.delete(phone);
+
+  // If DB is offline, give a mock session for any valid OTP
+  if (!isMongoConnected()) {
+    return res.json({
+      ok: true,
+      userId: 'mock-' + phone,
+      name: 'User',
+      role: 'client',
+      phone: phone,
+      walletBalance: 0,
+      totalEarnings: 0
+    });
+  }
 
   try {
     let user = await User.findOne({ phone });
@@ -2213,13 +2233,19 @@ const GlobalSettings = mongoose.model('GlobalSettings', GlobalSettingsSchema);
 
 // Load Settings from DB
 async function loadSlabRates() {
+  if (!isMongoConnected()) {
+    console.warn('[Admin] MongoDB offline - using default slab rates');
+    return;
+  }
   const settings = await GlobalSettings.findOne({ key: 'slab_rates' });
   if (settings && settings.value) {
     SLAB_RATES = settings.value;
     console.log('[Admin] Slab Rates loaded from DB:', SLAB_RATES);
   }
 }
-loadSlabRates();
+// Run after DB connects
+mongoose.connection.once('connected', () => loadSlabRates());
+
 
 async function processBillingCharge(sessionId, durationSeconds, minuteIndex, type) {
   try {
@@ -2615,16 +2641,33 @@ io.on('connection', (socket) => {
   logActivity('socket', `New connection: ${socket.id}`);
 
   // --- Register user ---
-  // --- Register user ---
   socket.on('register', (data, cb) => {
     try {
-      const { name, phone, existingUserId } = data || {};
+      const { name, phone } = data || {};
       const userId = data.userId || socketToUser.get(socket.id);
 
       const query = phone ? { phone } : (userId ? { userId } : null);
 
       if (!query) {
         if (typeof cb === 'function') cb({ ok: false, error: 'No identifier provided' });
+        return;
+      }
+
+      // If MongoDB is offline, register in-memory so the app still works
+      if (!isMongoConnected()) {
+        console.warn('[Socket] MongoDB offline - registering user in-memory');
+        const mockUserId = userId || ('mock-' + (phone || crypto.randomUUID()));
+        userSockets.set(mockUserId, socket.id);
+        socketToUser.set(socket.id, mockUserId);
+        socket.join(mockUserId);
+        if (typeof cb === 'function') cb({
+          ok: true,
+          userId: mockUserId,
+          role: data.role || 'client',
+          name: name || 'User',
+          walletBalance: 0,
+          totalEarnings: 0
+        });
         return;
       }
 
@@ -2716,9 +2759,14 @@ io.on('connection', (socket) => {
 
   // --- Get Astrologers List ---
   socket.on('get-astrologers', async (cb) => {
+    // Immediately return empty list if MongoDB is offline (avoids 10s hang)
+    if (!isMongoConnected()) {
+      socket.emit('astrologer-update', []);
+      if (typeof cb === 'function') cb({ astrologers: [] });
+      return;
+    }
     try {
       const astros = await User.find({ role: 'astrologer' });
-      // Emit to this socket directly for compatibility
       socket.emit('astrologer-update', astros);
       if (typeof cb === 'function') cb({ astrologers: astros });
     } catch (e) {
@@ -3908,6 +3956,10 @@ io.on('connection', (socket) => {
   socket.on('get-wallet', async (data) => {
     const userId = socketToUser.get(socket.id);
     if (!userId) return;
+    if (!isMongoConnected()) {
+      socket.emit('wallet-update', { balance: 0, totalEarnings: 0 });
+      return;
+    }
     try {
       const u = await User.findOne({ userId });
       if (u) {
