@@ -91,10 +91,10 @@ fun CosmicAppTheme(
 
             (currentContext as? Activity)?.let { activity ->
                 val window = activity.window
-                window.statusBarColor = Color.White.toArgb() // Pure White
-                window.navigationBarColor = Color.White.toArgb()
-                // isAppearanceLightStatusBars = true means DARK icons for LIGHT background
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+                window.statusBarColor = Color(0xFF0B0F1A).toArgb() // Celestial Dark
+                window.navigationBarColor = Color(0xFF0B0F1A).toArgb()
+                // isAppearanceLightStatusBars = false means LIGHT icons for DARK background
+                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
             }
         }
     }
@@ -103,10 +103,10 @@ fun CosmicAppTheme(
         LocalThemeColors provides pageColors
     ) {
         MaterialTheme(
-             colorScheme = androidx.compose.material3.lightColorScheme(
+             colorScheme = androidx.compose.material3.darkColorScheme(
                  primary = pageColors.headerStart,
                  secondary = pageColors.accent,
-                 background = Color.White, // Pure White
+                 background = Color(0xFF0B0F1A), 
                  surface = pageColors.cardBg,
                  onPrimary = Color.White,
                  onSecondary = Color.White,

@@ -4065,12 +4065,19 @@ io.on('connection', (socket) => {
       }
 
       try {
-        // If Astrologer, use grace period before marking offline
+        // If Astrologer, mark offline on disconnect
         const user = await User.findOne({ userId });
         if (user && user.role === 'astrologer') {
-          // Save current status before potential offline
-          return; // Manual Toggle Rule: Skip offline marking
-
+          console.log(`[Offline] Astrologer ${userId} disconnected. Marking offline.`);
+          await User.updateOne({ userId }, {
+            isAvailable: false,
+            isOnline: false,
+            isChatOnline: false,
+            isAudioOnline: false,
+            isVideoOnline: false,
+            lastSeen: new Date()
+          });
+          await broadcastAstroUpdate();
         }
       } catch (e) { console.error('Disconnect DB error', e); }
 

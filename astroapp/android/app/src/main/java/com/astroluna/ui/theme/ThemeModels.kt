@@ -30,18 +30,18 @@ data class ThemeColors(
 
 object ThemePalette {
 
-    // Base Premium Template
+    // Base Premium Template - Celestial Dark
     private val PremiumTemplate = ThemeColors(
-        bgStart = Color(0xFFFFFFFF), // Pure White Background
-        bgCenter = Color(0xFFFFFFFF),
-        bgEnd = Color(0xFFFFFFFF),
-        headerStart = Color(0xFF4A148C), // Primary Deep Purple
-        headerEnd = Color(0xFF4A148C),
-        cardBg = Color(0xFFFFFFFF),
-        cardStroke = Color(0xFF4A148C), // Purple Borders
-        textPrimary = Color(0xFF1C1F26),
-        textSecondary = Color(0xFF6B7280),
-        accent = Color(0xFF4A148C) // Accent Purple
+        bgStart = Color(0xFF0B0F1A), // Deep Cosmic Dark
+        bgCenter = Color(0xFF161B2E), // Secondary Deep Blue
+        bgEnd = Color(0xFF0B0F1A),
+        headerStart = Color(0xFF7C3AED), // Premium Purple
+        headerEnd = Color(0xFFC026D3), // Vibrant Magenta
+        cardBg = Color(0xFF161B2E), // Surface Blue
+        cardStroke = Color(0xFF2E344E), // Subtle Glass Border
+        textPrimary = Color(0xFFFFFFFF), // Pure White
+        textSecondary = Color(0xFF94A3B8), // Muted Slate
+        accent = Color(0xFFF59E0B) // Celestial Gold
     )
 
     // All themes are now forced to Premium as requested

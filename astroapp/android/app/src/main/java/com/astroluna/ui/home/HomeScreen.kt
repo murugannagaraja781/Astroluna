@@ -229,8 +229,8 @@ fun PremiumCard(
 ) {
     Card(
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = androidx.compose.foundation.BorderStroke(1.dp, colorResource(id = com.astroluna.R.color.surface_border)),
+    colors = CardDefaults.cardColors(containerColor = CosmicAppTheme.colors.cardBg),
+    border = androidx.compose.foundation.BorderStroke(1.dp, CosmicAppTheme.colors.cardStroke),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Using custom shadow wrapper if possible, or high elevation
         modifier = modifier
             .shadow(
@@ -312,8 +312,7 @@ fun HomeScreen(
     val filteredAstros = remember(selectedFilter, selectedTab, astrologers) {
         val list = when(selectedTab) {
             1 -> astrologers.sortedWith(compareByDescending<Astrologer> { it.isChatOnline }.thenByDescending { it.experience })
-            2 -> astrologers.sortedWith(compareByDescending<Astrologer> { it.isVideoOnline }.thenByDescending { it.experience })
-            3 -> astrologers.sortedWith(compareByDescending<Astrologer> { it.isAudioOnline }.thenByDescending { it.experience })
+            2 -> astrologers.sortedWith(compareByDescending<Astrologer> { it.isAudioOnline || it.isVideoOnline }.thenByDescending { it.experience })
             else -> astrologers
         }
 
@@ -375,13 +374,14 @@ fun HomeScreen(
                     scope.launch { drawerState.close() }
                     onDrawerItemClick(item)
                     if (item == "Logout") onLogoutClick()
+                    if (item == "Referral") selectedTab = 3
                 },
                 onClose = { scope.launch { drawerState.close() } }
             )
         }
     ) {
         Scaffold(
-            containerColor = RoyalMidnightBlue,
+            containerColor = CosmicAppTheme.colors.bgStart,
             topBar = {
                 HomeTopBar(
                     balance = walletBalance,
@@ -415,7 +415,7 @@ fun HomeScreen(
                 Box(modifier = Modifier.fillMaxSize().background(CosmicAppTheme.backgroundBrush))
                 StarField()
 
-                if (selectedTab == 5) {
+                if (selectedTab == 3) { // Tab 3 is now Referral
                     ReferralDashboard(
                         referralCode = referralCode,
                         isTamil = isTamil
@@ -456,10 +456,9 @@ fun HomeScreen(
                         item { CustomerStoriesSection() }
                         item {
                             val title = when(selectedTab) {
-                                1 -> Localization.get("chat_services", isTamil)
-                                2 -> Localization.get("video_call", isTamil)
-                                3 -> Localization.get("audio_call", isTamil)
-                                else -> Localization.get("premium_consultation", isTamil)
+                                1 -> if(isTamil) "அரட்டை சேவைகள்" else "Chat Services"
+                                2 -> if(isTamil) "அழைப்பு சேவைகள்" else "Call Services"
+                                else -> if(isTamil) "பிரீமியம் ஆலோசனை" else "Premium Consultation"
                             }
                             Text(
                                 text = title,
@@ -990,13 +989,13 @@ fun PolicyLink(label: String, url: String, context: android.content.Context) {
 fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
     val context = LocalContext.current
     ModalDrawerSheet(
-        drawerContainerColor = Color(0xFFF8F9FA), // Light Color (User Request)
-        drawerContentColor = Color.DarkGray
+        drawerContainerColor = CosmicAppTheme.colors.bgStart,
+        drawerContentColor = Color.White
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFFF8F9FA)) // Light BG
+                .background(CosmicAppTheme.colors.bgStart) 
                 .padding(24.dp)
         ) {
             // Close Button Row
@@ -1008,7 +1007,7 @@ fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
                     Icon(
                         imageVector = androidx.compose.material.icons.Icons.Default.Close,
                         contentDescription = "Close Drawer",
-                        tint = Color.Red // Red Color (User Request)
+                        tint = Color.White
                     )
                 }
             }
@@ -1023,21 +1022,21 @@ fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
                     .border(2.dp, Color.Gray, CircleShape)
             )
             Spacer(modifier = Modifier.height(12.dp))
-            Text("User Profile", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = Color.DarkGray) // Strong Gray
-            Text("Edit Profile", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+            Text("User Profile", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = Color.White)
+            Text("Edit Profile", style = MaterialTheme.typography.bodySmall, color = Color.White.copy(alpha = 0.6f))
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         // Drawer Items
-        val items = listOf("Home", "Profile", "Terms & Conditions", "Privacy Policy", "Settings", "Logout")
+        val items = listOf("Home", "Profile", "Referral", "Terms & Conditions", "Privacy Policy", "Settings", "Logout")
         items.forEach { item ->
             NavigationDrawerItem(
                 label = {
                     Text(
                         text = item,
-                        color = if(item == "Logout") Color.Red else Color.DarkGray, // Strong Gray / Red for logout might be nice, but strict request says "fornt garay color stonrg"
-                        fontWeight = FontWeight.Bold
+                        color = if(item == "Logout") Color(0xFFEF4444) else Color.White,
+                        fontWeight = FontWeight.Normal
                     )
                 },
                 selected = false,
@@ -1058,6 +1057,10 @@ fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
                             } catch (e: Exception) {
                                 android.widget.Toast.makeText(context, "Cannot open link", android.widget.Toast.LENGTH_SHORT).show()
                             }
+                        }
+                        "Referral" -> {
+                            onClose()
+                            onTabSelected(3) // Switch to Referral Tab
                         }
                         else -> onItemClick(item)
                     }
@@ -1213,7 +1216,7 @@ fun RasiItemView(item: ComposeRasiItem, onClick: (ComposeRasiItem) -> Unit) {
         Text(
             text = Localization.get(item.name.lowercase(), true),
             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            color = Color.DarkGray, // Visible on White Container
+            color = Color.White, 
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -1271,9 +1274,9 @@ fun AstrologerCard(
                 context.startActivity(intent)
             },
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = CosmicAppTheme.colors.cardBg),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // Handled by shadow modifier
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha = 0.5f)) // Subtle SaaS border
+        border = androidx.compose.foundation.BorderStroke(1.dp, CosmicAppTheme.colors.cardStroke)
     ) {
         Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
             Row(
@@ -1315,7 +1318,7 @@ fun AstrologerCard(
                          Text(
                              text = astro.name,
                              style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                             color = Color(0xFF0F172A), // Slate 900
+                             color = Color.White,
                              maxLines = 1,
                              overflow = TextOverflow.Ellipsis,
                              modifier = Modifier.weight(1f, fill = false)
@@ -1375,7 +1378,7 @@ fun AstrologerCard(
                      }
                  }
 
-                 Row(
+                  Row(
                      modifier = Modifier.fillMaxWidth(),
                      horizontalArrangement = Arrangement.spacedBy(4.dp)
                  ) {
@@ -1390,26 +1393,44 @@ fun AstrologerCard(
                           )
                       }
 
-                      if (showCall) {
-                          AstrologerActionButton(
-                              text = "Audio",
-                              icon = Icons.Default.Phone,
-                              isEnabled = astro.isAudioOnline,
-                              color = if (astro.isAudioOnline) Color(0xFF10B981) else Color.Gray,
-                              onClick = { onCallClick(astro, "Audio") },
-                              modifier = Modifier.weight(1f)
-                          )
-                      }
+                      var showCallChoices by remember { mutableStateOf(false) }
 
-                      if (showVideo) {
+                      Box(modifier = Modifier.weight(1f)) {
                           AstrologerActionButton(
-                              text = "Video",
-                              icon = Icons.Default.PlayArrow,
-                              isEnabled = astro.isVideoOnline,
-                              color = if (astro.isVideoOnline) Color(0xFF10B981) else Color.Gray,
-                              onClick = { onCallClick(astro, "Video") },
-                              modifier = Modifier.weight(1f)
+                              text = if(showCallChoices) "Choose" else "Call",
+                              icon = Icons.Default.Phone,
+                              isEnabled = astro.isAudioOnline || astro.isVideoOnline,
+                              color = if (astro.isAudioOnline || astro.isVideoOnline) Color(0xFF10B981) else Color.Gray,
+                              onClick = { showCallChoices = !showCallChoices },
+                              modifier = Modifier.fillMaxWidth()
                           )
+
+                          DropdownMenu(
+                              expanded = showCallChoices,
+                              onDismissRequest = { showCallChoices = false },
+                              modifier = Modifier.background(CosmicAppTheme.colors.cardBg).border(1.dp, CosmicAppTheme.colors.cardStroke)
+                          ) {
+                              if (astro.isAudioOnline) {
+                                  DropdownMenuItem(
+                                      text = { Text("Audio Call", color = Color.White) },
+                                      onClick = {
+                                          showCallChoices = false
+                                          onCallClick(astro, "Audio")
+                                      },
+                                      leadingIcon = { Icon(Icons.Default.Phone, null, tint = Color(0xFF10B981)) }
+                                  )
+                              }
+                              if (astro.isVideoOnline) {
+                                  DropdownMenuItem(
+                                      text = { Text("Video Call", color = Color.White) },
+                                      onClick = {
+                                          showCallChoices = false
+                                          onCallClick(astro, "Video")
+                                      },
+                                      leadingIcon = { Icon(Icons.Default.PlayArrow, null, tint = Color(0xFF10B981)) }
+                                  )
+                              }
+                          }
                       }
                  }
             }
@@ -1420,14 +1441,14 @@ fun AstrologerCard(
 @Composable
 fun HomeBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
     NavigationBar(
-        containerColor = Color.White,
-        contentColor = PeacockGreen
+        containerColor = CosmicAppTheme.colors.bgStart,
+        contentColor = CosmicAppTheme.colors.accent
     ) {
         val items = listOf(
             Triple("Home", androidx.compose.material.icons.Icons.Default.Home, 0),
             Triple("Chat", androidx.compose.material.icons.Icons.Default.Send, 1),
-            Triple("Video", androidx.compose.material.icons.Icons.Default.PlayArrow, 2),
-            Triple("Audio", androidx.compose.material.icons.Icons.Default.Phone, 3),
+            Triple("Call", androidx.compose.material.icons.Icons.Default.Phone, 2),
+            Triple("Referral", androidx.compose.material.icons.Icons.Default.Share, 3),
             Triple("Profile", androidx.compose.material.icons.Icons.Default.Person, 4)
         )
 
@@ -1439,8 +1460,8 @@ fun HomeBottomBar(selectedTab: Int, onTabSelected: (Int) -> Unit) {
                 onClick = { onTabSelected(index) },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color.White,
-                    selectedTextColor = PeacockGreen,
-                    indicatorColor = PeacockGreen,
+                    selectedTextColor = CosmicAppTheme.colors.accent,
+                    indicatorColor = CosmicAppTheme.colors.accent,
                     unselectedIconColor = Color.Gray.copy(alpha = 0.6f),
                     unselectedTextColor = Color.Gray.copy(alpha = 0.6f)
                 )
@@ -1456,9 +1477,9 @@ fun DailyHoroscopeCard(content: String) {
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = CosmicAppTheme.colors.cardBg),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFF1F5F9)) // Slate 100
+        border = androidx.compose.foundation.BorderStroke(1.dp, CosmicAppTheme.colors.cardStroke) 
     ) {
         Column(
             modifier = Modifier
@@ -1529,8 +1550,8 @@ fun RasiGridSection(onClick: (ComposeRasiItem) -> Unit) {
     // User Request: "12 rasi contain have one box that box bf use that bg" (Customer Style)
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha=0.5f)),
+        colors = CardDefaults.cardColors(containerColor = CosmicAppTheme.colors.cardBg),
+        border = androidx.compose.foundation.BorderStroke(1.dp, CosmicAppTheme.colors.cardStroke),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
@@ -1571,7 +1592,7 @@ fun InfoRow(icon: ImageVector, text: String) {
         Text(
             text = text,
             style = MaterialTheme.typography.bodySmall,
-            color = Color.DarkGray,
+            color = Color.White.copy(alpha = 0.7f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -1762,8 +1783,8 @@ fun ServiceItem(name: String, iconRes: Int, onClick: () -> Unit) {
     // MARKETPLACE SHORTCUT STYLE: White, 12dp, Thin Red Outline
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = androidx.compose.foundation.BorderStroke(1.dp, colorResource(id = com.astroluna.R.color.marketplace_red)),
+        colors = CardDefaults.cardColors(containerColor = CosmicAppTheme.colors.cardBg),
+        border = androidx.compose.foundation.BorderStroke(1.dp, CosmicAppTheme.colors.cardStroke),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .size(width = 80.dp, height = 90.dp)
@@ -1806,7 +1827,7 @@ fun CustomerStoriesSection() {
         Text(
             text = "Customer Stories",
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            color = Color.Black,
+            color = Color.White,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
@@ -1828,8 +1849,8 @@ fun CustomerStoriesSection() {
 fun CustomerStoryCard(name: String, loc: String, review: String) {
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha=0.5f)),
+        colors = CardDefaults.cardColors(containerColor = CosmicAppTheme.colors.cardBg),
+        border = androidx.compose.foundation.BorderStroke(1.dp, CosmicAppTheme.colors.cardStroke),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier.width(260.dp)
     ) {
@@ -1845,7 +1866,7 @@ fun CustomerStoryCard(name: String, loc: String, review: String) {
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = name, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(text = name, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(imageVector = Icons.Default.Menu, contentDescription=null, modifier=Modifier.size(16.dp), tint=Color.Gray) // 3-dot placeholder
                 }
@@ -1900,7 +1921,7 @@ fun StickyFooterButtons(
                  if (isGuest) {
                     onLoginClick()
                 } else {
-                    onTabSelected(3) // Tab 3 = Call
+                onTabSelected(2) // Tab 2 = Call
                 }
             },
             colors = ButtonDefaults.buttonColors(containerColor = colorResource(id = com.astroluna.R.color.marketplace_yellow), contentColor = Color.Black),
