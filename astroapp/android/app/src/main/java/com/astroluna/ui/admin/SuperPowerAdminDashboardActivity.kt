@@ -98,7 +98,19 @@ fun SuperPowerScreen(
                 title = { Text("Admin Dashboard", color = MaterialTheme.colorScheme.onBackground) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
-                )
+                ),
+                actions = {
+                    IconButton(onClick = {
+                        val tokenManager = com.astroluna.data.local.TokenManager(context)
+                        tokenManager.clearSession()
+                        val intent = Intent(context, com.astroluna.ui.guest.GuestDashboardActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        context.startActivity(intent)
+                        (context as? android.app.Activity)?.finish()
+                    }) {
+                        Icon(androidx.compose.material.icons.Icons.Default.ExitToApp, "Logout", tint = MaterialTheme.colorScheme.primary)
+                    }
+                }
             )
         }
     ) { padding ->

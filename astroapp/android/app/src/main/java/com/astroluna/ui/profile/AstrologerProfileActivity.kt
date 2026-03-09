@@ -91,7 +91,7 @@ fun AstrologerProfileScreen(
     onAction: (String) -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val peacockTeal = Color(0xFF004D40)
+    val headerColor = CosmicAppTheme.colors.headerStart
     val yellowAccent = Color(0xFFFFD54F)
 
     Scaffold(
@@ -121,7 +121,7 @@ fun AstrologerProfileScreen(
                         Icon(Icons.Default.Share, "Share", tint = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = peacockTeal)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = headerColor)
             )
         }
     ) { padding ->
@@ -142,7 +142,7 @@ fun AstrologerProfileScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
-                        .background(peacockTeal)
+                        .background(headerColor)
                 )
 
                 // Avatar
@@ -171,14 +171,14 @@ fun AstrologerProfileScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape)
-                            .border(4.dp, Color(0xFF1B5E20), CircleShape),
+                            .border(4.dp, Color(0xFF059669), CircleShape),
                         contentScale = ContentScale.Crop
                     )
                    // Verified Badge
                     Icon(
-                        imageVector = Icons.Default.Check,
+                        imageVector = Icons.Default.CheckCircle,
                         contentDescription = "Verified",
-                        tint = Color(0xFF4CAF50),
+                        tint = Color(0xFF10B981),
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .size(24.dp)
@@ -201,7 +201,7 @@ fun AstrologerProfileScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(
                             Brush.verticalGradient(
-                                listOf(peacockTeal, Color(0xFF00332E))
+                                listOf(headerColor, headerColor.copy(alpha = 0.8f))
                             )
                         )
                         .shadow(4.dp, RoundedCornerShape(16.dp))

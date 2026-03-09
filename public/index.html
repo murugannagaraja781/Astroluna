@@ -1047,7 +1047,7 @@
     .price-tag .value {
       font-size: 1.1rem;
       font-weight: 800;
-      color: #0f172a;
+      color: var(--text-main);
     }
 
     .price-tag .unit {
@@ -3954,6 +3954,7 @@
               <span style="font-size: 0.75rem; color: rgba(255,255,255,0.8); font-weight: 600;">System Active</span>
             </div>
           </div>
+          <i class="fas fa-sign-out-alt logout-btn-top" onclick="clearSession()" title="Logout"></i>
         </div>
         <!-- Service Controls -->
         <div class="service-status-grid">
@@ -4033,6 +4034,11 @@
             <div class="action-icon"><i class="fas fa-cog"></i></div>
             <span style="font-size: 0.8rem; font-weight: 600;">Settings</span>
           </div>
+          <div class="action-item" onclick="clearSession()"
+            style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);">
+            <div class="action-icon" style="color: #EF4444;"><i class="fas fa-sign-out-alt"></i></div>
+            <span style="font-size: 0.8rem; font-weight: 600; color: #EF4444;">Logout</span>
+          </div>
         </div>
       </div>
 
@@ -4062,6 +4068,24 @@
           right: 20px;
           font-size: 3rem;
           color: rgba(255, 255, 255, 0.05);
+        }
+
+        .logout-btn-top {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          font-size: 1.2rem;
+          color: white;
+          cursor: pointer;
+          opacity: 0.7;
+          transition: 0.2s;
+          padding: 10px;
+          z-index: 10;
+        }
+
+        .logout-btn-top:hover {
+          opacity: 1;
+          transform: scale(1.1);
         }
 
         .astro-banner-img {
@@ -4396,6 +4420,54 @@
     </div>
 
     <!-- Screen: Recharge Wallet Modal -->
+    <!-- Screen: Main Wallet Modal (New) -->
+    <div id="screen-main-wallet" class="modal-overlay hidden"
+      style="align-items: center; justify-content: center; z-index: 20000; background: rgba(0, 0, 0, 0.7);">
+      <div class="call-popup"
+        style="width: 90%; max-width: 380px; text-align: center; position: relative; padding: 25px; background: white; border-radius: 24px; color: #1f2937;">
+        <button onclick="document.getElementById('screen-main-wallet').classList.add('hidden')" class="close-btn"
+          style="position: absolute; right: 15px; top: 15px; color: #9ca3af; border:none; background:none; font-size:1.2rem;"><i
+            class="fas fa-times"></i></button>
+
+        <div style="font-size: 3rem; margin-bottom: 10px;">💳</div>
+        <h2 style="margin: 0; color: #111827; font-size: 1.5rem; font-weight: 800;">My Wallet</h2>
+        <p style="color: #6b7280; font-size: 0.9rem; margin-top: 5px;">Manage your cosmic balance</p>
+
+        <div style="margin: 25px 0; display: flex; flex-direction: column; gap: 12px;">
+          <div
+            style="background: #f3f4f6; padding: 15px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="text-align: left;">
+              <div style="font-size: 0.75rem; color: #6b7280; font-weight: 600; text-transform: uppercase;">Main Wallet
+              </div>
+              <div style="font-size: 1.5rem; font-weight: 800; color: #111827;">₹<span id="mainWalletVal">0.00</span>
+              </div>
+            </div>
+            <i class="fas fa-wallet" style="color: #059669; font-size: 1.5rem; opacity: 0.2;"></i>
+          </div>
+
+          <div
+            style="background: #fff1f2; padding: 15px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #fecdd3;">
+            <div style="text-align: left;">
+              <div style="font-size: 0.75rem; color: #e11d48; font-weight: 600; text-transform: uppercase;">Super Wallet
+              </div>
+              <div style="font-size: 1.5rem; font-weight: 800; color: #be123f;">₹<span id="superWalletVal">0.00</span>
+              </div>
+            </div>
+            <i class="fas fa-magic" style="color: #e11d48; font-size: 1.5rem; opacity: 0.2;"></i>
+          </div>
+        </div>
+
+        <p style="font-size: 0.75rem; color: #9ca3af; margin-bottom: 20px; line-height: 1.4;">
+          * Rule: 70% from Main, 30% from Super Wallet.<br>Main Balance required to start sessions.
+        </p>
+
+        <button class="cosmic-btn" onclick="openRecharge()"
+          style="width: 100%; padding: 16px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; border:none; background: #059669; color:white;">
+          <i class="fas fa-plus-circle"></i> Add Money
+        </button>
+      </div>
+    </div>
+
     <div id="screen-recharge" class="modal-overlay hidden"
       style="align-items: center; justify-content: center; z-index: 20000;">
       <div class="call-popup"
@@ -5380,6 +5452,119 @@
         </div>
 
         <!-- Screen: Incoming Call (CRITICAL - was missing, causing null ptr errors) -->
+        <!-- Screen: History -->
+        <div id="screen-history" class="modal-overlay hidden">
+          <div
+            style="background: white; width: 90%; max-width: 400px; height: 80%; border-radius: 20px; display: flex; flex-direction: column; overflow: hidden;">
+            <div
+              style="padding: 15px; background: #f3f4f6; font-weight: bold; display: flex; justify-content: space-between; align-items: center; color: #111827;">
+              <span>Consultation History</span>
+              <button onclick="document.getElementById('screen-history').classList.add('hidden')"
+                style="background: none; border: none; font-size: 1.2rem; cursor: pointer;"><i
+                  class="fas fa-times"></i></button>
+            </div>
+            <div id="historyList" style="flex: 1; overflow-y: auto; padding: 15px;">
+              <!-- History Items -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Screen: Horoscope Match Modal -->
+        <div id="screen-porutham" class="modal-overlay hidden" style="align-items: center;">
+          <div class="chart-modal-content"
+            style="max-width: 800px; height: 90vh; background: white; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column;">
+            <div
+              style="padding:20px; background:white; font-weight:700; font-size:1.2rem; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e5e5e5; color:#1F2937;">
+              <span>💞 Horoscope Matching (Porutham)</span>
+              <button onclick="document.getElementById('screen-porutham').classList.add('hidden')"
+                style="background:none; border:none; font-size:1.4rem; color:#6B7280; cursor:pointer;"><i
+                  class="fas fa-times"></i></button>
+            </div>
+
+            <div class="chart-body" style="padding: 20px; overflow-y: auto; flex: 1;">
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Boy Details -->
+                <div class="input-card" style="background: #f8fafc; padding: 20px; border-radius: 15px;">
+                  <div style="font-weight:bold; color:#3b82f6; margin-bottom:15px; font-size:1.1rem;">🤵 Boy's
+                    Details
+                  </div>
+
+                  <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Date of
+                    Birth</label>
+                  <input type="date" id="boyDate" class="cosmic-input"
+                    style="background:#fff; color:black; border:1px solid #ddd; width: 100%; border-radius: 8px; padding: 10px;">
+
+                  <label style="display:block; margin-bottom:5px; margin-top:10px; font-size:0.9rem; color:#666;">Time
+                    of Birth</label>
+                  <input type="time" id="boyTime" class="cosmic-input"
+                    style="background:#fff; color:black; border:1px solid #ddd; width: 100%; border-radius: 8px; padding: 10px;">
+
+                  <label
+                    style="display:block; margin-bottom:5px; margin-top:10px; font-size:0.9rem; color:#666;">City</label>
+                  <div style="position:relative;">
+                    <input type="text" id="boyCity" class="cosmic-input" placeholder="Search City..."
+                      oninput="handleMatchCitySearch(this, 'boy')"
+                      style="background:#fff; color:black; border:1px solid #ddd; width: 100%; border-radius: 8px; padding: 10px;">
+                    <div id="boyCityResults" class="city-results-dropdown"
+                      style="display:none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 10;">
+                    </div>
+                    <input type="hidden" id="boyLat">
+                    <input type="hidden" id="boyLon">
+                    <input type="hidden" id="boyTz" value="5.5">
+                  </div>
+                </div>
+
+                <!-- Girl Details -->
+                <div class="input-card" style="background: #fdf2f8; padding: 20px; border-radius: 15px;">
+                  <div style="font-weight:bold; color:#ec4899; margin-bottom:15px; font-size:1.1rem;">👰 Girl's
+                    Details</div>
+
+                  <label style="display:block; margin-bottom:5px; font-size:0.9rem; color:#666;">Date of
+                    Birth</label>
+                  <input type="date" id="girlDate" class="cosmic-input"
+                    style="background:#fff; color:black; border:1px solid #ddd; width: 100%; border-radius: 8px; padding: 10px;">
+
+                  <label style="display:block; margin-bottom:5px; margin-top:10px; font-size:0.9rem; color:#666;">Time
+                    of Birth</label>
+                  <input type="time" id="girlTime" class="cosmic-input"
+                    style="background:#fff; color:black; border:1px solid #ddd; width: 100%; border-radius: 8px; padding: 10px;">
+
+                  <label
+                    style="display:block; margin-bottom:5px; margin-top:10px; font-size:0.9rem; color:#666;">City</label>
+                  <div style="position:relative;">
+                    <input type="text" id="girlCity" class="cosmic-input" placeholder="Search City..."
+                      oninput="handleMatchCitySearch(this, 'girl')"
+                      style="background:#fff; color:black; border:1px solid #ddd; width: 100%; border-radius: 8px; padding: 10px;">
+                    <div id="girlCityResults" class="city-results-dropdown"
+                      style="display:none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 10;">
+                    </div>
+                    <input type="hidden" id="girlLat">
+                    <input type="hidden" id="girlLon">
+                    <input type="hidden" id="girlTz" value="5.5">
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-top:20px;">
+                <button onclick="calculatePorutham()" class="cosmic-btn"
+                  style="width:100%; padding:15px; font-size:1.1rem; border-radius: 12px; background: #8B5CF6; color: white; border: none; font-weight: bold; cursor: pointer;">
+                  <i class="fas fa-heart"></i> Calculate Compatibility
+                </button>
+              </div>
+
+              <div id="poruthamLoading" style="display:none; text-align:center; padding:40px; color: #8B5CF6;">
+                <div style="margin-top:15px; font-weight:500;">Calculating Porutham...</div>
+              </div>
+
+              <!-- Results -->
+              <div id="poruthamResults" style="display:none; margin-top:30px; color: #111827;">
+                <!-- Populated by JS -->
+              </div>
+
+            </div>
+          </div>
+        </div>
+
         <div id="screen-incoming" class="hidden"
           style="position:fixed; inset:0; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 9999; display:flex; align-items:center; justify-content:center;">
           <div
@@ -5693,6 +5878,284 @@
             }
             window.location.reload();
           }
+
+          // --- Translation Helper ---
+          const tamilDict = {
+            'Consultation History': 'ஆலோசனை வரலாறு',
+            'No History Found': 'வரலாறு எதுவும் இல்லை',
+            'Compatibility Score': 'பொருத்த மதிப்பெண்',
+            'points matched': 'புள்ளிகள் பொருந்தியுள்ளன',
+            'Boy': 'ஆண்',
+            'Girl': 'பெண்',
+            'Rasi': 'ராசி',
+            'Yes': 'ஆம்',
+            'No': 'இல்லை',
+            'Kuja Dosha': 'செவ்வாய் தோஷம்',
+            'Dasha Sandhi': 'தசா சந்தி',
+            'Overlap': 'சந்திப்பு உண்டு',
+            'No Overlap': 'சந்திப்பு இல்லை',
+            'Severe': 'கடுமையானது',
+            'Advisable': 'பொருத்தம் உண்டு',
+            'Not Advisable': 'பொருத்தம் போதாது',
+            'Aries': 'மேஷம்', 'Taurus': 'ரிஷபம்', 'Gemini': 'மிதுனம்', 'Cancer': 'கடகம்',
+            'Leo': 'சிம்மம்', 'Virgo': 'கன்னி', 'Libra': 'துலாம்', 'Scorpio': 'விருச்சிகம்',
+            'Sagittarius': 'தனுசு', 'Capricorn': 'மகரம்', 'Aquarius': 'கும்பம்', 'Pisces': 'மீனம்'
+          };
+
+          function t(key) {
+            if (state.lang === 'en') return key;
+            return tamilDict[key] || key;
+          }
+
+          // --- Main Wallet Modal Logic ---
+          window.openMainWallet = function () {
+            const modal = document.getElementById('screen-main-wallet');
+            if (!modal) return;
+
+            // Update balances
+            document.getElementById('mainWalletVal').innerText = Number(state.me?.walletBalance || 0).toFixed(2);
+            document.getElementById('superWalletVal').innerText = Number(state.me?.superWalletBalance || 0).toFixed(2);
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+          };
+
+          window.closeMainWallet = function () {
+            const modal = document.getElementById('screen-main-wallet');
+            if (modal) {
+              modal.classList.add('hidden');
+              modal.classList.remove('flex');
+            }
+          };
+
+          window.openRecharge = function () {
+            closeMainWallet();
+            const rechargeModal = document.getElementById('screen-recharge');
+            if (rechargeModal) {
+              rechargeModal.classList.remove('hidden');
+              rechargeModal.classList.add('flex');
+            }
+          };
+
+          // --- History Logic ---
+          function showHistory() {
+            const modal = document.getElementById('screen-history');
+            const list = document.getElementById('historyList');
+            if (!modal || !list) return;
+
+            list.innerHTML = '<div style="text-align:center; margin-top:20px;">Loading History...</div>';
+            modal.classList.remove('hidden');
+
+            socket.emit('get-history', (res) => {
+              if (!res.ok || !res.sessions) {
+                list.innerHTML = '<div style="text-align:center; color:red;">Failed to load.</div>';
+                return;
+              }
+
+              if (res.sessions.length === 0) {
+                list.innerHTML = `<div style="text-align:center; color:#999; margin-top:50px;">${t('No History Found')}</div>`;
+                return;
+              }
+
+              list.innerHTML = '';
+              res.sessions.forEach(s => {
+                const date = new Date(s.startTime).toLocaleString();
+                let duraText = '0m 0s';
+                if (s.duration) {
+                  const totalSec = Math.floor(s.duration / 1000);
+                  const m = Math.floor(totalSec / 60);
+                  const s_left = totalSec % 60;
+                  duraText = m > 0 ? `${m}m ${s_left}s` : `${s_left}s`;
+                }
+
+                const isAstro = state.me.role === 'astrologer';
+                const otherId = (s.fromUserId === state.me.userId) ? s.toUserId : s.fromUserId;
+                const amount = isAstro ? (s.totalEarned || 0) : (s.totalCharged || 0);
+                const amountLabel = isAstro ? 'Earned' : 'Paid';
+
+                const item = document.createElement('div');
+                item.style.cssText = 'background: white; padding: 15px; margin-bottom: 15px; border-radius: 16px; border: 1px solid #f0f0f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);';
+                item.innerHTML = `
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                    <div>
+                      <div style="font-weight:700; font-size:1.1rem; color:#1e3a8a; display:flex; align-items:center; gap:8px;">
+                        <i class="fas ${s.type === 'video' ? 'fa-video' : (s.type === 'chat' ? 'fa-comment' : 'fa-phone-alt')}" style="font-size:0.9rem; color:#F59E0B;"></i>
+                        ${s.type.toUpperCase()}
+                      </div>
+                      <div style="font-size:0.8rem; color:#6B7280; margin-top: 4px; font-family:monospace;">ID: ${otherId ? otherId.slice(0, 8) : '---'}</div>
+                    </div>
+                    <div style="font-size:0.75rem; color:#9CA3AF; text-align: right; background:#f8fafc; padding:4px 8px; border-radius:6px;">${date}</div>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding-top:12px; border-top:1px solid #f1f5f9;">
+                     <div style="display:flex; flex-direction:column;">
+                        <span style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase;">Duration</span>
+                        <span style="font-size:0.95rem; font-weight:600; color:#334155;">${duraText}</span>
+                     </div>
+                     <div style="display:flex; flex-direction:column; align-items:flex-end;">
+                        <span style="font-size:0.7rem; color:#94a3b8; text-transform:uppercase;">${amountLabel}</span>
+                        <span style="font-size:1.1rem; font-weight:800; color:${isAstro ? '#059669' : '#1e3a8a'};">₹${amount.toFixed(2)}</span>
+                     </div>
+                  </div>
+                `;
+                list.appendChild(item);
+              });
+            });
+          }
+
+          // --- Porutham Logic ---
+          window.calculatePorutham = async function () {
+            const bDate = document.getElementById('boyDate').value;
+            const bTime = document.getElementById('boyTime').value;
+            const bLat = document.getElementById('boyLat').value || 13.0827;
+            const bLon = document.getElementById('boyLon').value || 80.2707;
+            const bTz = document.getElementById('boyTz').value || 5.5;
+
+            const gDate = document.getElementById('girlDate').value;
+            const gTime = document.getElementById('girlTime').value;
+            const gLat = document.getElementById('girlLat').value || 13.0827;
+            const gLon = document.getElementById('girlLon').value || 80.2707;
+            const gTz = document.getElementById('girlTz').value || 5.5;
+
+            if (!bDate || !bTime || !gDate || !gTime) {
+              alert('Please fill all birth details for both partners');
+              return;
+            }
+
+            document.getElementById('poruthamLoading').style.display = 'block';
+            document.getElementById('poruthamResults').style.display = 'none';
+
+            try {
+              const payload = {
+                boyData: { dob: bDate, tob: bTime, lat: parseFloat(bLat), lng: parseFloat(bLon), timezone: parseFloat(bTz) },
+                girlData: { dob: gDate, tob: gTime, lat: parseFloat(gLat), lng: parseFloat(gLon), timezone: parseFloat(gTz) }
+              };
+
+              const res = await fetch('/api/rasi-eng/matching', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              }).then(r => r.json());
+
+              document.getElementById('poruthamLoading').style.display = 'none';
+              if (res.error) throw new Error(res.error);
+              if (!res.data) throw new Error("Invalid response from server");
+
+              displayPoruthamResults(res);
+
+            } catch (e) {
+              console.error('Match Error:', e);
+              document.getElementById('poruthamLoading').style.display = 'none';
+              alert('Error: ' + e.message);
+            }
+          };
+
+          function displayPoruthamResults(res) {
+            const data = res.data || {};
+            const m = data;
+            const div = document.getElementById('poruthamResults');
+
+            const isGood = m.percentage >= 50 && m.poruthams.find(p => p.name === 'Rajju')?.score > 0;
+            const scoreColor = isGood ? '#10b981' : '#ef4444';
+            const verdict = t(m.verdict || (isGood ? 'Advisable' : 'Not Advisable'));
+
+            let html = `
+              <div style="background:white; border-radius:15px; border:1px solid #e5e7eb; overflow:hidden; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom:20px;">
+                 <div style="background:linear-gradient(135deg, ${scoreColor} 0%, ${scoreColor}dd 100%); padding:25px; text-align:center; color:white;">
+                   <div style="font-size:0.85rem; opacity:0.9; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px;">${t('Compatibility Score')}</div>
+                   <div style="font-size:3rem; font-weight:900; line-height:1; margin-bottom:10px;">${m.percentage}%</div>
+                   <div style="background:rgba(255,255,255,0.2); display:inline-block; padding:5px 15px; border-radius:20px; font-weight:bold; font-size:1rem;">
+                     ${verdict}
+                   </div>
+                   <div style="margin-top:10px; font-size:0.8rem; opacity:0.8;">${m.totalScore} ${t('points matched')}</div>
+                 </div>
+
+                 <div style="padding:15px;">
+                   <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:15px;">
+                      <div style="background:#eff6ff; padding:12px; border-radius:12px; border:1px solid #dbeafe;">
+                         <div style="font-weight:bold; color:#1e40af; font-size:0.75rem; text-transform:uppercase; margin-bottom:5px;">🤵 ${t('Boy')}</div>
+                         <div style="font-weight:bold; color:#1e3a8a; font-size:0.9rem;">${t(data.boy.nakshatra)}</div>
+                         <div style="font-size:0.75rem; color:#60a5fa;">${t(data.boy.rasi)} ${t('Rasi')}</div>
+                      </div>
+                       <div style="background:#fdf2f8; padding:12px; border-radius:12px; border:1px solid #fce7f3;">
+                         <div style="font-weight:bold; color:#be185d; font-size:0.75rem; text-transform:uppercase; margin-bottom:5px;">👰 ${t('Girl')}</div>
+                         <div style="font-weight:bold; color:#9d174d; font-size:0.9rem;">${t(data.girl.nakshatra)}</div>
+                         <div style="font-size:0.75rem; color:#f472b6;">${t(data.girl.rasi)} ${t('Rasi')}</div>
+                      </div>
+                   </div>
+
+                   <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            `;
+
+            if (m.poruthams && Array.isArray(m.poruthams)) {
+              m.poruthams.forEach(p => {
+                const matched = p.score > 0;
+                const statusIcon = matched ? 'fa-check-circle' : 'fa-times-circle';
+                const statusColor = matched ? '#10b981' : '#f87171';
+                const bg = matched ? '#f0fdf4' : '#fef2f2';
+
+                html += `
+                     <div style="background:${bg}; border:1px solid ${statusColor}20; padding:10px; border-radius:10px; display:flex; flex-direction:column; justify-content:center;">
+                       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                         <span style="font-size:0.7rem; color:#6b7280; font-weight:600;">${t(p.name)}</span>
+                         <i class="fas ${statusIcon}" style="color:${statusColor}; font-size:0.8rem;"></i>
+                       </div>
+                       <div style="font-weight:bold; font-size:0.85rem; color:#374151;">${matched ? t('Yes') : t('No')}</div>
+                       <div style="font-size:0.65rem; color:#9ca3af;">${p.score}/${p.max} Pts</div>
+                     </div>
+                   `;
+              });
+            }
+
+            html += `</div>`;
+            if (m.girlDosha || m.boyDosha || (m.sandhi && m.sandhi.hasSandhi)) {
+              html += `<div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
+                <div style="font-weight:bold; color:#374151; margin-bottom:10px; font-size:0.9rem;">${t('Compatibility Check')}</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                   <div style="background:#fef2f2; padding:10px; border-radius:10px; border:1px solid #fee2e2;">
+                      <div style="font-size:0.7rem; color:#991b1b; font-weight:bold; text-transform:uppercase;">${t('Kuja Dosha')}</div>
+                      <div style="font-size:0.75rem; margin-top:4px;">
+                        <b>G:</b> ${m.girlDosha?.hasDosha ? t('Severe') : t('No')}, <b>B:</b> ${m.boyDosha?.hasDosha ? t('Severe') : t('No')}
+                      </div>
+                   </div>
+                   <div style="background:#f0fdfa; padding:10px; border-radius:10px; border:1px solid #ccfbf1;">
+                      <div style="font-size:0.7rem; color:#0f766e; font-weight:bold; text-transform:uppercase;">${t('Dasha Sandhi')}</div>
+                      <div style="font-size:0.75rem; margin-top:4px;">
+                        ${m.sandhi?.hasSandhi ? '⚠️ ' + t('Overlap') : '✅ ' + t('No Overlap')}
+                      </div>
+                   </div>
+                </div>
+              </div>`;
+            }
+            html += `</div></div>`;
+            div.innerHTML = html;
+            div.style.display = 'block';
+          }
+
+          async function handleMatchCitySearch(input, type) {
+            const query = input.value;
+            const resultsDiv = document.getElementById(type + 'CityResults');
+            if (query.length < 3) { resultsDiv.style.display = 'none'; return; }
+
+            try {
+              const res = await fetch(`/api/geo/cities?q=${encodeURIComponent(query)}`).then(r => r.json());
+              if (res.ok && res.cities.length > 0) {
+                resultsDiv.innerHTML = res.cities.map(c => `
+                  <div class="city-item" style="padding:10px; border-bottom:1px solid #eee; cursor:pointer;"
+                       onclick="selectMatchCity('${type}', '${c.name}', ${c.lat}, ${c.lng})">
+                       ${c.name}
+                  </div>
+                `).join('');
+                resultsDiv.style.display = 'block';
+              }
+            } catch (e) { console.error('City fetch error:', e); }
+          }
+
+          window.selectMatchCity = function (type, name, lat, lon) {
+            document.getElementById(type + 'City').value = name;
+            document.getElementById(type + 'Lat').value = lat;
+            document.getElementById(type + 'Lon').value = lon;
+            document.getElementById(type + 'CityResults').style.display = 'none';
+          };
 
           // Initialize Socket
           const socket = io();

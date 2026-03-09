@@ -598,11 +598,7 @@ fun IntakeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF4A148C), Color(0xFF7B1FA2), Color(0xFFAB47BC))
-                )
-            )
+            .background(CosmicAppTheme.backgroundBrush)
     ) {
         Scaffold(
             containerColor = Color.Transparent,
@@ -612,13 +608,13 @@ fun IntakeScreen(
                     title = {
                         Text(
                             "Consultation Details",
-                            color = Color.White,
+                            color = CosmicAppTheme.colors.textPrimary,
                             fontWeight = FontWeight.Bold
                         )
                     },
                     navigationIcon = {
                         IconButton(onClick = onClose) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = CosmicAppTheme.colors.textPrimary)
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

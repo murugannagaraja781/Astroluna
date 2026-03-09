@@ -770,7 +770,8 @@ fun AstrologerDashboardScreen(
                 "Earnings" to Icons.Default.AddCircle,
                 "Reviews" to Icons.Default.Star,
                 "History" to Icons.Default.Refresh,
-                "Profile" to Icons.Default.Person
+                "Profile" to Icons.Default.Person,
+                "Logout" to Icons.Default.ExitToApp
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -798,6 +799,7 @@ fun AstrologerDashboardScreen(
                                              "Profile" -> context.startActivity(Intent(context, com.astroluna.ui.settings.SettingsActivity::class.java))
                                              "History" -> context.startActivity(Intent(context, com.astroluna.ui.astro.AstrologerHistoryActivity::class.java))
                                              "Earnings" -> Toast.makeText(context, "Fetching Data...", Toast.LENGTH_SHORT).show()
+                                             "Logout" -> onLogout()
                                          }
                                      }
                              ) {
