@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -108,7 +110,7 @@ fun SuperPowerScreen(
                         context.startActivity(intent)
                         (context as? android.app.Activity)?.finish()
                     }) {
-                        Icon(androidx.compose.material.icons.Icons.Default.ExitToApp, "Logout", tint = MaterialTheme.colorScheme.primary)
+                        Icon(Icons.Default.ExitToApp, "Logout", tint = MaterialTheme.colorScheme.primary)
                     }
                 }
             )

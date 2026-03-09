@@ -51,6 +51,11 @@ fun ConsultHistoryScreen(onBack: () -> Unit) {
 
     LaunchedEffect(Unit) {
         val socket = SocketManager.getSocket()
+        if (socket == null) {
+            isLoading = false
+            error = "Not connected to server"
+            return@LaunchedEffect
+        }
         socket.emit("get-history", object : io.socket.emitter.Emitter.Listener {
             override fun call(vararg args: Any?) {
                 val res = args[0] as? JSONObject ?: return

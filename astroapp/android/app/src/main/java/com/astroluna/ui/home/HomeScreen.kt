@@ -1361,21 +1361,18 @@ fun AstrologerCard(
 
                     // ⚡ Skills
                     IconTextRow(
-                        iconRes = com.astroluna.R.drawable.ic_bolt_small, // Check if this exists or use Bolt
                         icon = Icons.Default.Bolt,
                         text = if(astro.skills.isNotEmpty()) astro.skills.joinToString(", ") else "Vedic, Vastu"
                     )
 
                     // 文 Languages
                     IconTextRow(
-                        iconRes = com.astroluna.R.drawable.ic_translate_small,
                         icon = Icons.Default.Translate,
                         text = "Hindi, English, Tamil"
                     )
 
                     // 🕒 Experience
                     IconTextRow(
-                        iconRes = com.astroluna.R.drawable.ic_history_small,
                         icon = Icons.Default.Schedule,
                         text = "Exp: ${if(astro.experience>0) astro.experience else 5} Years"
                     )
