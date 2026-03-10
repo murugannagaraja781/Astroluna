@@ -354,6 +354,97 @@ app.use("/api/rasipalan", rasipalanRouter);
 app.use("/api/horoscope/rasi-palan", rasipalanRouter); // Android App specific path
 app.use("/api/horoscope", freeHoroscopeRouter); // Free horoscope chart generation
 
+// --- Astrologer Registration API ---
+app.post('/api/astrologer/register', async (req, res) => {
+  try {
+    const data = req.body;
+    if (!data.realName || !data.cellNumber1) {
+      return res.status(400).json({ ok: false, error: 'Real name and primary mobile number are required' });
+    }
+
+    // Check for existing application
+    const existing = await AstrologerApplication.findOne({ cellNumber1: data.cellNumber1, status: 'pending' });
+    if (existing) {
+      return res.status(400).json({ ok: false, error: 'Application already pending for this number' });
+    }
+
+    const applicationId = crypto.randomUUID();
+    await AstrologerApplication.create({
+      applicationId,
+      ...data,
+      appliedAt: new Date()
+    });
+
+    console.log(`[Registration] New astrologer application from ${data.realName} (${data.cellNumber1})`);
+    res.json({ ok: true, message: 'Application submitted successfully' });
+  } catch (err) {
+    console.error('Registration error:', err);
+    res.status(500).json({ ok: false, error: 'Internal server error' });
+  }
+});
+
+// Admin: Get all astrologer applications
+app.get('/api/admin/astrologer-applications', async (req, res) => {
+  try {
+    const { status = 'pending' } = req.query;
+    const applications = await AstrologerApplication.find({ status }).sort({ appliedAt: -1 });
+    res.json({ ok: true, applications });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Admin: Approve/Reject Astrologer Application
+app.post('/api/admin/astrologer/process-application', async (req, res) => {
+  try {
+    const { applicationId, status, notes } = req.body; // status: 'approved' or 'rejected'
+    const adminId = 'superadmin'; // Should come from session/auth
+
+    const application = await AstrologerApplication.findOne({ applicationId });
+    if (!application) return res.status(404).json({ ok: false, error: 'Application not found' });
+
+    if (status === 'approved') {
+      // 1. Create or Update user to Astrologer role
+      let user = await User.findOne({ phone: application.cellNumber1 });
+      if (user) {
+        user.role = 'astrologer';
+        user.name = application.realName;
+        user.skills = [application.profession || 'Astrology'];
+        user.experience = parseInt(application.astrologyExperience) || 0;
+        user.isDocumentVerified = true;
+        user.documentStatus = 'verified';
+        await user.save();
+        console.log(`[Admin] Approved application: User ${user.userId} promoted to Astrologer`);
+      } else {
+        const userId = crypto.randomUUID();
+        user = await User.create({
+          userId,
+          phone: application.cellNumber1,
+          name: application.realName,
+          role: 'astrologer',
+          isDocumentVerified: true,
+          documentStatus: 'verified',
+          skills: [application.profession || 'Astrology'],
+          experience: parseInt(application.astrologyExperience) || 0,
+          walletBalance: 0
+        });
+        console.log(`[Admin] Approved application: New Astrologer created: ${user.phone}`);
+      }
+    }
+
+    application.status = status;
+    application.processedAt = new Date();
+    application.notes = notes;
+    application.processedBy = adminId;
+    await application.save();
+
+    res.json({ ok: true, message: `Application ${status} successfully` });
+  } catch (err) {
+    console.error('Process application error:', err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // FCM Test Endpoint - Verify Firebase is working
 app.get('/api/test-fcm', async (req, res) => {
   try {
@@ -704,6 +795,34 @@ const AccountDeletionRequestSchema = new mongoose.Schema({
   notes: String // Admin notes
 });
 const AccountDeletionRequest = mongoose.model('AccountDeletionRequest', AccountDeletionRequestSchema);
+// Astrologer Application Schema
+const AstrologerApplicationSchema = new mongoose.Schema({
+  applicationId: { type: String, unique: true },
+  realName: { type: String, required: true },
+  displayName: String,
+  gender: String,
+  dob: String,
+  tob: String,
+  pob: String,
+  cellNumber1: { type: String, required: true },
+  cellNumber2: String,
+  whatsAppNumber: String,
+  email: String,
+  address: String,
+  aadharNumber: String,
+  panNumber: String,
+  astrologyExperience: String,
+  profession: String,
+  bankDetails: String,
+  upiName: String,
+  upiNumber: String,
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  appliedAt: { type: Date, default: Date.now },
+  processedAt: Date,
+  processedBy: String, // Super Admin userId
+  notes: String
+});
+const AstrologerApplication = mongoose.model('AstrologerApplication', AstrologerApplicationSchema);
 
 
 // ===== Seed Data =====
@@ -873,9 +992,8 @@ app.post('/api/astrologer/register', async (req, res) => {
 // Admin: Get Pending Astrologer Requests
 app.get('/api/admin/astrologer-requests', async (req, res) => {
   try {
-    const requests = await User.find({ astrologerRequestStatus: 'pending' })
-      .select('userId name phone image experience astrologerExperience astrologerRequestedAt createdAt')
-      .sort({ astrologerRequestedAt: -1 })
+    const requests = await AstrologerApplication.find({ status: 'pending' })
+      .sort({ appliedAt: -1 })
       .lean();
 
     res.json({ ok: true, requests });
@@ -3418,6 +3536,34 @@ io.on('connection', (socket) => {
         isTyping: !!isTyping,
       });
     } catch (err) { console.error('typing error', err); }
+  });
+
+  // --- Astrologer Registration Support (Web) ---
+  socket.on('submit-astro-registration', async (data, cb) => {
+    try {
+      if (!data.realName || !data.cellNumber1) {
+        return cb({ ok: false, error: 'Mandatory fields missing' });
+      }
+
+      // Check for existing pending application
+      const existing = await AstrologerApplication.findOne({ cellNumber1: data.cellNumber1, status: 'pending' });
+      if (existing) {
+        return cb({ ok: false, error: 'Registration already pending for this number' });
+      }
+
+      const applicationId = crypto.randomUUID();
+      await AstrologerApplication.create({
+        applicationId,
+        ...data,
+        appliedAt: new Date()
+      });
+
+      console.log(`[Socket] New astrologer application from ${data.realName}`);
+      cb({ ok: true });
+    } catch (err) {
+      console.error('Socket registration error:', err.message);
+      cb({ ok: false, error: 'Internal Error' });
+    }
   });
 
   // --- Phase 1: Connection & Billing Start ---

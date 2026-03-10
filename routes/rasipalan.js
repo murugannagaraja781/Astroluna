@@ -29,28 +29,35 @@ router.get('/', async (req, res) => {
 
         if (externalData && Array.isArray(externalData)) {
             // Map external data to our app's expected format (RasipalanModel.kt)
-            const mappedData = externalData.map((item, index) => ({
-                signId: index + 1,
-                signNameEn: item.sign_en,
-                signNameTa: item.sign_ta,
-                date: today,
-                prediction: {
-                    ta: item.prediction_ta || item.forecast_ta || "",
-                    en: item.prediction_en || item.forecast_en || ""
-                },
-                details: {
-                    career: item.career_ta,
-                    finance: item.finance_ta,
-                    health: item.health_ta
-                },
-                lucky: {
-                    number: String(item.lucky_number),
-                    color: {
-                        ta: item.lucky_color_ta,
-                        en: item.lucky_color_en
+            const mappedData = externalData.map((item, index) => {
+                const predictionTa = item.prediction_ta || item.forecast_ta || item.details?.career || "";
+                const predictionEn = item.prediction_en || item.forecast_en || item.details?.career_en || "";
+
+                if (index === 0) console.log(`Sample item prediction_ta: ${item.prediction_ta?.substring(0, 50)}`);
+
+                return {
+                    signId: index + 1,
+                    signNameEn: item.sign_en,
+                    signNameTa: item.sign_ta,
+                    date: today,
+                    prediction: {
+                        ta: predictionTa,
+                        en: predictionEn
+                    },
+                    details: {
+                        career: item.career_ta || item.details?.career || "",
+                        finance: item.finance_ta || item.details?.finance || "",
+                        health: item.health_ta || item.details?.health || ""
+                    },
+                    lucky: {
+                        number: String(item.lucky_number || ""),
+                        color: {
+                            ta: item.lucky_color_ta || "",
+                            en: item.lucky_color_en || ""
+                        }
                     }
-                }
-            }));
+                };
+            });
 
             console.log("Fetched and mapped Rasi Engine horoscope data for Android successfully.");
             // Android app expects the array directly

@@ -135,6 +135,9 @@ class HomeActivity : AppCompatActivity() {
                             "Profile" -> {
                                 startActivity(Intent(this, com.astroluna.ui.profile.UserProfileActivity::class.java))
                             }
+                            "Astrologer Registration" -> {
+                                startActivity(Intent(this, com.astroluna.ui.astro.AstrologerRegistrationActivity::class.java))
+                            }
                             else -> {
                                 // Handle Navigation
                                 // Toast.makeText(context, "$item Clicked", Toast.LENGTH_SHORT).show()
