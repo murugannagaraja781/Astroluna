@@ -951,6 +951,10 @@ app.get('/api/user/:userId', async (req, res) => {
       referralCode: user.referralCode || '',
       isOnline: Boolean(user.isOnline),
       isAvailable: Boolean(user.isAvailable),
+      isChatOnline: Boolean(user.isChatOnline),
+      isAudioOnline: Boolean(user.isAudioOnline),
+      isVideoOnline: Boolean(user.isVideoOnline),
+      isBusy: Boolean(user.isBusy),
       totalEarnings: Number(user.totalEarnings || 0),
       image: user.image || ''
     };
@@ -1605,14 +1609,16 @@ app.post('/api/verify-otp', async (req, res) => {
         role: 'astrologer',
         walletBalance: 5000,
         totalEarnings: 0,
-        isOnline: true,
-        isAvailable: true,
+        isOnline: false, // User Request: Default should be offline
+        isAvailable: false,
+        isChatOnline: false,
+        isAudioOnline: false,
+        isVideoOnline: false,
         ratePerMinute: 10
       });
     } else if (user.role !== 'astrologer') {
       user.role = 'astrologer';
-      user.isOnline = true;
-      user.isAvailable = true;
+      // User Request: Never force online magically.
       user.ratePerMinute = user.ratePerMinute || 10;
       await user.save();
     }
@@ -2919,7 +2925,8 @@ io.on('connection', (socket) => {
         if (s && s.status === 'ringing') {
           console.log(`[Session] Ringing timeout for ${sessionId}. Marking as MISSED.`);
 
-          // CRITICAL: Set astrologer offline if they missed the call
+          // USER REQUEST: DO NOT set astrologer offline on missed call.
+          /*
           if (astrologerId) {
             try {
               const astro = await User.findOne({ userId: astrologerId });
@@ -2936,8 +2943,8 @@ io.on('connection', (socket) => {
 
                 // Notify Super Admin
                 io.to('superadmin').emit('admin-notification', {
-                  title: 'Call Missed - Astro Offline',
-                  message: `Astrologer ${astro.name} missed an incoming call and has been set offline.`,
+                  title: 'Call Missed - Astro Stayed Online',
+                  message: `Astrologer ${astro.name} missed an incoming call. Status was NOT changed.`,
                   type: 'warning',
                   astroId: astrologerId,
                   sessionId: sessionId
@@ -2945,14 +2952,26 @@ io.on('connection', (socket) => {
 
                 // Notify the astrologer via socket (if connected)
                 io.to(astrologerId).emit('admin-notification', {
-                  title: 'Status Changed to Offline',
-                  message: 'You missed a call, so your status has been changed to offline.',
+                  title: 'Call Missed',
+                  message: 'You missed a call. Please check your dashboard.',
                   type: 'warning'
                 });
               }
             } catch (e) {
-              console.error('[Missed Call] Error setting astro offline:', e);
+              console.error('[Missed Call] Error handling missed call:', e);
             }
+          }
+          */
+
+          // Broadcast MISSED update to Super Admin (Status remains unchanged as per User Request)
+          if (astrologerId) {
+            io.to('superadmin').emit('admin-notification', {
+              title: 'Call Missed',
+              message: `Astrologer missed a call, but remained online (User Request).`,
+              type: 'info',
+              astroId: astrologerId,
+              sessionId: sessionId
+            });
           }
 
           io.to(fromUserId).emit('session-ended', { sessionId, reason: 'no_answer' });
