@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -41,10 +42,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import com.astroluna.ui.theme.CosmicAppTheme
 import kotlinx.coroutines.delay
-import com.astroluna.data.local.TokenManager
 import com.astroluna.data.remote.SocketManager
 import com.astroluna.utils.CallState
-import org.json.JSONObject
 
 /**
  * IncomingCallActivity - Full-screen incoming call UI
@@ -97,8 +96,6 @@ class IncomingCallActivity : ComponentActivity() {
             finish()
             return
         }
-
-        CallState.markActive(callId)
 
         setupWindowFlags()
 
@@ -276,26 +273,6 @@ class IncomingCallActivity : ComponentActivity() {
         stopRingtoneAndVibration()
         handler.removeCallbacks(timeoutRunnable)
 
-        // --- NEW: Emit rejection to server ---
-        val myUserId = TokenManager(this).getUserSession()?.userId
-        if (myUserId != null && callId.isNotEmpty()) {
-            try {
-                // Ensure socket is active
-                SocketManager.init()
-                SocketManager.registerUser(myUserId) {
-                    val payload = JSONObject().apply {
-                        put("sessionId", callId)
-                        put("toUserId", callerId)
-                        put("accept", false)
-                    }
-                    SocketManager.getSocket()?.emit("answer-session", payload)
-                    Log.d(TAG, "Emitted rejection for session: $callId to $callerId")
-                }
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to emit rejection", e)
-            }
-        }
-
         // Stop foreground service
         stopService(Intent(this, CallForegroundService::class.java))
 
@@ -361,7 +338,7 @@ fun IncomingCallScreen(
             val typeLabel = when(callType) {
                 "chat" -> "Incoming Chat Request"
                 "video" -> "Incoming Video Call"
-                else -> "Incoming Audio Call"
+                else -> "Incoming call"
             }
 
             Text(typeLabel, color = Color.Gray, fontSize = 16.sp)

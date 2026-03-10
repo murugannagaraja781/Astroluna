@@ -107,7 +107,7 @@ class CallForegroundService : Service() {
 
         // Build notification
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Incoming Audio Call")
+            .setContentTitle("Incoming Call")
             .setContentText("$callerName is calling...")
             .setSmallIcon(android.R.drawable.ic_menu_call)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -193,7 +193,7 @@ class CallForegroundService : Service() {
         )
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("📞 Audio Call in Progress")
+            .setContentTitle("📞 Call in Progress")
             .setContentText("Speaking with $partnerName")
             .setSmallIcon(android.R.drawable.ic_menu_call)
             .setPriority(NotificationCompat.PRIORITY_LOW)

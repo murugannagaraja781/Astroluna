@@ -14,25 +14,6 @@ const multer = require('multer');
 const admin = require('firebase-admin'); // Firebase Admin for Mobile App
 const { DateTime } = require('luxon');
 const { fetchDailyHoroscope } = require("./utils/rasiEng/horoscopeData");
-const { GoogleAuth } = require('google-auth-library');
-const helmet = require('helmet');
-const xss = require('xss');
-const rateLimit = require('express-rate-limit');
-
-
-
-
-// --- Global Error Safety Nets ---
-// Prevent Node.js from cleanly exiting on unhandled errors, ensuring the backend stays alive
-process.on('uncaughtException', (err) => {
-  console.error('[CRITICAL] Uncaught Exception:', err);
-  // Optional: Send alert to developers here
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('[CRITICAL] Unhandled Rejection at:', promise, 'reason:', reason);
-});
-// --------------------------------
 
 // Activity Logger Helper
 function logActivity(type, message, details = null) {
@@ -339,55 +320,12 @@ const io = new Server(server);
 const cors = require("cors");
 const compression = require('compression');
 
-app.use(helmet({
-  contentSecurityPolicy: false, // Disable for now to fix Login Button
-}));
+app.use(compression());
+app.use(cors({ origin: "*" }));
 
-// Fixed Security Middleware: Skip mongo-sanitize if it's breaking Express 5
-app.use((req, res, next) => {
-  // Manual sanitization if needed, but let's just bypass the crashing part
-  next();
-});
-
-
-
-// Custom Security Middleware: Combined XSS and NoSQL Injection Prevention
-app.use((req, res, next) => {
-  const sanitize = (obj) => {
-    if (obj instanceof Object) {
-      for (let key in obj) {
-        if (key.startsWith('$') || key.includes('.')) {
-          delete obj[key]; // Block NoSQL Injection keys
-        } else if (typeof obj[key] === 'string') {
-          obj[key] = xss(obj[key]); // Cleanup XSS
-        } else if (obj[key] instanceof Object) {
-          sanitize(obj[key]); // Recursive for nested objects
-        }
-      }
-    }
-  };
-
-  if (req.body) sanitize(req.body);
-  // Note: We don't sanitize req.query directly because it's read-only in some environments
-  next();
-});
-
-
-
-
-// Rate limiting to prevent brute-force attacks
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // Limit each IP to 1000 requests per window
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-app.use('/api/', limiter); // Apply limiter only to API routes
-
-app.use(express.json({ limit: '10kb' })); // Body limit to prevent DoS
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));  // Serve static files
-
 
 // Policy Page Routes
 app.get('/privacy-policy', (req, res) => res.sendFile(path.join(__dirname, 'public', 'privacy-policy.html')));
@@ -908,7 +846,7 @@ generateTamilHoroscope();
 // === Astrologer Registration (New & Upgrade) ===
 app.post('/api/astrologer/register', async (req, res) => {
   try {
-    const { name, phone, dob, tob, experience, about, bankDetails, skills } = req.body;
+    const { name, phone, experience, about, bankDetails, skills } = req.body;
     if (!phone) return res.status(400).json({ ok: false, error: 'Phone number required' });
 
     let user = await User.findOne({ phone });
@@ -929,9 +867,6 @@ app.post('/api/astrologer/register', async (req, res) => {
       user.astrologerAbout = about || '';
       user.bankDetails = bankDetails || {};
       user.astrologerSkills = skills || [];
-      if (dob || tob) {
-        user.birthDetails = { ...user.birthDetails, dob: dob || '', tob: tob || '' };
-      }
       user.astrologerRequestStatus = 'pending';
       user.astrologerRequestedAt = new Date();
       await user.save();
@@ -948,8 +883,7 @@ app.post('/api/astrologer/register', async (req, res) => {
         astrologerExperience: experience || '',
         astrologerAbout: about || '',
         bankDetails: bankDetails || {},
-        astrologerSkills: skills || [],
-        birthDetails: { dob: dob || '', tob: tob || '', pob: '' }
+        astrologerSkills: skills || []
       });
     }
 
@@ -1155,7 +1089,6 @@ app.post('/api/withdraw-referral', async (req, res) => {
 
 // Astrologer List API (Used by Mobile App)
 app.get('/api/astrology/astrologers', async (req, res) => {
-  if (!isMongoConnected()) return res.json({ ok: true, astrologers: [] });
   try {
     const astrologers = await User.find({ role: 'astrologer' })
       .select('userId name phone skills price isOnline isChatOnline isAudioOnline isVideoOnline experience isVerified image walletBalance totalEarnings')
@@ -1630,14 +1563,6 @@ app.post('/api/verify-otp', async (req, res) => {
 
   // --- Super Admin Backdoor ---
   if (phone === '9876543210' && otp === '1369') {
-    // Fallback if MongoDB is offline for testing the UI
-    if (!isMongoConnected()) {
-      return res.json({
-        ok: true, userId: "admin-fixed-id", name: 'Super Admin (Mock)', role: 'superadmin',
-        phone, walletBalance: 100000, totalEarnings: 0, referralCode: "ADMIN123"
-      });
-    }
-
     let user = await User.findOne({ phone });
     if (!user) {
       user = await User.create({
@@ -1671,14 +1596,6 @@ app.post('/api/verify-otp', async (req, res) => {
 
   // --- Test Astrologer Account ---
   if (phone === '8000000001' && otp === '0101') {
-    // Fallback if MongoDB is offline
-    if (!isMongoConnected()) {
-      return res.json({
-        ok: true, userId: "astro-fixed-id", name: 'Test Astrologer (Mock)', role: 'astrologer',
-        phone, walletBalance: 5000, totalEarnings: 0, isOnline: true, isAvailable: true
-      });
-    }
-
     let user = await User.findOne({ phone });
     if (!user) {
       user = await User.create({
@@ -1720,12 +1637,6 @@ app.post('/api/verify-otp', async (req, res) => {
 
   // --- Test Client Account ---
   if (phone === '9000000001' && otp === '0101') {
-    if (!isMongoConnected()) {
-      return res.json({
-        ok: true, userId: 'client-fixed-id', name: 'Test Client (Mock)', role: 'client',
-        phone, walletBalance: 1000, totalEarnings: 0
-      });
-    }
     let user = await User.findOne({ phone });
     if (!user) {
       user = await User.create({
@@ -1763,19 +1674,6 @@ app.post('/api/verify-otp', async (req, res) => {
   if (Date.now() > entry.expires) return res.json({ ok: false, error: 'Expired' });
   if (entry.otp !== otp) return res.json({ ok: false, error: 'Invalid OTP' });
   otpStore.delete(phone);
-
-  // If DB is offline, give a mock session for any valid OTP
-  if (!isMongoConnected()) {
-    return res.json({
-      ok: true,
-      userId: 'mock-' + phone,
-      name: 'User',
-      role: 'client',
-      phone: phone,
-      walletBalance: 0,
-      totalEarnings: 0
-    });
-  }
 
   try {
     let user = await User.findOne({ phone });
@@ -2217,35 +2115,12 @@ async function endSessionRecord(sessionId) {
 }
 
 // --- Phase 3: Billing Helper ---
-let SLAB_RATES = {
+const SLAB_RATES = {
   1: 0.30, // 30% to Astro
   2: 0.35, // 35%
   3: 0.40, // 40%
   4: 0.50  // 50%
 };
-
-// Global Settings Model
-const GlobalSettingsSchema = new mongoose.Schema({
-  key: { type: String, unique: true },
-  value: mongoose.Schema.Types.Mixed
-});
-const GlobalSettings = mongoose.model('GlobalSettings', GlobalSettingsSchema);
-
-// Load Settings from DB
-async function loadSlabRates() {
-  if (!isMongoConnected()) {
-    console.warn('[Admin] MongoDB offline - using default slab rates');
-    return;
-  }
-  const settings = await GlobalSettings.findOne({ key: 'slab_rates' });
-  if (settings && settings.value) {
-    SLAB_RATES = settings.value;
-    console.log('[Admin] Slab Rates loaded from DB:', SLAB_RATES);
-  }
-}
-// Run after DB connects
-mongoose.connection.once('connected', () => loadSlabRates());
-
 
 async function processBillingCharge(sessionId, durationSeconds, minuteIndex, type) {
   try {
@@ -2550,7 +2425,7 @@ async function broadcastAstroUpdate() {
     // Optimization: Only fetch and send essential fields to reduce memory and bandwidth
     const astros = await User.find(
       { role: 'astrologer' },
-      'userId name isOnline isAvailable isBusy isChatOnline isAudioOnline isVideoOnline price image skills experience rating'
+      'userId name isOnline isAvailable isBusy price image skills experience rating'
     ).lean();
 
     if (io) io.emit('astrologer-update', astros);
@@ -2641,33 +2516,16 @@ io.on('connection', (socket) => {
   logActivity('socket', `New connection: ${socket.id}`);
 
   // --- Register user ---
+  // --- Register user ---
   socket.on('register', (data, cb) => {
     try {
-      const { name, phone } = data || {};
+      const { name, phone, existingUserId } = data || {};
       const userId = data.userId || socketToUser.get(socket.id);
 
       const query = phone ? { phone } : (userId ? { userId } : null);
 
       if (!query) {
         if (typeof cb === 'function') cb({ ok: false, error: 'No identifier provided' });
-        return;
-      }
-
-      // If MongoDB is offline, register in-memory so the app still works
-      if (!isMongoConnected()) {
-        console.warn('[Socket] MongoDB offline - registering user in-memory');
-        const mockUserId = userId || ('mock-' + (phone || crypto.randomUUID()));
-        userSockets.set(mockUserId, socket.id);
-        socketToUser.set(socket.id, mockUserId);
-        socket.join(mockUserId);
-        if (typeof cb === 'function') cb({
-          ok: true,
-          userId: mockUserId,
-          role: data.role || 'client',
-          name: name || 'User',
-          walletBalance: 0,
-          totalEarnings: 0
-        });
         return;
       }
 
@@ -2759,14 +2617,9 @@ io.on('connection', (socket) => {
 
   // --- Get Astrologers List ---
   socket.on('get-astrologers', async (cb) => {
-    // Immediately return empty list if MongoDB is offline (avoids 10s hang)
-    if (!isMongoConnected()) {
-      socket.emit('astrologer-update', []);
-      if (typeof cb === 'function') cb({ astrologers: [] });
-      return;
-    }
     try {
       const astros = await User.find({ role: 'astrologer' });
+      // Emit to this socket directly for compatibility
       socket.emit('astrologer-update', astros);
       if (typeof cb === 'function') cb({ astrologers: astros });
     } catch (e) {
@@ -2933,30 +2786,35 @@ io.on('connection', (socket) => {
       if (!fromUserId) return cb({ ok: false, error: 'Not registered' });
       if (!toUserId || !type) return cb({ ok: false, error: 'Missing fields' });
 
-      // Check target is connected via socket first (in-memory, no DB needed)
-      const toSocketId = userSockets.get(toUserId);
-      if (!toSocketId) {
-        return cb({ ok: false, error: 'User not online' });
+      // Get target user from DB
+      const toUser = await User.findOne({ userId: toUserId });
+      const fromUser = await User.findOne({ userId: fromUserId });
+
+      if (!toUser) {
+        return cb({ ok: false, error: 'User not found' });
       }
 
-      // DB-dependent lookups (skip gracefully when offline)
-      let toUser = null;
-      let fromUser = null;
-      if (isMongoConnected()) {
-        toUser = await User.findOne({ userId: toUserId });
-        fromUser = await User.findOne({ userId: fromUserId });
-        if (!toUser) return cb({ ok: false, error: 'User not found' });
-      }
+      // Check if astrologer is available (MANUAL ONLY)
+      const isAvailable = toUser.isAvailable === true;
+
+      // ALLOW CALL even if offline -> Logic will fall back to FCM below
+      // if (!isAvailable) {
+      //   return cb({ ok: false, error: 'Astrologer is offline' });
+      // }
 
       if (userActiveSession.has(toUserId)) {
         const existingSessionId = userActiveSession.get(toUserId);
         const existingSession = activeSessions.get(existingSessionId);
+
         if (!existingSession) {
+          // Ghost session cleanup
+          console.log(`[Session] Ghost session ${existingSessionId} detected for ${toUserId}. Auto-cleaning.`);
           userActiveSession.delete(toUserId);
-        } else if (existingSession.users.includes(fromUserId)) {
-          console.log(`[Session] Stale session detected, auto-cleaning.`);
-          if (isMongoConnected()) await endSessionRecord(existingSessionId);
-          else { activeSessions.delete(existingSessionId); userActiveSession.delete(toUserId); }
+        }
+        else if (existingSession.users.includes(fromUserId)) {
+          // Same caller retrying
+          console.log(`[Session] Stale session ${existingSessionId} detected between ${fromUserId} and ${toUserId}. Auto-cleaning.`);
+          await endSessionRecord(existingSessionId);
         } else {
           return cb({ ok: false, error: 'User busy' });
         }
@@ -2973,19 +2831,14 @@ io.on('connection', (socket) => {
       if (toUser && toUser.role === 'client') clientId = toUserId;
       if (toUser && toUser.role === 'astrologer') astrologerId = toUserId;
 
-
-      // Persist session to DB (only if online)
-      if (isMongoConnected()) {
-        await Session.create({
-          sessionId, fromUserId, toUserId, type, startTime: Date.now(),
-          clientId, astrologerId
-        }).catch(e => console.warn('[Session] DB create warn:', e.message));
-      }
+      await Session.create({
+        sessionId, fromUserId, toUserId, type, startTime: Date.now(),
+        clientId, astrologerId
+      });
 
       activeSessions.set(sessionId, {
         type,
         users: [fromUserId, toUserId],
-        status: 'ringing',
         startedAt: Date.now(),
         clientId,
         astrologerId,
@@ -2998,42 +2851,53 @@ io.on('connection', (socket) => {
       userActiveSession.set(fromUserId, sessionId);
       userActiveSession.set(toUserId, sessionId);
 
-      // Send incoming-session via Socket room (works for both web and app)
+      // Try socket notification (might fail if in background - that's OK!)
+      let socketSent = false;
       io.to(toUserId).emit('incoming-session', {
         sessionId,
         fromUserId,
-        callerName: fromUser?.name || 'User',
+        callerName: fromUser?.name || 'Client',  // FIX: Add caller name for display
         type,
         birthData: birthData || null
       });
-      console.log(`[Session] incoming-session emitted to room: ${toUserId}`);
+      socketSent = true;
+      console.log(`[Session] Socket notification sent to room: ${toUserId}`);
 
-      // Send FCM push as backup (only if we have user data from DB)
+      // IMPROVED: Send FCM Push Notification as BACKUP (even if socket sent)
+      // This ensures the call reaches the user if socket message is missed/dropped
+      // The Android app handles duplicate by showing only one IncomingCallActivity
       if (toUser && toUser.fcmToken) {
         const fcmData = {
           type: 'INCOMING_CALL',
           sessionId: sessionId,
           callType: type,
-          callerName: fromUser?.name || 'User',
-          callerId: fromUserId,
+          callerName: fromUser?.name || 'Client',
+          callerId: fromUserId, // Fixed: callerUserId -> callerId
           timestamp: Date.now().toString(),
           birthData: JSON.stringify(birthData || {})
         };
+
         const fcmNotification = {
           title: '📞 Incoming Call',
           body: `${fromUser?.name || 'Someone'} is calling you`
         };
+
         sendFcmV1Push(toUser.fcmToken, fcmData, fcmNotification)
           .then(result => {
-            console.log(`[FCM v1] Push to ${toUserId}: Success=${result.success}`);
+            console.log(`[FCM v1] Session Push to ${toUserId}: Success=${result.success} (socketSent=${socketSent})`);
             if (!result.success && (result.error?.includes('Requested entity was not found') || result.error === 'UNREGISTERED')) {
-              if (isMongoConnected()) User.updateOne({ userId: toUserId }, { $unset: { fcmToken: 1 } }).catch(() => { });
+              // Token is stale/invalid
+              User.updateOne({ userId: toUserId }, { $unset: { fcmToken: 1 } })
+                .then(() => console.log(`[FCM v1] Invalid token removed for ${toUserId}`))
+                .catch(e => console.error('Token removal error', e));
             }
           })
-          .catch(err => { console.error('[FCM v1] Push Error:', err.message); });
+          .catch(err => {
+            console.error('[FCM v1] Session Push Error:', err.message);
+          });
       }
 
-      console.log(`[Session] Request: ${sessionId} (${type}) from ${fromUserId} to ${toUserId}`);
+      console.log(`Session request: ${sessionId} (${type})`);
       cb({ ok: true, sessionId });
 
       // --- MISSED CALL TIMEOUT (25s) ---
@@ -3043,17 +2907,11 @@ io.on('connection', (socket) => {
           console.log(`[Session] Ringing timeout for ${sessionId}. Marking as MISSED.`);
           io.to(fromUserId).emit('session-ended', { sessionId, reason: 'no_answer' });
           io.to(toUserId).emit('session-ended', { sessionId, reason: 'missed' });
+
           userActiveSession.delete(fromUserId);
           userActiveSession.delete(toUserId);
           activeSessions.delete(sessionId);
-          if (isMongoConnected()) {
-            await Session.updateOne({ sessionId }, { status: 'missed', endTime: Date.now() }).catch(() => { });
-            await User.updateOne({ userId: toUserId, role: 'astrologer' }, {
-              isAvailable: false, isOnline: false, isChatOnline: false,
-              isAudioOnline: false, isVideoOnline: false
-            }).catch(() => { });
-          }
-          broadcastAstroUpdate();
+          await Session.updateOne({ sessionId }, { status: 'missed', endTime: Date.now() }).catch(() => { });
         }
       }, 25000);
     } catch (err) {
@@ -3124,9 +2982,6 @@ io.on('connection', (socket) => {
 
       if (!accept) {
         endSessionRecord(sessionId);
-      } else {
-        const s = activeSessions.get(sessionId);
-        if (s) s.status = 'answered';
       }
 
       // Emit to Room (userId) - works even after reconnect!
@@ -3200,7 +3055,6 @@ io.on('connection', (socket) => {
       const targetSocketId = userSockets.get(fromUserId);
 
       if (accept) {
-        session.status = 'answered';
         if (targetSocketId) {
           io.to(targetSocketId).emit('session-answered', {
             sessionId,
@@ -3634,61 +3488,34 @@ io.on('connection', (socket) => {
   socket.on('get-all-users', async (cb) => {
     if (!await checkAdmin(socket.id)) return cb({ ok: false });
     try {
-      const usersRaw = await User.find({ role: { $ne: 'superadmin' } }).sort({ role: 1, name: 1 }).lean();
-      cb({ ok: true, users: usersRaw });
+      const usersRaw = await User.find({}).sort({ role: 1, name: 1 }).lean();
+
+      // Enhance users with referral counts (L1, L2, L3)
+      // This is slightly heavy but requested for tracking
+      const allUsers = await Promise.all(usersRaw.map(async (u) => {
+        const l1 = await User.find({ referredBy: u.userId }).select('userId').lean();
+        const l1Ids = l1.map(x => x.userId);
+
+        const l2 = await User.find({ referredBy: { $in: l1Ids } }).select('userId').lean();
+        const l2Ids = l2.map(x => x.userId);
+
+        const l3 = await User.find({ referredBy: { $in: l2Ids } }).select('userId').lean();
+
+        return {
+          ...u,
+          refStats: {
+            l1: l1.length,
+            l2: l2.length,
+            l3: l3.length,
+            total: l1.length + l2.length + l3.length
+          }
+        };
+      }));
+
+      cb({ ok: true, users: allUsers });
     } catch (e) {
-      console.error("[Admin] Error fetching users:", e);
-      cb({ ok: false, users: [] });
-    }
-  });
-
-  // --- Commission Slab Handlers ---
-  socket.on('get-slab-rates', async (cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
-    cb({ ok: true, rates: SLAB_RATES });
-  });
-
-  socket.on('update-slab-rates', async (rates, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
-    try {
-      if (!rates || typeof rates !== 'object') return cb({ ok: false, error: 'Invalid data format' });
-      await GlobalSettings.updateOne({ key: 'slab_rates' }, { value: rates }, { upsert: true });
-      SLAB_RATES = rates;
-      console.log('[Admin] Slab Rates updated:', SLAB_RATES);
-      cb({ ok: true });
-    } catch (e) {
-      cb({ ok: false, error: e.message });
-    }
-  });
-
-  // --- FCM Broadcast Handler ---
-  socket.on('admin-send-bulk-fcm', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
-    try {
-      const { title, body, imageUrl, allUsers, userIds } = data;
-      let query = {};
-      if (allUsers) {
-        query = { fcmToken: { $exists: true, $ne: '' } };
-      } else {
-        if (!userIds || userIds.length === 0) return cb({ ok: false, error: 'No users selected' });
-        query = { userId: { $in: userIds } };
-      }
-
-      const users = await User.find(query, 'userId fcmToken').lean();
-      const validUsers = users.filter(u => (u.fcmToken && u.fcmToken.length > 5));
-
-      let successCount = 0;
-      for (const u of validUsers) {
-        const res = await sendFcmV1Push(
-          u.fcmToken,
-          { type: 'broadcast', title, body, image: imageUrl || '' },
-          { title, body, image: imageUrl || '' }
-        );
-        if (res.success) successCount++;
-      }
-      cb({ ok: true, sentCount: successCount });
-    } catch (e) {
-      cb({ ok: false, error: e.message });
+      console.error("[Admin] Error fetching all users:", e);
+      cb({ ok: false });
     }
   });
 
@@ -3940,10 +3767,6 @@ io.on('connection', (socket) => {
   socket.on('get-wallet', async (data) => {
     const userId = socketToUser.get(socket.id);
     if (!userId) return;
-    if (!isMongoConnected()) {
-      socket.emit('wallet-update', { balance: 0, totalEarnings: 0 });
-      return;
-    }
     try {
       const u = await User.findOne({ userId });
       if (u) {
@@ -4117,19 +3940,12 @@ io.on('connection', (socket) => {
       }
 
       try {
-        // If Astrologer, mark offline on disconnect
+        // If Astrologer, use grace period before marking offline
         const user = await User.findOne({ userId });
         if (user && user.role === 'astrologer') {
-          console.log(`[Offline] Astrologer ${userId} disconnected. Marking offline.`);
-          await User.updateOne({ userId }, {
-            isAvailable: false,
-            isOnline: false,
-            isChatOnline: false,
-            isAudioOnline: false,
-            isVideoOnline: false,
-            lastSeen: new Date()
-          });
-          await broadcastAstroUpdate();
+          // Save current status before potential offline
+          return; // Manual Toggle Rule: Skip offline marking
+
         }
       } catch (e) { console.error('Disconnect DB error', e); }
 
@@ -4365,22 +4181,35 @@ app.post('/api/payment/token', async (req, res) => {
       return res.json({ ok: false, error: 'User not found' });
     }
 
+    // GST 18% calculation
+    const baseAmountValue = parseFloat(amount);
+    const gstValue = Math.round(baseAmountValue * 0.18 * 100) / 100;
+    const totalAmountValue = Math.round((baseAmountValue + gstValue) * 100) / 100;
+
     // Generate secure token
     const token = crypto.randomBytes(32).toString('hex');
 
     // Store token mapping
     paymentTokens.set(token, {
       userId: userId,
-      amount: amount,
+      amount: totalAmountValue, // STORE TOTAL AMOUNT TO CHARGE
+      baseAmount: baseAmountValue, // STORE BASE AMOUNT TO CREDIT
+      gst: gstValue,
       createdAt: Date.now(),
       used: false,
       userName: user.name,
       userPhone: user.phone
     });
 
-    console.log(`Payment Token Created: ${token.substring(0, 8)}... for ${user.name} amount ₹${amount}`);
+    console.log(`Payment Token Created: ${token.substring(0, 8)}... for ${user.name} | Base: ₹${baseAmountValue} + GST: ₹${gstValue} = Total: ₹${totalAmountValue}`);
 
-    res.json({ ok: true, token });
+    res.json({
+      ok: true,
+      token,
+      baseAmount: baseAmountValue,
+      totalAmount: totalAmountValue,
+      gst: gstValue
+    });
 
   } catch (e) {
     console.error('Payment Token Error:', e);
@@ -4415,10 +4244,12 @@ app.get('/api/verify-payment-token', async (req, res) => {
       return res.json({ valid: false, error: 'Token already used' });
     }
 
-    // Valid token - return payment details (but NOT the userId for security)
+    // Valid token - return payment details
     res.json({
       valid: true,
-      amount: tokenData.amount,
+      amount: tokenData.amount, // Total amount to pay
+      baseAmount: tokenData.baseAmount,
+      gst: tokenData.gst,
       userName: tokenData.userName,
       expiresIn: Math.floor((expiryTime - (Date.now() - tokenData.createdAt)) / 1000) // seconds
     });
@@ -4470,6 +4301,14 @@ app.post('/api/payment/create', async (req, res) => {
       return res.json({ ok: false, error: 'Missing Amount or User' });
     }
 
+    // Apply 18% GST if not already applied (Token flow already has it)
+    if (!token) {
+      const baseAmt = parseFloat(amount);
+      const gst = Math.round(baseAmt * 0.18 * 100) / 100;
+      amount = Math.round((baseAmt + gst) * 100) / 100;
+      console.log(`Legacy Auth Payment: userId=${userId} Base: ${baseAmt} + GST: ${gst} = Total: ${amount}`);
+    }
+
     // Fetch User to get real mobile number
     const userObj = await User.findOne({ userId });
     const rawPhone = (userObj && userObj.phone) ? userObj.phone : "9999999999";
@@ -4483,7 +4322,7 @@ app.post('/api/payment/create', async (req, res) => {
       transactionId: merchantTransactionId,
       merchantTransactionId,
       userId,
-      amount,
+      amount, // THIS IS NOW THE TOTAL AMOUNT (BASE + GST)
       status: 'pending',
       isApp: !!isApp // Store the source
     });

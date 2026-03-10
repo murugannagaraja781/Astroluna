@@ -1,8 +1,8 @@
 package com.astroluna.ui.intake
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.List
 import com.astroluna.ui.theme.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -598,7 +600,11 @@ fun IntakeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(CosmicAppTheme.backgroundBrush)
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(Color(0xFF4A148C), Color(0xFF7B1FA2), Color(0xFFAB47BC))
+                )
+            )
     ) {
         Scaffold(
             containerColor = Color.Transparent,
@@ -608,13 +614,13 @@ fun IntakeScreen(
                     title = {
                         Text(
                             "Consultation Details",
-                            color = CosmicAppTheme.colors.textPrimary,
+                            color = Color.White,
                             fontWeight = FontWeight.Bold
                         )
                     },
                     navigationIcon = {
                         IconButton(onClick = onClose) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = CosmicAppTheme.colors.textPrimary)
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -687,73 +693,68 @@ fun IntakeScreen(
                             }
 
                             Text("Date of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
+                            val displayDate = remember(day, month, year) {
+                                if (day.isNotBlank() && month.isNotBlank() && year.isNotBlank())
+                                    "$day/$month/$year"
+                                else "Select Date"
+                            }
                             OutlinedTextField(
-                                value = if (day.isNotEmpty() && month.isNotEmpty() && year.isNotEmpty()) "$day/$month/$year" else "",
+                                value = displayDate,
                                 onValueChange = {},
-                                label = { Text("Select Date") },
+                                label = { Text("Select DOB") },
                                 readOnly = true,
                                 enabled = false,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        val cal = Calendar.getInstance()
+                                        val curDay = day.toIntOrNull() ?: 1
+                                        val curMonth = (month.toIntOrNull() ?: 1) - 1
+                                        val curYear = year.toIntOrNull() ?: 1990
                                         DatePickerDialog(context, { _, y, m, d ->
                                             day = d.toString()
                                             month = (m + 1).toString()
                                             year = y.toString()
-                                        }, year.toIntOrNull() ?: cal.get(Calendar.YEAR),
-                                           (month.toIntOrNull() ?: (cal.get(Calendar.MONTH) + 1)) - 1,
-                                           day.toIntOrNull() ?: cal.get(Calendar.DAY_OF_MONTH)).show()
+                                        }, curYear, curMonth, curDay).show()
                                     },
                                 shape = RoundedCornerShape(12.dp),
-                                trailingIcon = { Icon(Icons.Default.Edit, "Pick Date", tint = PeacockGreen) },
+                                trailingIcon = { Icon(Icons.Default.DateRange, "Pick Date", tint = PeacockGreen) },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     disabledTextColor = RoyalMidnightBlue,
-                                    disabledBorderColor = Color.Gray,
+                                    disabledBorderColor = PeacockGreen,
                                     disabledLabelColor = RoyalMidnightBlue,
                                     disabledContainerColor = Color.Transparent
                                 )
                             )
 
                             Text("Time of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
+                            val displayTime = remember(hour, minute, amPm) {
+                                if (hour.isNotBlank() && minute.isNotBlank())
+                                    "$hour:$minute $amPm"
+                                else "Select Time"
+                            }
                             OutlinedTextField(
-                                value = if (hour.isNotEmpty() && minute.isNotEmpty()) {
-                                    val h = hour.toIntOrNull() ?: 0
-                                    val m = minute.toIntOrNull() ?: 0
-                                    String.format("%02d:%02d %s", if (h == 0 || h == 12) 12 else h % 12, m, amPm)
-                                } else "",
+                                value = displayTime,
                                 onValueChange = {},
-                                label = { Text("Select Time") },
+                                label = { Text("Select TOB") },
                                 readOnly = true,
                                 enabled = false,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        val cal = Calendar.getInstance()
-                                        val currentHour24 = if (hour.isEmpty()) cal.get(Calendar.HOUR_OF_DAY) else {
-                                            var h = hour.toIntOrNull() ?: 0
-                                            if (amPm == "PM" && h < 12) h += 12
-                                            else if (amPm == "AM" && h == 12) h = 0
-                                            h
-                                        }
-                                        val currentMin = if (minute.isEmpty()) cal.get(Calendar.MINUTE) else minute.toIntOrNull() ?: 0
-
-                                        TimePickerDialog(context, { _, h24, m ->
+                                        val curHour = convertTo24Hour(hour, amPm)
+                                        val curMin = minute.toIntOrNull() ?: 0
+                                        TimePickerDialog(context, { _, h, m ->
+                                            val h12 = if (h == 0) 12 else if (h > 12) h - 12 else h
+                                            hour = h12.toString()
                                             minute = String.format("%02d", m)
-                                            if (h24 >= 12) {
-                                                amPm = "PM"
-                                                hour = (if (h24 == 12) 12 else h24 - 12).toString()
-                                            } else {
-                                                amPm = "AM"
-                                                hour = (if (h24 == 0) 12 else h24).toString()
-                                            }
-                                        }, currentHour24, currentMin, false).show()
+                                            amPm = if (h >= 12) "PM" else "AM"
+                                        }, curHour, curMin, false).show()
                                     },
                                 shape = RoundedCornerShape(12.dp),
-                                trailingIcon = { Icon(Icons.Default.Edit, "Pick Time", tint = PeacockGreen) },
+                                trailingIcon = { Icon(Icons.Default.List, "Pick Time", tint = PeacockGreen) },
                                 colors = OutlinedTextFieldDefaults.colors(
                                     disabledTextColor = RoyalMidnightBlue,
-                                    disabledBorderColor = Color.Gray,
+                                    disabledBorderColor = PeacockGreen,
                                     disabledLabelColor = RoyalMidnightBlue,
                                     disabledContainerColor = Color.Transparent
                                 )
@@ -767,15 +768,8 @@ fun IntakeScreen(
                                 Text("Don't know exact time", color = RoyalMidnightBlue)
                             }
 
-                                Text("Place of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
-                            // Country and State hidden as per user request
-                            /*
-                            OutlinedTextField(
-                                value = countryName,
-                                ...
-                            )
-                            */
-
+                            Text("Place of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
+// Hidden Country/State per User request
 
                             OutlinedTextField(
                                 value = cityName,
@@ -898,41 +892,46 @@ fun IntakeScreen(
                                     )
                                 )
                                 Text("Partner DOB", fontWeight = FontWeight.Bold, color = RoyalMidnightBlue)
+                                val partnerDisplayDate = remember(pDay, pMonth, pYear) {
+                                    if (pDay.isNotBlank() && pMonth.isNotBlank() && pYear.isNotBlank())
+                                        "$pDay/$pMonth/$pYear"
+                                    else "Select Date"
+                                }
                                 OutlinedTextField(
-                                    value = if (pDay.isNotEmpty() && pMonth.isNotEmpty() && pYear.isNotEmpty()) "$pDay/$pMonth/$pYear" else "",
+                                    value = partnerDisplayDate,
                                     onValueChange = {},
-                                    label = { Text("Select Partner Date") },
+                                    label = { Text("Select Partner DOB") },
                                     readOnly = true,
                                     enabled = false,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            val cal = Calendar.getInstance()
+                                            val curDay = pDay.toIntOrNull() ?: 1
+                                            val curMonth = (pMonth.toIntOrNull() ?: 1) - 1
+                                            val curYear = pYear.toIntOrNull() ?: 1990
                                             DatePickerDialog(context, { _, y, m, d ->
                                                 pDay = d.toString()
                                                 pMonth = (m + 1).toString()
                                                 pYear = y.toString()
-                                            }, pYear.toIntOrNull() ?: cal.get(Calendar.YEAR),
-                                               (pMonth.toIntOrNull() ?: (cal.get(Calendar.MONTH) + 1)) - 1,
-                                               pDay.toIntOrNull() ?: cal.get(Calendar.DAY_OF_MONTH)).show()
+                                            }, curYear, curMonth, curDay).show()
                                         },
                                     shape = RoundedCornerShape(12.dp),
-                                    trailingIcon = { Icon(Icons.Default.Edit, "Pick Date", tint = PeacockGreen) },
+                                    trailingIcon = { Icon(Icons.Default.DateRange, "Pick Date", tint = PeacockGreen) },
                                     colors = OutlinedTextFieldDefaults.colors(
                                         disabledTextColor = RoyalMidnightBlue,
-                                        disabledBorderColor = Color.Gray,
+                                        disabledBorderColor = PeacockGreen,
                                         disabledLabelColor = RoyalMidnightBlue,
                                         disabledContainerColor = Color.Transparent
                                     )
                                 )
-
                                 Text("Partner Time", fontWeight = FontWeight.Bold, color = RoyalMidnightBlue)
+                                val partnerDisplayTime = remember(pHour, pMinute, pAmPm) {
+                                    if (pHour.isNotBlank() && pMinute.isNotBlank())
+                                        "$pHour:$pMinute $pAmPm"
+                                    else "Select Time"
+                                }
                                 OutlinedTextField(
-                                    value = if (pMinute.isNotEmpty() && pHour.isNotEmpty()) {
-                                        val h = pHour.toIntOrNull() ?: 0
-                                        val m = pMinute.toIntOrNull() ?: 0
-                                        String.format("%02d:%02d %s", if (h == 0 || h == 12) 12 else h % 12, m, pAmPm)
-                                    } else "",
+                                    value = partnerDisplayTime,
                                     onValueChange = {},
                                     label = { Text("Select Partner Time") },
                                     readOnly = true,
@@ -940,49 +939,30 @@ fun IntakeScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
-                                            val cal = Calendar.getInstance()
-                                            val currentHour24 = if (pHour.isEmpty()) cal.get(Calendar.HOUR_OF_DAY) else {
-                                                var h = pHour.toIntOrNull() ?: 0
-                                                if (pAmPm == "PM" && h < 12) h += 12
-                                                else if (pAmPm == "AM" && h == 12) h = 0
-                                                h
-                                            }
-                                            val currentMin = if (pMinute.isEmpty()) cal.get(Calendar.MINUTE) else pMinute.toIntOrNull() ?: 0
-
-                                            TimePickerDialog(context, { _, h24, m ->
+                                            val curHour = convertTo24Hour(pHour, pAmPm)
+                                            val curMin = pMinute.toIntOrNull() ?: 0
+                                            TimePickerDialog(context, { _, h, m ->
+                                                val h12 = if (h == 0) 12 else if (h > 12) h - 12 else h
+                                                pHour = h12.toString()
                                                 pMinute = String.format("%02d", m)
-                                                if (h24 >= 12) {
-                                                    pAmPm = "PM"
-                                                    pHour = (if (h24 == 12) 12 else h24 - 12).toString()
-                                                } else {
-                                                    pAmPm = "AM"
-                                                    pHour = (if (h24 == 0) 12 else h24).toString()
-                                                }
-                                            }, currentHour24, currentMin, false).show()
+                                                pAmPm = if (h >= 12) "PM" else "AM"
+                                            }, curHour, curMin, false).show()
                                         },
                                     shape = RoundedCornerShape(12.dp),
-                                    trailingIcon = { Icon(Icons.Default.Edit, "Pick Time", tint = PeacockGreen) },
+                                    trailingIcon = { Icon(Icons.Default.List, "Pick Time", tint = PeacockGreen) },
                                     colors = OutlinedTextFieldDefaults.colors(
                                         disabledTextColor = RoyalMidnightBlue,
-                                        disabledBorderColor = Color.Gray,
+                                        disabledBorderColor = PeacockGreen,
                                         disabledLabelColor = RoyalMidnightBlue,
                                         disabledContainerColor = Color.Transparent
                                     )
                                 )
-
                                 Text(
                                     "Partner Place of Birth",
                                     fontWeight = FontWeight.Bold,
                                     color = RoyalMidnightBlue
                                 )
-                                // Country and State hidden as per user request
-                            /*
-                            OutlinedTextField(
-                                value = pCountryName,
-                                ...
-                            )
-                            */
-
+// Hidden Partner Country/State per User request
                                 OutlinedTextField(
                                     value = pCityName,
                                     onValueChange = {},

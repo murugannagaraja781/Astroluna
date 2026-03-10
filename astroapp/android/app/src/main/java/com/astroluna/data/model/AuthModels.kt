@@ -25,9 +25,6 @@ data class AuthResponse(
     val walletBalance: Double? = 0.0,
     val referralCode: String? = null,
     val image: String?,
-    val dob: String? = null,
-    val tob: String? = null,
-    val pob: String? = null,
     val error: String?
 )
 @Keep

@@ -392,6 +392,34 @@ fun WalletScreen(
                                 singleLine = true
                             )
 
+                            // GST Breakdown UI
+                            val amt = amountInput.toDoubleOrNull() ?: 0.0
+                            if (amt >= 1.0) {
+                                val gst = amt * 0.18
+                                val total = amt + gst
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color.Black.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+                                        .padding(12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                        Text("Recharge Amount", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+                                        Text("₹${String.format("%.2f", amt)}", color = Color.White, fontSize = 12.sp)
+                                    }
+                                    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                        Text("GST (18%)", color = Color.White.copy(alpha = 0.6f), fontSize = 12.sp)
+                                        Text("₹${String.format("%.2f", gst)}", color = Color.White, fontSize = 12.sp)
+                                    }
+                                    Divider(color = Color.White.copy(alpha = 0.1f), thickness = 0.5.dp, modifier = Modifier.padding(vertical = 4.dp))
+                                    Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                                        Text("Total Payable", color = neonCyan, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                        Text("₹${String.format("%.2f", total)}", color = neonCyan, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                    }
+                                }
+                            }
+
                             Button(
                                 onClick = {
                                     val amt = amountInput.toIntOrNull() ?: 0

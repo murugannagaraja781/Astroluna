@@ -94,7 +94,8 @@ class ChatActivity : ComponentActivity() {
         handleIntent(intent)
 
         // --- GLOBAL STATE FIX: Mark chat as active to prevent incoming calls during session ---
-        com.astroluna.utils.CallState.markActive(sessionId)
+        com.astroluna.utils.CallState.isCallActive = true
+        com.astroluna.utils.CallState.currentSessionId = sessionId
         setContent {
             CosmicAppTheme {
                 ChatScreen(
@@ -193,14 +194,12 @@ class ChatActivity : ComponentActivity() {
             val minutes = summary.duration / 60
             val seconds = summary.duration % 60
             val durationStr = String.format("%02d:%02d", minutes, seconds)
-            if (!isFinishing && !isDestroyed) {
-                androidx.appcompat.app.AlertDialog.Builder(this)
-                    .setTitle("Chat Summary")
-                    .setMessage("Duration: $durationStr\nDeducted: ₹${String.format("%.2f", summary.deducted)}")
-                    .setPositiveButton("OK") { _, _ -> finish() }
-                    .setCancelable(false)
-                    .show()
-            }
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Chat Summary")
+                .setMessage("Duration: $durationStr\nDeducted: ₹${String.format("%.2f", summary.deducted)}")
+                .setPositiveButton("OK") { _, _ -> finish() }
+                .setCancelable(false)
+                .show()
         }
         viewModel.sessionEnded.observe(this) { ended ->
             if (ended && viewModel.sessionSummary.value == null) {
@@ -293,7 +292,8 @@ class ChatActivity : ComponentActivity() {
 
     override fun finish() {
         // Reset CallState
-        com.astroluna.utils.CallState.markInactive()
+        com.astroluna.utils.CallState.isCallActive = false
+        com.astroluna.utils.CallState.currentSessionId = null
         super.finish()
     }
 

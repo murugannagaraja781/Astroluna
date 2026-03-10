@@ -10,38 +10,19 @@ object CallState {
     @Volatile
     var currentSessionId: String? = null
 
-    private var lastActiveTimestamp: Long = 0
-
+    /**
+     * Determines if a new call/chat session can be received.
+     * Block if a session is already active (CallActivity/ChatActivity).
+     */
     fun canReceiveCall(newSessionId: String?): Boolean {
-        val now = System.currentTimeMillis()
+        // If we are already in an active call/chat, block new ones
+        if (isCallActive) return false
 
-        // Safety: If no activity for 30 mins, reset stuck state
-        if (isCallActive && (now - lastActiveTimestamp > 30 * 60 * 1000L)) {
-            isCallActive = false
-            currentSessionId = null
-        }
+        // If the new session is the same as the current one, we can either allow it (to refresh UI)
+        // or block it if we know an activity is already handling it.
+        // For now, only block if isCallActive is true.
+        // The Activity's launchMode (singleTop) will handle duplicate intents for the same session.
 
-        // Allow if not active
-        if (!isCallActive) return true
-
-        // Allow if it's the SAME session (Re-entry or Duplicate FCM)
-        if (newSessionId != null && newSessionId == currentSessionId) return true
-
-        return false
-    }
-
-    fun markActive(sessionId: String?) {
-        isCallActive = true
-        currentSessionId = sessionId
-        lastActiveTimestamp = System.currentTimeMillis()
-    }
-
-    fun markInactive() {
-        isCallActive = false
-        currentSessionId = null
-    }
-
-    fun updateActivity() {
-        if (isCallActive) lastActiveTimestamp = System.currentTimeMillis()
+        return true
     }
 }

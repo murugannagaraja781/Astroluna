@@ -30,46 +30,32 @@ data class ThemeColors(
 
 object ThemePalette {
 
-    // Base Premium Template - Celestial Dark (Kept for reference or future use)
-    private val DarkTemplate = ThemeColors(
-        bgStart = Color(0xFF0B0F1A), // Deep Cosmic Dark
-        bgCenter = Color(0xFF161B2E), // Secondary Deep Blue
-        bgEnd = Color(0xFF0B0F1A),
-        headerStart = Color(0xFF7C3AED), // Premium Purple
-        headerEnd = Color(0xFFC026D3), // Vibrant Magenta
-        cardBg = Color(0xFF161B2E), // Surface Blue
-        cardStroke = Color(0xFF2E344E), // Subtle Glass Border
-        textPrimary = Color(0xFFFFFFFF), // Pure White
-        textSecondary = Color(0xFF94A3B8), // Muted Slate
-        accent = Color(0xFFF59E0B) // Celestial Gold
+    // Base Premium Template
+    private val PremiumTemplate = ThemeColors(
+        bgStart = Color(0xFFFFFFFF), // Pure White Background
+        bgCenter = Color(0xFFFFFFFF),
+        bgEnd = Color(0xFFFFFFFF),
+        headerStart = Color(0xFF4A148C), // Primary Deep Purple
+        headerEnd = Color(0xFF4A148C),
+        cardBg = Color(0xFFFFFFFF),
+        cardStroke = Color(0xFF4A148C), // Purple Borders
+        textPrimary = Color(0xFF1C1F26),
+        textSecondary = Color(0xFF6B7280),
+        accent = Color(0xFF4A148C) // Accent Purple
     )
 
-    // Base Light Template - Requested by referthecode standards
-    private val LightTemplate = ThemeColors(
-        bgStart = Color(0xFFFFFFFF), // Pure White top
-        bgCenter = Color(0xFFF0FDF4), // Mint/Emerald White from referthecode
-        bgEnd = Color(0xFFDCFCE7), // Soft premium green base
-        headerStart = Color(0xFF059669), // Emerald Green (referthecode primary)
-        headerEnd = Color(0xFF10B981),
-        cardBg = Color(0xFFFFFFFF), // White Cards
-        cardStroke = Color(0xFFD1FAE5), // Mint border
-        textPrimary = Color(0xFF111827), // Deep Gray/Black
-        textSecondary = Color(0xFF4B5563), // Muted Gray
-        accent = Color(0xFFD97706) // Premium Gold Accent
-    )
-
-    // All themes are now forced to Light as requested
-    val CosmicPurple = LightTemplate
-    val MidnightIndigo = LightTemplate
-    val RoyalBlue = LightTemplate
-    val EmeraldNight = LightTemplate
-    val CharcoalGold = LightTemplate
-    val DeepAmethyst = LightTemplate
-    val SunsetGlow = LightTemplate
-    val OceanBreeze = LightTemplate
-    val ForestMystic = LightTemplate
-    val RubyPassion = LightTemplate
+    // All themes are now forced to Premium as requested
+    val CosmicPurple = PremiumTemplate
+    val MidnightIndigo = PremiumTemplate
+    val RoyalBlue = PremiumTemplate
+    val EmeraldNight = PremiumTemplate
+    val CharcoalGold = PremiumTemplate
+    val DeepAmethyst = PremiumTemplate
+    val SunsetGlow = PremiumTemplate
+    val OceanBreeze = PremiumTemplate
+    val ForestMystic = PremiumTemplate
+    val RubyPassion = PremiumTemplate
 
     // Helper to get colors by enum
-    fun getColors(theme: AppTheme): ThemeColors = LightTemplate
+    fun getColors(theme: AppTheme): ThemeColors = PremiumTemplate
 }

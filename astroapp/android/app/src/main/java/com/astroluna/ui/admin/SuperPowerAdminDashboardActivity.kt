@@ -18,8 +18,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -100,19 +98,7 @@ fun SuperPowerScreen(
                 title = { Text("Admin Dashboard", color = MaterialTheme.colorScheme.onBackground) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
-                ),
-                actions = {
-                    IconButton(onClick = {
-                        val tokenManager = com.astroluna.data.local.TokenManager(context)
-                        tokenManager.clearSession()
-                        val intent = Intent(context, com.astroluna.ui.guest.GuestDashboardActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        context.startActivity(intent)
-                        (context as? android.app.Activity)?.finish()
-                    }) {
-                        Icon(Icons.Default.ExitToApp, "Logout", tint = MaterialTheme.colorScheme.primary)
-                    }
-                }
+                )
             )
         }
     ) { padding ->

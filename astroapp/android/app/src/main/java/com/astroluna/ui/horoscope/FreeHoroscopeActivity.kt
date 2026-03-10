@@ -1,6 +1,8 @@
 package com.astroluna.ui.horoscope
 
 import android.app.Activity
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +11,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.List
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,10 +26,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -288,139 +291,83 @@ fun FreeHoroscopeScreen(
 
                         // Date of Birth Split
                         Text("Date of Birth", fontWeight = FontWeight.SemiBold, color = Color.White)
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            listOf(day to "DD", month to "MM", year to "YYYY").forEach { (valStr, lbl) ->
-                                OutlinedTextField(
-                                    value = if(lbl == "DD") day else if(lbl == "MM") month else year,
-                                    onValueChange = {
-                                        if(lbl == "DD" && it.length <= 2) day = it
-                                        else if(lbl == "MM" && it.length <= 2) month = it
-                                        else if(lbl == "YYYY" && it.length <= 4) year = it
-                                    },
-                                    label = { Text(lbl, color = Color.White.copy(alpha = 0.5f)) },
-                                    modifier = Modifier.weight(if(lbl == "YYYY") 1.5f else 1f),
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = OutlinedTextFieldDefaults.colors(
-                                        focusedBorderColor = neonCyan,
-                                        unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
-                                        focusedTextColor = Color.White,
-                                        unfocusedTextColor = Color.White
-                                    )
-                                )
-                            }
+                        val displayDate = remember(day, month, year) {
+                            if (day.isNotBlank() && month.isNotBlank() && year.isNotBlank())
+                                "$day/$month/$year"
+                            else "Select Date"
                         }
+                        OutlinedTextField(
+                            value = displayDate,
+                            onValueChange = {},
+                            label = { Text("Select DOB", color = Color.White.copy(alpha = 0.6f)) },
+                            readOnly = true,
+                            enabled = false,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    val curDay = day.toIntOrNull() ?: 1
+                                    val curMonth = (month.toIntOrNull() ?: 1) - 1
+                                    val curYear = year.toIntOrNull() ?: 1990
+                                    DatePickerDialog(context, { _, y, m, d ->
+                                        day = d.toString()
+                                        month = (m + 1).toString()
+                                        year = y.toString()
+                                    }, curYear, curMonth, curDay).show()
+                                },
+                            shape = RoundedCornerShape(12.dp),
+                            trailingIcon = { Icon(Icons.Default.DateRange, "Pick Date", tint = neonCyan) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                disabledTextColor = Color.White,
+                                disabledBorderColor = Color.White.copy(alpha = 0.2f),
+                                disabledLabelColor = Color.White.copy(alpha = 0.5f),
+                                disabledContainerColor = Color.Transparent
+                            )
+                        )
 
-                        // Time of Birth Split
                         Text("Time of Birth", fontWeight = FontWeight.SemiBold, color = Color.White)
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            OutlinedTextField(
-                                value = hour,
-                                onValueChange = { if (it.length <= 2) hour = it },
-                                label = { Text("HH", color = Color.White.copy(alpha = 0.5f)) },
-                                modifier = Modifier.weight(1f),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = neonCyan,
-                                    unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
-                                    focusedTextColor = Color.White,
-                                    unfocusedTextColor = Color.White
-                                )
-                            )
-                            Text(":", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 20.sp)
-                            OutlinedTextField(
-                                value = minute,
-                                onValueChange = { if (it.length <= 2) minute = it },
-                                label = { Text("MM", color = Color.White.copy(alpha = 0.5f)) },
-                                modifier = Modifier.weight(1f),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = neonCyan,
-                                    unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
-                                    focusedTextColor = Color.White,
-                                    unfocusedTextColor = Color.White
-                                )
-                            )
-
-                            Row(
-                                modifier = Modifier
-                                    .weight(1.5f)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(Color.White.copy(alpha = 0.1f))
-                                    .border(1.dp, Color.White.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
-                            ) {
-                                Text(
-                                    "AM",
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clickable { amPm = "AM" }
-                                        .background(if (amPm == "AM") neonCyan else Color.Transparent)
-                                        .padding(12.dp),
-                                    textAlign = TextAlign.Center,
-                                    color = if (amPm == "AM") DeepSpaceNavy else Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    "PM",
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clickable { amPm = "PM" }
-                                        .background(if (amPm == "PM") neonCyan else Color.Transparent)
-                                        .padding(12.dp),
-                                    textAlign = TextAlign.Center,
-                                    color = if (amPm == "PM") DeepSpaceNavy else Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
+                        val displayTime = remember(hour, minute, amPm) {
+                            if (hour.isNotBlank() && minute.isNotBlank())
+                                "$hour:$minute $amPm"
+                            else "Select Time"
                         }
+                        OutlinedTextField(
+                            value = displayTime,
+                            onValueChange = {},
+                            label = { Text("Select TOB", color = Color.White.copy(alpha = 0.6f)) },
+                            readOnly = true,
+                            enabled = false,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    val curHour = if (hour.isNotBlank()) {
+                                        val h = hour.toIntOrNull() ?: 0
+                                        if (amPm == "PM" && h < 12) h + 12
+                                        else if (amPm == "AM" && h == 12) 0
+                                        else h
+                                    } else 12
+                                    val curMin = minute.toIntOrNull() ?: 0
+                                    TimePickerDialog(context, { _, h, m ->
+                                        val h12 = if (h == 0) 12 else if (h > 12) h - 12 else h
+                                        hour = h12.toString()
+                                        minute = String.format("%02d", m)
+                                        amPm = if (h >= 12) "PM" else "AM"
+                                    }, curHour, curMin, false).show()
+                                },
+                            shape = RoundedCornerShape(12.dp),
+                            trailingIcon = { Icon(Icons.Default.List, "Pick Time", tint = neonCyan) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                disabledTextColor = Color.White,
+                                disabledBorderColor = Color.White.copy(alpha = 0.2f),
+                                disabledLabelColor = Color.White.copy(alpha = 0.5f),
+                                disabledContainerColor = Color.Transparent
+                            )
+                        )
 
                         // Place of Birth (Auto-Select)
                         Text("Place of Birth", fontWeight = FontWeight.SemiBold, color = RoyalMidnightBlue)
 
                         // Country (Read-only + Picker)
-                        OutlinedTextField(
-                            value = countryName,
-                            onValueChange = {},
-                            label = { Text("Country") },
-                            readOnly = true,
-                            enabled = false,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { launchLocationPicker() },
-                            trailingIcon = { Icon(Icons.Default.LocationOn, "Pick", tint = PeacockGreen) },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                disabledTextColor = RoyalMidnightBlue,
-                                disabledBorderColor = Color.Gray,
-                                disabledLabelColor = RoyalMidnightBlue,
-                                disabledContainerColor = Color.Transparent
-                            )
-                        )
-
-                        // State (Read-only + Picker)
-                        OutlinedTextField(
-                            value = stateName,
-                            onValueChange = {},
-                            label = { Text("State") },
-                            readOnly = true,
-                            enabled = false,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { launchLocationPicker() },
-                            trailingIcon = { Icon(Icons.Default.LocationOn, "Pick", tint = PeacockGreen) },
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                disabledTextColor = RoyalMidnightBlue,
-                                disabledBorderColor = Color.Gray,
-                                disabledLabelColor = RoyalMidnightBlue,
-                                disabledContainerColor = Color.Transparent
-                            )
-                        )
+// Hidden Country/State per User request
 
                         // City (Read-only + Picker)
                         OutlinedTextField(

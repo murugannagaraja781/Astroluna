@@ -15,19 +15,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import java.util.Calendar
-import java.util.TimeZone
-import kotlin.math.abs
-import kotlin.math.roundToInt
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -81,10 +75,6 @@ fun UserProfileScreen(
 
     var name by remember { mutableStateOf(session?.name ?: "") }
     var imageUrl by remember { mutableStateOf(session?.image ?: "") }
-    var dob by remember { mutableStateOf(session?.dob ?: "") }
-    var tob by remember { mutableStateOf(session?.tob ?: "") }
-    var pob by remember { mutableStateOf(session?.pob ?: "") }
-
     var isUploading by remember { mutableStateOf(false) }
 
     val pickerLauncher = rememberLauncherForActivityResult(
@@ -113,17 +103,10 @@ fun UserProfileScreen(
                         Icon(Icons.Default.ArrowBack, "Back", tint = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = CosmicAppTheme.colors.headerStart)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF004D40))
             )
         }
     ) { padding ->
-        val cityLauncher = rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == android.app.Activity.RESULT_OK && result.data != null) {
-                pob = result.data?.getStringExtra("name") ?: ""
-            }
-        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -171,73 +154,10 @@ fun UserProfileScreen(
                 onValueChange = { name = it },
                 label = { Text("Display Name") },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = CosmicAppTheme.colors.accent)
+                singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Date of Birth
-            OutlinedTextField(
-                value = dob,
-                onValueChange = { dob = it },
-                label = { Text("Date of Birth (DD-MM-YYYY)") },
-                modifier = Modifier.fillMaxWidth().clickable {
-                    val cal = Calendar.getInstance()
-                    android.app.DatePickerDialog(context, { _, y, m, d ->
-                        dob = "$d-${m+1}-$y"
-                    }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
-                },
-                enabled = false,
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = CosmicAppTheme.colors.textPrimary,
-                    disabledBorderColor = Color.Gray,
-                    disabledLabelColor = CosmicAppTheme.colors.textSecondary,
-                    disabledContainerColor = Color.Transparent
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Time of Birth
-            OutlinedTextField(
-                value = tob,
-                onValueChange = { tob = it },
-                label = { Text("Time of Birth (HH:MM)") },
-                modifier = Modifier.fillMaxWidth().clickable {
-                    val cal = Calendar.getInstance()
-                    android.app.TimePickerDialog(context, { _, h, min ->
-                        tob = String.format("%02d:%02d", h, min)
-                    }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
-                },
-                enabled = false,
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = CosmicAppTheme.colors.textPrimary,
-                    disabledBorderColor = Color.Gray,
-                    disabledLabelColor = CosmicAppTheme.colors.textSecondary,
-                    disabledContainerColor = Color.Transparent
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Place of Birth
-            OutlinedTextField(
-                value = pob,
-                onValueChange = { pob = it },
-                label = { Text("Place of Birth") },
-                modifier = Modifier.fillMaxWidth().clickable {
-                    cityLauncher.launch(Intent(context, com.astroluna.ui.city.CitySearchActivity::class.java))
-                },
-                enabled = false,
-                trailingIcon = { Icon(Icons.Default.Place, null, tint = CosmicAppTheme.colors.accent) },
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = CosmicAppTheme.colors.textPrimary,
-                    disabledBorderColor = Color.Gray,
-                    disabledLabelColor = CosmicAppTheme.colors.textSecondary,
-                    disabledContainerColor = Color.Transparent
-                )
-            )
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Save Button
             Button(
@@ -245,20 +165,11 @@ fun UserProfileScreen(
                     val updates = JSONObject().apply {
                         put("name", name)
                         put("image", imageUrl)
-                        put("dob", dob)
-                        put("tob", tob)
-                        put("pob", pob)
                     }
                     SocketManager.updateProfile(updates) { res ->
                         if (res?.optBoolean("ok") == true) {
                             // Update local session
-                            val updatedUser = session?.copy(
-                                name = name,
-                                image = imageUrl,
-                                dob = dob,
-                                tob = tob,
-                                pob = pob
-                            )
+                            val updatedUser = session?.copy(name = name, image = imageUrl)
                             if (updatedUser != null) {
                                 tokenManager.saveUserSession(updatedUser)
                             }
@@ -273,11 +184,10 @@ fun UserProfileScreen(
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = CosmicAppTheme.colors.headerStart)
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF004D40))
             ) {
-                Text("Save Profile", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("Save Changes", fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }

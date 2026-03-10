@@ -203,8 +203,9 @@ class CallActivity : ComponentActivity() {
             partnerId = savedInstanceState.getString("partnerId")
         }
 
-        // --- GLOBAL STATE FIX: Mark chat as active to prevent incoming calls during session ---
-        com.astroluna.utils.CallState.markActive(sessionId)
+        // --- GLOBAL STATE FIX: Mark call as active to prevent duplicate starts ---
+        CallState.isCallActive = true
+        CallState.currentSessionId = intent.getStringExtra("sessionId")
 
         // Initialize WebRTC Views Programmatically
         localView = SurfaceViewRenderer(this)
@@ -864,14 +865,12 @@ class CallActivity : ComponentActivity() {
                     else -> "Duration: $durationStr\nDeducted: ₹${String.format("%.2f", deducted)}"
                 }
 
-                if (!isFinishing && !isDestroyed) {
-                    androidx.appcompat.app.AlertDialog.Builder(this@CallActivity)
-                        .setTitle(if (reason == "insufficient_funds") "⚠️ Low Balance" else "📞 Call Summary")
-                        .setMessage(message)
-                        .setPositiveButton("OK") { _, _ -> finish() }
-                        .setCancelable(false)
-                        .show()
-                }
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle(if (reason == "insufficient_funds") "⚠️ Low Balance" else "📞 Call Summary")
+                    .setMessage(message)
+                    .setPositiveButton("OK") { _, _ -> finish() }
+                    .setCancelable(false)
+                    .show()
             }
         }
 
@@ -1003,7 +1002,8 @@ class CallActivity : ComponentActivity() {
 
     override fun finish() {
         // Ensure state is cleared even if finished via system back or other means
-        CallState.markInactive()
+        CallState.isCallActive = false
+        CallState.currentSessionId = null
         stopBackgroundService()
         super.finish()
     }

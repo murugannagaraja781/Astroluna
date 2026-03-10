@@ -91,7 +91,7 @@ fun AstrologerProfileScreen(
     onAction: (String) -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val headerColor = CosmicAppTheme.colors.headerStart
+    val peacockTeal = Color(0xFF004D40)
     val yellowAccent = Color(0xFFFFD54F)
 
     Scaffold(
@@ -104,24 +104,11 @@ fun AstrologerProfileScreen(
                     }
                 },
                 actions = {
-                    val context = androidx.compose.ui.platform.LocalContext.current
-                    IconButton(onClick = {
-                        try {
-                            val shareIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(android.content.Intent.EXTRA_SUBJECT, "Astro Luna - $name")
-                                putExtra(android.content.Intent.EXTRA_TEXT, "Consult $name on Astro Luna! The best astrologer with $exp years of experience in $skills.\n\nCheck out their profile on the app!")
-                            }
-                            val chooser = android.content.Intent.createChooser(shareIntent, "Share Profile")
-                            context.startActivity(chooser)
-                        } catch (e: Exception) {
-                            android.widget.Toast.makeText(context, "Share failed", android.widget.Toast.LENGTH_SHORT).show()
-                        }
-                    }) {
+                    IconButton(onClick = {}) {
                         Icon(Icons.Default.Share, "Share", tint = Color.White)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = headerColor)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = peacockTeal)
             )
         }
     ) { padding ->
@@ -142,7 +129,7 @@ fun AstrologerProfileScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
-                        .background(headerColor)
+                        .background(peacockTeal)
                 )
 
                 // Avatar
@@ -171,14 +158,14 @@ fun AstrologerProfileScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(CircleShape)
-                            .border(4.dp, Color(0xFF059669), CircleShape),
+                            .border(4.dp, Color(0xFF1B5E20), CircleShape),
                         contentScale = ContentScale.Crop
                     )
                    // Verified Badge
                     Icon(
-                        imageVector = Icons.Default.CheckCircle,
+                        imageVector = Icons.Default.Check,
                         contentDescription = "Verified",
-                        tint = Color(0xFF10B981),
+                        tint = Color(0xFF4CAF50),
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .size(24.dp)
@@ -201,7 +188,7 @@ fun AstrologerProfileScreen(
                         .clip(RoundedCornerShape(16.dp))
                         .background(
                             Brush.verticalGradient(
-                                listOf(headerColor, headerColor.copy(alpha = 0.8f))
+                                listOf(peacockTeal, Color(0xFF00332E))
                             )
                         )
                         .shadow(4.dp, RoundedCornerShape(16.dp))
@@ -248,29 +235,36 @@ fun AstrologerProfileScreen(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    ActionButton(
-                        icon = Icons.Default.Send,
-                        label = "Chat",
-                        color = Color(0xFF00BCD4),
-                        isEnabled = isChatOnline,
-                        onClick = { onAction("chat") }
-                    )
+                    // Only show buttons for services the astrologer has enabled
+                    if (isChatOnline) {
+                        ActionButton(
+                            icon = Icons.Default.Send,
+                            label = "Chat",
+                            color = Color(0xFF00BCD4),
+                            isEnabled = true,
+                            onClick = { onAction("chat") }
+                        )
+                    }
 
-                    ActionButton(
-                        icon = Icons.Default.Phone,
-                        label = "Audio",
-                        color = Color(0xFF00796B),
-                        isEnabled = isAudioOnline,
-                        onClick = { onAction("audio") }
-                    )
+                    if (isAudioOnline) {
+                        ActionButton(
+                            icon = Icons.Default.Phone,
+                            label = "Call",
+                            color = Color(0xFF00796B),
+                            isEnabled = true,
+                            onClick = { onAction("audio") }
+                        )
+                    }
 
-                    ActionButton(
-                        icon = Icons.Filled.Videocam,
-                        label = "Video",
-                        color = Color(0xFFD32F2F),
-                        isEnabled = true, // Always enabled
-                        onClick = { onAction("video") }
-                    )
+                    if (isVideoOnline) {
+                        ActionButton(
+                            icon = Icons.Default.PlayArrow,
+                            label = "Video",
+                            color = Color(0xFFD32F2F),
+                            isEnabled = true,
+                            onClick = { onAction("video") }
+                        )
+                    }
                 }
 
                 // Reviews Section Placeholder

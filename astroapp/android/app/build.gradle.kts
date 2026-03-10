@@ -5,7 +5,6 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    id("com.google.firebase.crashlytics")
 
     id("kotlin-kapt")
 }
@@ -16,7 +15,7 @@ android {
     defaultConfig {
         applicationId = "com.astroluna.test"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 33
         versionCode = 7
         versionName = "6.1.0"
         multiDexEnabled = true
@@ -97,7 +96,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-messaging")
     implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-crashlytics")
 
     // Networking
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
@@ -126,9 +124,8 @@ dependencies {
     // PhonePe (Keep slightly older or check compatibility)
     implementation("phonepe.intentsdk.android.release:IntentSDK:5.3.0")
 
-    // Icons (Added extended for Videocam)
+    // Icons (Using core only to save 10MB+)
     implementation("androidx.compose.material:material-icons-core:1.6.8")
-    implementation("androidx.compose.material:material-icons-extended:1.6.8")
 
     // Jetpack Compose (BOM 2024.06.00)
     implementation(platform("androidx.compose:compose-bom:2024.06.00"))
