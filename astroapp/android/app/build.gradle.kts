@@ -13,7 +13,7 @@ android {
     namespace = "com.astroluna"
     compileSdk = 34
     defaultConfig {
-        applicationId = "com.astroluna.test"
+        applicationId = "com.astroluna"
         minSdk = 21
         targetSdk = 34
         versionCode = 20260311

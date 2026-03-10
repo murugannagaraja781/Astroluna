@@ -211,7 +211,7 @@ const COMMISSION_L3 = 0.01; // 1%
 const CASHBACK_CLIENT = 0.02; // 2% for referred client
 
 // FCM Project and Auth
-const FCM_PROJECT_ID = 'astroluna-d487c';
+const FCM_PROJECT_ID = 'astroluna-76da1';
 let fcmAuth = null;
 
 // Initialize FCM v1 Auth
