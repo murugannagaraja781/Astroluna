@@ -259,6 +259,7 @@ class IncomingCallActivity : ComponentActivity() {
                 putExtra("birthData", birthData)
             }
         }
+        SocketManager.answerSessionNative(callId, true, callType)
         startActivity(intent)
 
         // --- FIX: Do NOT stop service here. Let CallActivity take over ---
@@ -270,6 +271,7 @@ class IncomingCallActivity : ComponentActivity() {
 
     private fun onCallRejected() {
         Log.d(TAG, "Call rejected: $callId")
+        SocketManager.answerSessionNative(callId, false)
         stopRingtoneAndVibration()
         handler.removeCallbacks(timeoutRunnable)
 

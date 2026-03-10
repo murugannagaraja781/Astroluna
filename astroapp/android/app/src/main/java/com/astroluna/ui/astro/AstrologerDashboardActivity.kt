@@ -8,7 +8,15 @@ import java.util.Locale
 import java.io.File
 import android.net.Uri
 import androidx.core.content.FileProvider
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import android.os.Bundle
+import android.provider.Settings
+import android.os.Build
+import android.app.AlertDialog
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -269,19 +277,39 @@ fun AstrologerDashboardScreen(
     var isVideoOnline by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    // Permission Launchers
+    val micPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            Toast.makeText(context, "Microphone permission is required for calls", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    val videoPermissionsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { perms ->
+        val micGranted = perms[Manifest.permission.RECORD_AUDIO] == true
+        val camGranted = perms[Manifest.permission.CAMERA] == true
+        if (!micGranted || !camGranted) {
+            Toast.makeText(context, "Camera and Microphone permissions are required for video calls", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (!isGranted) {
+            Toast.makeText(context, "Notification permission is recommended for call alerts", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     // NEW: Local Today's Progress Logic
     val tokenManager = remember { TokenManager(context) }
     var todayProgress by remember { mutableIntStateOf(tokenManager.getDailyProgress()) }
-
-    val services = remember {
-        mutableStateListOf(
-            ServiceData("Chat", true, Icons.Default.Send),
-            ServiceData("Call", true, Icons.Default.Phone),
-            ServiceData("Video", true, Icons.Default.Person)
-        )
-    }
     val scrollState = rememberScrollState()
-    val scope = rememberCoroutineScope()
 
     var showWithdrawDialog by remember { mutableStateOf(false) }
     var withdrawAmount by remember { mutableStateOf("") }
@@ -677,18 +705,85 @@ fun AstrologerDashboardScreen(
                 isAudioOnline = isAudioOnline,
                 isVideoOnline = isVideoOnline,
                 onChatToggle = { enabled ->
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(context)) {
+                        android.app.AlertDialog.Builder(context)
+                            .setTitle("Permission Required")
+                            .setMessage("To receive calls even when the app is closed, please enable 'Display over other apps' in settings.")
+                            .setPositiveButton("Go to Settings") { _, _ ->
+                                val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${context.packageName}"))
+                                context.startActivity(intent)
+                            }
+                            .setNegativeButton("Not Now", null)
+                            .show()
+                        return@ServiceTogglesCard
+                    }
                     isChatOnline = enabled
                     scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                         updateServiceStatus(sessionId, "chat", enabled)
                     }
                 },
                 onAudioToggle = { enabled ->
+                    if (enabled) {
+                        // 1. Overlay Check
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(context)) {
+                            android.app.AlertDialog.Builder(context)
+                                .setTitle("Permission Required")
+                                .setMessage("To receive calls even when the app is closed, please enable 'Display over other apps' in settings.")
+                                .setPositiveButton("Go to Settings") { _, _ ->
+                                    val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${context.packageName}"))
+                                    context.startActivity(intent)
+                                }
+                                .setNegativeButton("Not Now", null)
+                                .show()
+                            return@ServiceTogglesCard
+                        }
+
+                        // 2. Microphone Check
+                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+                            micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                            return@ServiceTogglesCard
+                        }
+
+                        // 3. Notification Check (Android 13+)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            if (ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                // We don't block for notifications, just ask
+                            }
+                        }
+                    }
+
                     isAudioOnline = enabled
                     scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                         updateServiceStatus(sessionId, "audio", enabled)
                     }
                 },
                 onVideoToggle = { enabled ->
+                    if (enabled) {
+                        // 1. Overlay Check
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M && !android.provider.Settings.canDrawOverlays(context)) {
+                            android.app.AlertDialog.Builder(context)
+                                .setTitle("Permission Required")
+                                .setMessage("To receive calls even when the app is closed, please enable 'Display over other apps' in settings.")
+                                .setPositiveButton("Go to Settings") { _, _ ->
+                                    val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION, android.net.Uri.parse("package:${context.packageName}"))
+                                    context.startActivity(intent)
+                                }
+                                .setNegativeButton("Not Now", null)
+                                .show()
+                            return@ServiceTogglesCard
+                        }
+
+                        // 2. Camera & Microphone Check
+                        val hasMic = ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+                        val hasCam = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+
+                        if (!hasMic || !hasCam) {
+                            videoPermissionsLauncher.launch(arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA))
+                            return@ServiceTogglesCard
+                        }
+                    }
+
                     isVideoOnline = enabled
                     scope.launch(kotlinx.coroutines.Dispatchers.IO) {
                         updateServiceStatus(sessionId, "video", enabled)

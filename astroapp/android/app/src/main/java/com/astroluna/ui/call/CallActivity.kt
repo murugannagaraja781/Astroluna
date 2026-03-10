@@ -854,9 +854,12 @@ class CallActivity : ComponentActivity() {
 
         SocketManager.onSessionEndedWithSummary { reason, deducted, earned, duration ->
             runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+
                 timerHandler.removeCallbacks(timerRunnable)
-                val minutes = duration / 60
-                val seconds = duration % 60
+                val totalSeconds = duration // duration is already in seconds from server
+                val minutes = totalSeconds / 60
+                val seconds = totalSeconds % 60
                 val durationStr = String.format("%02d:%02d", minutes, seconds)
 
                 val message = when {
@@ -865,12 +868,22 @@ class CallActivity : ComponentActivity() {
                     else -> "Duration: $durationStr\nDeducted: ₹${String.format("%.2f", deducted)}"
                 }
 
-                androidx.appcompat.app.AlertDialog.Builder(this)
-                    .setTitle(if (reason == "insufficient_funds") "⚠️ Low Balance" else "📞 Call Summary")
-                    .setMessage(message)
-                    .setPositiveButton("OK") { _, _ -> finish() }
-                    .setCancelable(false)
-                    .show()
+                try {
+                    androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setTitle(if (reason == "insufficient_funds") "⚠️ Low Balance" else "📞 Call Summary")
+                        .setMessage(message)
+                        .setPositiveButton("OK") { _, _ -> finish() }
+                        .setCancelable(false)
+                        .show()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Failed to show call summary dialog", e)
+                    finish()
+                }
+
+                // Fallback: If dialog fails to show or is dismissed without clicking OK, finish after 5s
+                timerHandler.postDelayed({
+                    if (!isFinishing && !isDestroyed) finish()
+                }, 10000)
             }
         }
 

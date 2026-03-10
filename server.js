@@ -2538,6 +2538,7 @@ io.on('connection', (socket) => {
         const userId = user.userId;
         userSockets.set(userId, socket.id);
         socketToUser.set(socket.id, userId);
+        socket.join(userId); // JOIN ROOM FOR RELIABLE SIGNALING
 
         if (typeof cb === 'function') cb({
           ok: true,
@@ -2846,7 +2847,8 @@ io.on('connection', (socket) => {
         lastBilledMinute: 0,
         actualBillingStart: null,
         totalDeducted: 0,
-        totalEarned: 0
+        totalEarned: 0,
+        status: 'ringing'
       });
       userActiveSession.set(fromUserId, sessionId);
       userActiveSession.set(toUserId, sessionId);
@@ -2905,6 +2907,43 @@ io.on('connection', (socket) => {
         const s = activeSessions.get(sessionId);
         if (s && s.status === 'ringing') {
           console.log(`[Session] Ringing timeout for ${sessionId}. Marking as MISSED.`);
+
+          // CRITICAL: Set astrologer offline if they missed the call
+          if (astrologerId) {
+            try {
+              const astro = await User.findOne({ userId: astrologerId });
+              if (astro) {
+                astro.isChatOnline = false;
+                astro.isAudioOnline = false;
+                astro.isVideoOnline = false;
+                astro.isOnline = false;
+                astro.isAvailable = false;
+                await astro.save();
+
+                // Broadcast to all clients
+                broadcastAstroUpdate();
+
+                // Notify Super Admin
+                io.to('superadmin').emit('admin-notification', {
+                  title: 'Call Missed - Astro Offline',
+                  message: `Astrologer ${astro.name} missed an incoming call and has been set offline.`,
+                  type: 'warning',
+                  astroId: astrologerId,
+                  sessionId: sessionId
+                });
+
+                // Notify the astrologer via socket (if connected)
+                io.to(astrologerId).emit('admin-notification', {
+                  title: 'Status Changed to Offline',
+                  message: 'You missed a call, so your status has been changed to offline.',
+                  type: 'warning'
+                });
+              }
+            } catch (e) {
+              console.error('[Missed Call] Error setting astro offline:', e);
+            }
+          }
+
           io.to(fromUserId).emit('session-ended', { sessionId, reason: 'no_answer' });
           io.to(toUserId).emit('session-ended', { sessionId, reason: 'missed' });
 
@@ -2982,6 +3021,16 @@ io.on('connection', (socket) => {
 
       if (!accept) {
         endSessionRecord(sessionId);
+      } else {
+        const session = activeSessions.get(sessionId);
+        if (session) {
+          session.status = 'active';
+          if (session.astrologerId) {
+            User.updateOne({ userId: session.astrologerId }, { isBusy: true }).then(() => {
+              broadcastAstroUpdate();
+            }).catch(e => console.error('Error setting isBusy on answer-session', e));
+          }
+        }
       }
 
       // Emit to Room (userId) - works even after reconnect!
@@ -3026,6 +3075,11 @@ io.on('connection', (socket) => {
 
         if (accept) {
           // Notify caller that call was accepted
+          if (astrologerId) {
+            User.updateOne({ userId: astrologerId }, { isBusy: true }).then(() => {
+              broadcastAstroUpdate();
+            }).catch(e => console.error('Error setting isBusy on answer-session-native-db', e));
+          }
           io.to(fromUserId).emit('session-answered', {
             sessionId,
             fromUserId: astrologerId,
@@ -3033,7 +3087,7 @@ io.on('connection', (socket) => {
             accept: true
           });
 
-          console.log(`[Native] Call accepted - Session: ${sessionId}, From: ${fromUserId}, To: ${astrologerId}`);
+          console.log(`[Native] Call accepted (DB) - Session: ${sessionId}, From: ${fromUserId}, To: ${astrologerId}`);
           if (typeof cb === 'function') cb({ ok: true, fromUserId });
         } else {
           // Call rejected
@@ -3055,24 +3109,28 @@ io.on('connection', (socket) => {
       const targetSocketId = userSockets.get(fromUserId);
 
       if (accept) {
-        if (targetSocketId) {
-          io.to(targetSocketId).emit('session-answered', {
-            sessionId,
-            fromUserId: astrologerId,
-            type: callType || session.type,
-            accept: true
-          });
+        session.status = 'active';
+        if (astrologerId) {
+          User.updateOne({ userId: astrologerId }, { isBusy: true }).then(() => {
+            broadcastAstroUpdate();
+          }).catch(e => console.error('Error setting isBusy on answer-session-native', e));
         }
+        // USE userId ROOM instead of socket ID for reliability (fixes web issues)
+        io.to(fromUserId).emit('session-answered', {
+          sessionId,
+          fromUserId: astrologerId,
+          type: callType || session.type,
+          accept: true
+        });
         console.log(`[Native] Call accepted - Session: ${sessionId}, Caller: ${fromUserId}, Astro: ${astrologerId}`);
         if (typeof cb === 'function') cb({ ok: true, fromUserId });
       } else {
-        if (targetSocketId) {
-          io.to(targetSocketId).emit('session-answered', {
-            sessionId,
-            fromUserId: astrologerId,
-            accept: false
-          });
-        }
+        // USE userId ROOM instead of socket ID for reliability
+        io.to(fromUserId).emit('session-answered', {
+          sessionId,
+          fromUserId: astrologerId,
+          accept: false
+        });
         endSessionRecord(sessionId);
         console.log(`[Native] Call rejected - Session: ${sessionId}`);
         if (typeof cb === 'function') cb({ ok: true });

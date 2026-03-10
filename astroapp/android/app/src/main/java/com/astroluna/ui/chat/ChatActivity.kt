@@ -190,37 +190,37 @@ class ChatActivity : ComponentActivity() {
 
     private fun setupObservers() {
         viewModel.sessionSummary.observe(this) { summary ->
+            if (isFinishing || isDestroyed) return@observe
             timerHandler.removeCallbacks(timerRunnable)
             val minutes = summary.duration / 60
             val seconds = summary.duration % 60
             val durationStr = String.format("%02d:%02d", minutes, seconds)
-            androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Chat Summary")
-                .setMessage("Duration: $durationStr\nDeducted: ₹${String.format("%.2f", summary.deducted)}")
-                .setPositiveButton("OK") { _, _ -> finish() }
-                .setCancelable(false)
-                .show()
+
+            try {
+                androidx.appcompat.app.AlertDialog.Builder(this)
+                    .setTitle("Chat Summary")
+                    .setMessage("Duration: $durationStr\nDeducted: ₹${String.format("%.2f", summary.deducted)}")
+                    .setPositiveButton("OK") { _, _ ->
+                        navigateToDashboard()
+                    }
+                    .setCancelable(false)
+                    .show()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                navigateToDashboard()
+            }
         }
         viewModel.sessionEnded.observe(this) { ended ->
             if (ended && viewModel.sessionSummary.value == null) {
+                if (isFinishing || isDestroyed) return@observe
+
                 Toast.makeText(this, "Chat Ended by Partner", Toast.LENGTH_SHORT).show()
 
                 // Clear all notifications
                 val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
                 notificationManager.cancelAll()
 
-                // Navigate to appropriate dashboard
-                val userSession = TokenManager(this).getUserSession()
-                if (userSession?.role == "astrologer") {
-                    val intent = android.content.Intent(this, com.astroluna.ui.astro.AstrologerDashboardActivity::class.java)
-                    intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                } else {
-                    val intent = android.content.Intent(this, com.astroluna.MainActivity::class.java)
-                    intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                }
-                finish()
+                navigateToDashboard()
             }
         }
         viewModel.availableMinutes.observe(this) { mins ->
@@ -229,6 +229,19 @@ class ChatActivity : ComponentActivity() {
             val remSecs = remainingSeconds % 60
             remainingTime = String.format("%02d:%02d", remMins, remSecs)
         }
+    }
+
+    private fun navigateToDashboard() {
+        if (isFinishing || isDestroyed) return
+        val userSession = TokenManager(this).getUserSession()
+        val intent = if (userSession?.role == "astrologer") {
+            android.content.Intent(this, com.astroluna.ui.astro.AstrologerDashboardActivity::class.java)
+        } else {
+            android.content.Intent(this, com.astroluna.MainActivity::class.java)
+        }
+        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
     }
 
     private fun endChat() {
@@ -241,25 +254,16 @@ class ChatActivity : ComponentActivity() {
             val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
             notificationManager.cancelAll()
 
-            // Delay to ensure socket emit completes, then navigate
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                // Check if user is Astrologer
-                val userSession = TokenManager(this).getUserSession()
-                if (userSession?.role == "astrologer") {
-                    // Navigate to Astrologer Dashboard
-                    val intent = android.content.Intent(this, com.astroluna.ui.astro.AstrologerDashboardActivity::class.java)
-                    intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
-                } else {
-                    // Client - go to MainActivity
-                    val intent = android.content.Intent(this, com.astroluna.MainActivity::class.java)
-                    intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
+            // The summary observer will handle navigation when it receives the "session-ended" event from server
+            // But if it takes too long (e.g. 3 seconds), we navigate anyway as a fallback
+            timerHandler.postDelayed({
+                if (!isFinishing && !isDestroyed && viewModel.sessionSummary.value == null) {
+                    navigateToDashboard()
                 }
-                finish()
-            }, 500)
+            }, 3000)
         } else {
              Toast.makeText(this, "Error: Session ID is null", Toast.LENGTH_SHORT).show()
+             finish()
         }
     }
 

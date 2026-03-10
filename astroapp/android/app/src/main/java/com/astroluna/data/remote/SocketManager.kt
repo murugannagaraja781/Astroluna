@@ -95,6 +95,17 @@ object SocketManager {
         })
     }
 
+    fun answerSessionNative(sessionId: String, accept: Boolean, callType: String? = null) {
+        val data = JSONObject().apply {
+            put("sessionId", sessionId)
+            put("accept", accept)
+            if (callType != null) {
+                put("callType", callType)
+            }
+        }
+        socket?.emit("answer-session-native", data)
+    }
+
     fun onSessionAnswered(listener: (JSONObject) -> Unit) {
         socket?.off("session-answered")
         socket?.on("session-answered") { args ->
