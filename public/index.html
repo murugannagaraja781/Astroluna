@@ -9193,7 +9193,7 @@
             res.innerHTML = '<div style="padding:10px; color:#666;">Searching...</div>';
             res.style.display = 'block';
             try {
-              const req = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=15&q=${encodeURIComponent(v)}`);
+              const req = await fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=15&countrycodes=in&q=${encodeURIComponent(v)}`);
               const data = await req.json();
               res.innerHTML = '';
               if (!data.length) { res.innerHTML = '<div style="padding:10px; color:#999;">No results</div>'; return; }
@@ -9201,8 +9201,8 @@
               data.sort((a, b) => {
                 const nA = a.display_name.toLowerCase();
                 const nB = b.display_name.toLowerCase();
-                let sA = 0; if (nA.includes("tamil nadu")) sA += 100; else if (nA.includes("india")) sA += 50;
-                let sB = 0; if (nB.includes("tamil nadu")) sB += 100; else if (nB.includes("india")) sB += 50;
+                let sA = 0; if (nA.includes("tamil nadu")) sA += 100;
+                let sB = 0; if (nB.includes("tamil nadu")) sB += 100;
                 return sB - sA;
               });
 

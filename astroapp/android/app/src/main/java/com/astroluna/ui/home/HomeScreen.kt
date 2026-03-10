@@ -1200,7 +1200,7 @@ fun AstrologerCard(
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val showChat = (selectedTab == 0 || selectedTab == 1)
-    val showVideo = (selectedTab == 0 || selectedTab == 2)
+    val showVideo = (selectedTab == 0 || selectedTab == 2 || selectedTab == 3)
     val showCall = (selectedTab == 0 || selectedTab == 3)
 
     Card(

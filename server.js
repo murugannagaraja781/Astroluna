@@ -2422,10 +2422,10 @@ app.post('/api/city-timezone', async (req, res) => {
 // --- Presence Helpers ---
 async function broadcastAstroUpdate() {
   try {
-    // Optimization: Only fetch and send essential fields to reduce memory and bandwidth
+    // Include ALL fields needed by client apps for real-time status
     const astros = await User.find(
       { role: 'astrologer' },
-      'userId name isOnline isAvailable isBusy price image skills experience rating'
+      'userId name isOnline isChatOnline isAudioOnline isVideoOnline isAvailable isBusy price image skills experience rating isVerified phone'
     ).lean();
 
     if (io) io.emit('astrologer-update', astros);
