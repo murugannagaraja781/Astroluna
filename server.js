@@ -1623,6 +1623,15 @@ app.post('/api/verify-otp', async (req, res) => {
       await user.save();
     }
 
+    // User Request: Always reset toggles to offline on login
+    user.isOnline = false;
+    user.isAvailable = false;
+    user.isChatOnline = false;
+    user.isAudioOnline = false;
+    user.isVideoOnline = false;
+    user.isBusy = false;
+    await user.save();
+
     if (!user.referralCode) {
       user.referralCode = await generateReferralCode(user.name || 'Astro');
       await user.save();
@@ -1749,6 +1758,19 @@ app.post('/api/verify-otp', async (req, res) => {
       if (!user.referralCode) {
         user.referralCode = await generateReferralCode(user.name || 'User');
         await user.save();
+      }
+
+      // User Request: Astrologer login should default all toggles to OFFLINE
+      if (user.role === 'astrologer') {
+        user.isOnline = false;
+        user.isAvailable = false;
+        user.isChatOnline = false;
+        user.isAudioOnline = false;
+        user.isVideoOnline = false;
+        user.isBusy = false;
+        await user.save();
+        console.log(`[Login] Astrologer ${user.name} logged in - all toggles set to OFFLINE`);
+        broadcastAstroUpdate();
       }
     }
 
@@ -2578,13 +2600,9 @@ io.on('connection', (socket) => {
             offlineTimeouts.delete(userId);
           }
 
-          // Re-sync online status if isAvailable is true
-          if (user.isAvailable) {
-            user.isOnline = true;
-            user.save().then(() => broadcastAstroUpdate());
-          } else {
-            broadcastAstroUpdate();
-          }
+          // User Request: Do NOT auto-restore online status on socket register.
+          // Astrologer must manually toggle online after login.
+          broadcastAstroUpdate();
         }
         // If superadmin, join room
         if (user.role === 'superadmin') {
