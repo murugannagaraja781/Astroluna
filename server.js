@@ -286,7 +286,28 @@ async function sendFcmV1Push(fcmToken, data, notification) {
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  pingTimeout: 60000,
+  pingInterval: 25000,
+  connectTimeout: 45000,
+  allowEIO3: true,
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
+// Helper for safe callbacks
+function safeAck(cb, data) {
+  if (typeof cb === 'function') {
+    try {
+      cb(data);
+    } catch (e) {
+      console.error('[Socket] Callback Error:', e.message);
+    }
+  }
+}
+
 const cors = require("cors");
 const compression = require('compression');
 
@@ -2673,13 +2694,13 @@ io.on('connection', (socket) => {
       const query = phone ? { phone } : (userId ? { userId } : null);
 
       if (!query) {
-        if (typeof cb === 'function') cb({ ok: false, error: 'No identifier provided' });
+        safeAck(cb, { ok: false, error: 'No identifier provided' });
         return;
       }
 
       User.findOne(query).then(user => {
         if (!user) {
-          if (typeof cb === 'function') cb({ ok: false, error: 'User not found' });
+          safeAck(cb, { ok: false, error: 'User not found' });
           return;
         }
 
@@ -2688,7 +2709,7 @@ io.on('connection', (socket) => {
         socketToUser.set(socket.id, userId);
         socket.join(userId); // JOIN ROOM FOR RELIABLE SIGNALING
 
-        if (typeof cb === 'function') cb({
+        safeAck(cb, {
           ok: true,
           userId: user.userId,
           role: user.role,
@@ -2735,7 +2756,7 @@ io.on('connection', (socket) => {
       });
     } catch (err) {
       console.error('register error', err);
-      if (typeof cb === 'function') cb({ ok: false, error: 'Internal error' });
+      safeAck(cb, { ok: false, error: 'Internal error' });
     }
   });
 
@@ -2766,9 +2787,9 @@ io.on('connection', (socket) => {
       const astros = await User.find({ role: 'astrologer' });
       // Emit to this socket directly for compatibility
       socket.emit('astrologer-update', astros);
-      if (typeof cb === 'function') cb({ astrologers: astros });
+      safeAck(cb, { astrologers: astros });
     } catch (e) {
-      if (typeof cb === 'function') cb({ astrologers: [] });
+      safeAck(cb, { astrologers: [] });
     }
   });
 
@@ -3778,19 +3799,19 @@ io.on('connection', (socket) => {
       cb({ ok: true, users: allUsers });
     } catch (e) {
       console.error("[Admin] Error fetching all users:", e);
-      cb({ ok: false });
+      safeAck(cb, { ok: false });
     }
   });
 
   // --- Admin: Edit User (Name Only) ---
   socket.on('admin-edit-user', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false, error: 'Unauthorized' });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false, error: 'Unauthorized' });
     try {
       const { targetUserId, updates } = data || {};
-      if (!targetUserId || !updates || !updates.name) return cb({ ok: false, error: 'Invalid Data' });
+      if (!targetUserId || !updates || !updates.name) return safeAck(cb, { ok: false, error: 'Invalid Data' });
 
       const u = await User.findOne({ userId: targetUserId });
-      if (!u) return cb({ ok: false, error: 'User not found' });
+      if (!u) return safeAck(cb, { ok: false, error: 'User not found' });
 
       u.name = updates.name;
       await u.save();
@@ -3799,20 +3820,20 @@ io.on('connection', (socket) => {
 
       if (u.role === 'astrologer') broadcastAstroUpdate();
 
-      cb({ ok: true });
+      safeAck(cb, { ok: true });
     } catch (e) {
       console.error(e);
-      cb({ ok: false, error: 'Internal Error' });
+      safeAck(cb, { ok: false, error: 'Internal Error' });
     }
   });
 
   // --- Admin: Update User Details (Unified) ---
   socket.on('admin-update-user-details', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false, error: 'Unauthorized' });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false, error: 'Unauthorized' });
     try {
       const { userId, updates } = data;
       const user = await User.findOne({ userId });
-      if (!user) return cb({ ok: false, error: 'User not found' });
+      if (!user) return safeAck(cb, { ok: false, error: 'User not found' });
 
       // Update allowed fields
       if (updates.name) user.name = updates.name;
@@ -3830,15 +3851,15 @@ io.on('connection', (socket) => {
 
       if (user.role === 'astrologer') broadcastAstroUpdate();
 
-      cb({ ok: true, user });
+      safeAck(cb, { ok: true, user });
     } catch (e) {
       console.error(e);
-      cb({ ok: false, error: 'Update Failed' });
+      safeAck(cb, { ok: false, error: 'Update Failed' });
     }
   });
 
   socket.on('admin-update-role', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       const updates = { role: data.role };
       if (data.role === 'astrologer') {
@@ -3853,16 +3874,16 @@ io.on('connection', (socket) => {
         io.to(sId).emit('app-notification', { text: `Your role has been updated to ${data.role}!` });
       }
 
-      cb({ ok: true });
-    } catch (e) { cb({ ok: false }); }
+      safeAck(cb, { ok: true });
+    } catch (e) { safeAck(cb, { ok: false }); }
   });
 
   // === Astrologer Request: Approve ===
   socket.on('admin-approve-astrologer', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false, error: 'Unauthorized' });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false, error: 'Unauthorized' });
     try {
       const user = await User.findOne({ userId: data.userId });
-      if (!user) return cb({ ok: false, error: 'User not found' });
+      if (!user) return safeAck(cb, { ok: false, error: 'User not found' });
 
       user.role = 'astrologer';
       user.walletBalance = 0;
@@ -3895,19 +3916,19 @@ io.on('connection', (socket) => {
       }
 
       broadcastAstroUpdate();
-      cb({ ok: true });
+      safeAck(cb, { ok: true });
     } catch (e) {
       console.error('[Approve Astrologer Error]', e);
-      cb({ ok: false, error: e.message });
+      safeAck(cb, { ok: false, error: e.message });
     }
   });
 
   // === Astrologer Request: Reject ===
   socket.on('admin-reject-astrologer', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false, error: 'Unauthorized' });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false, error: 'Unauthorized' });
     try {
       const user = await User.findOne({ userId: data.userId });
-      if (!user) return cb({ ok: false, error: 'User not found' });
+      if (!user) return safeAck(cb, { ok: false, error: 'User not found' });
 
       user.astrologerRequestStatus = 'rejected';
       await user.save();
@@ -3935,15 +3956,15 @@ io.on('connection', (socket) => {
         console.log(`[FCM] Rejection notification sent to ${user.name}`);
       }
 
-      cb({ ok: true });
+      safeAck(cb, { ok: true });
     } catch (e) {
       console.error('[Reject Astrologer Error]', e);
-      cb({ ok: false, error: e.message });
+      safeAck(cb, { ok: false, error: e.message });
     }
   });
 
   socket.on('admin-add-wallet', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       const u = await User.findOne({ userId: data.userId });
       u.walletBalance += parseInt(data.amount);
@@ -3953,46 +3974,46 @@ io.on('connection', (socket) => {
       const s = userSockets.get(data.userId);
       if (s) io.to(s).emit('wallet-update', { balance: u.walletBalance });
 
-      cb({ ok: true });
-    } catch (e) { cb({ ok: false }); }
+      safeAck(cb, { ok: true });
+    } catch (e) { safeAck(cb, { ok: false }); }
   });
 
   socket.on('admin-toggle-ban', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       await User.updateOne({ userId: data.userId }, { isBanned: data.isBanned });
-      cb({ ok: true });
+      safeAck(cb, { ok: true });
       // If banned, disconnect socket?
       if (data.isBanned) {
         const s = userSockets.get(data.userId);
         if (s) io.to(s).emit('force-logout'); // Need to handle client side
       }
-    } catch (e) { cb({ ok: false }); }
+    } catch (e) { safeAck(cb, { ok: false }); }
   });
 
   socket.on('admin-get-pending-requests', async (cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       const requests = await User.find({ astrologerRequestStatus: 'pending' }).sort({ astrologerRequestedAt: -1 });
-      cb({ ok: true, requests });
-    } catch (e) { cb({ ok: false }); }
+      safeAck(cb, { ok: true, requests });
+    } catch (e) { safeAck(cb, { ok: false }); }
   });
 
   socket.on('get-slab-rates', async (cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
-    cb({ ok: true, rates: SLAB_RATES });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
+    safeAck(cb, { ok: true, rates: SLAB_RATES });
   });
 
   socket.on('update-slab-rates', async (rates, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     for (const key in rates) {
       SLAB_RATES[key] = parseFloat(rates[key]);
     }
-    cb({ ok: true });
+    safeAck(cb, { ok: true });
   });
 
   socket.on('admin-force-offline', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       const astro = await User.findOne({ userId: data.userId });
       if (astro) {
@@ -4003,22 +4024,22 @@ io.on('connection', (socket) => {
         astro.isVideoOnline = false;
         await astro.save();
         broadcastAstroUpdate();
-        cb({ ok: true });
-      } else cb({ ok: false, error: 'User not found' });
-    } catch (e) { cb({ ok: false, error: e.message }); }
+        safeAck(cb, { ok: true });
+      } else safeAck(cb, { ok: false, error: 'User not found' });
+    } catch (e) { safeAck(cb, { ok: false, error: e.message }); }
   });
 
   socket.on('admin-get-photo-approvals', async (cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       // Find users with a pending image URL. Assuming 'pendingImage' schema or unstructured approach.
       const pendingUsers = await User.find({ pendingImage: { $exists: true, $ne: '' } });
-      cb({ ok: true, requests: pendingUsers });
-    } catch (e) { cb({ ok: false }); }
+      safeAck(cb, { ok: true, requests: pendingUsers });
+    } catch (e) { safeAck(cb, { ok: false }); }
   });
 
   socket.on('admin-resolve-photo-approval', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       const user = await User.findOne({ userId: data.userId });
       if (user && data.action === 'approve') {
@@ -4028,12 +4049,12 @@ io.on('connection', (socket) => {
         user.pendingImage = undefined;
       }
       await user.save();
-      cb({ ok: true });
-    } catch (e) { cb({ ok: false, error: e.message }); }
+      safeAck(cb, { ok: true });
+    } catch (e) { safeAck(cb, { ok: false, error: e.message }); }
   });
 
   socket.on('send-bulk-fcm', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       let tokens = [];
       if (data.allUsers) {
@@ -4049,26 +4070,26 @@ io.on('connection', (socket) => {
           if (res.success) sentCount++;
         }).catch(err => console.error(err));
       }
-      cb({ ok: true, sentCount });
-    } catch (e) { cb({ ok: false }); }
+      safeAck(cb, { ok: true, sentCount });
+    } catch (e) { safeAck(cb, { ok: false }); }
   });
 
   socket.on('admin-delete-user', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       const res = await User.deleteOne({ userId: data.userId });
       if (res.deletedCount > 0) {
         broadcastAstroUpdate();
-        cb({ ok: true });
+        safeAck(cb, { ok: true });
       } else {
-        cb({ ok: false, error: 'User not found' });
+        safeAck(cb, { ok: false, error: 'User not found' });
       }
-    } catch (e) { cb({ ok: false, error: e.message }); }
+    } catch (e) { safeAck(cb, { ok: false, error: e.message }); }
   });
 
   // Phase 10: Ledger Stats
   socket.on('admin-get-ledger-stats', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       // Get billing stats
       const billingStats = await BillingLedger.aggregate([
@@ -4102,10 +4123,10 @@ io.on('connection', (socket) => {
         activeSessions: activeSessionCount
       };
 
-      cb({ ok: true, stats, fullLedger });
+      safeAck(cb, { ok: true, stats, fullLedger });
     } catch (e) {
       console.error(e);
-      cb({ ok: false });
+      safeAck(cb, { ok: false });
     }
   });
 
@@ -4143,11 +4164,11 @@ io.on('connection', (socket) => {
     if (!userId) return;
     try {
       const amount = parseInt(data.amount);
-      if (!amount || amount < 100) return cb({ ok: false, error: 'Minimum limit 100' });
+      if (!amount || amount < 100) return safeAck(cb, { ok: false, error: 'Minimum limit 100' });
 
       // Check Balance
       const u = await User.findOne({ userId });
-      if (!u || u.walletBalance < amount) return cb({ ok: false, error: 'Insufficient Balance' });
+      if (!u || u.walletBalance < amount) return safeAck(cb, { ok: false, error: 'Insufficient Balance' });
 
       // DEDUCT IMMEDIATELY
       u.walletBalance -= amount;
@@ -4170,22 +4191,22 @@ io.on('connection', (socket) => {
         data: { withdrawalId: w._id, astroName: u.name, amount }
       });
 
-      cb({ ok: true, balance: u.walletBalance });
+      safeAck(cb, { ok: true, balance: u.walletBalance });
     } catch (e) {
       console.error(e);
-      cb({ ok: false, error: 'Error' });
+      safeAck(cb, { ok: false, error: 'Error' });
     }
   });
 
   socket.on('approve-withdrawal', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       const { withdrawalId } = data;
       const w = await Withdrawal.findById(withdrawalId);
-      if (!w || w.status !== 'pending') return cb({ ok: false, error: 'Invalid Request' });
+      if (!w || w.status !== 'pending') return safeAck(cb, { ok: false, error: 'Invalid Request' });
 
       const u = await User.findOne({ userId: w.astroId });
-      if (!u) return cb({ ok: false, error: 'User not found' });
+      if (!u) return safeAck(cb, { ok: false, error: 'User not found' });
 
       // Balance already deducted at request time
 
@@ -4200,19 +4221,19 @@ io.on('connection', (socket) => {
         io.to(sId).emit('app-notification', { text: `✅ Your withdrawal of ₹${w.amount} is approved!` });
       }
 
-      cb({ ok: true, balance: u.walletBalance });
+      safeAck(cb, { ok: true, balance: u.walletBalance });
     } catch (e) {
       console.error(e);
-      cb({ ok: false, error: 'Error' });
+      safeAck(cb, { ok: false, error: 'Error' });
     }
   });
 
   socket.on('reject-withdrawal', async (data, cb) => {
-    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     try {
       const { withdrawalId } = data;
       const w = await Withdrawal.findById(withdrawalId);
-      if (!w || w.status !== 'pending') return cb({ ok: false, error: 'Invalid Request' });
+      if (!w || w.status !== 'pending') return safeAck(cb, { ok: false, error: 'Invalid Request' });
 
       const u = await User.findOne({ userId: w.astroId });
       if (u) {
@@ -4237,10 +4258,10 @@ io.on('connection', (socket) => {
       w.processedAt = Date.now();
       await w.save();
 
-      cb({ ok: true });
+      safeAck(cb, { ok: true });
     } catch (e) {
       console.error(e);
-      cb({ ok: false });
+      safeAck(cb, { ok: false });
     }
   });
 
@@ -4252,10 +4273,10 @@ io.on('connection', (socket) => {
         const u = await User.findOne({ userId: w.astroId });
         enriched.push({ ...w.toObject(), astroName: u ? u.name : 'Unknown' });
       }
-      if (typeof cb === 'function') cb({ ok: true, list: enriched });
+      safeAck(cb, { ok: true, list: enriched });
     } catch (e) {
       console.error(e);
-      if (typeof cb === 'function') cb({ ok: false, list: [] });
+      safeAck(cb, { ok: false, list: [] });
     }
   });
 
@@ -4264,16 +4285,16 @@ io.on('connection', (socket) => {
     if (!userId) return;
     try {
       const list = await Withdrawal.find({ astroId: userId }).sort({ requestedAt: -1 }).limit(10);
-      if (typeof cb === 'function') cb({ ok: true, list });
+      safeAck(cb, { ok: true, list });
     } catch (e) {
-      if (typeof cb === 'function') cb({ ok: false });
+      safeAck(cb, { ok: false });
     }
   });
 
   socket.on('get-payout-status', async (data, cb) => {
     try {
       const userId = socketToUser.get(socket.id);
-      if (!userId) return cb({ ok: false });
+      if (!userId) return safeAck(cb, { ok: false });
 
       const pending = await Withdrawal.find({ astroId: userId, status: 'pending' });
       const totalPending = pending.reduce((sum, w) => sum + (w.amount || 0), 0);
