@@ -3024,6 +3024,10 @@ io.on('connection', (socket) => {
       } else {
         const session = activeSessions.get(sessionId);
         if (session) {
+          if (session.status === 'active') {
+            console.log('[Session] Ignoring duplicate web answer for active session', sessionId);
+            return;
+          }
           session.status = 'active';
           if (session.astrologerId) {
             User.updateOne({ userId: session.astrologerId }, { isBusy: true }).then(() => {
@@ -3109,6 +3113,11 @@ io.on('connection', (socket) => {
       const targetSocketId = userSockets.get(fromUserId);
 
       if (accept) {
+        if (session.status === 'active') {
+          console.log('[Native] Ignoring duplicate answer for active session', sessionId);
+          if (typeof cb === 'function') cb({ ok: true, fromUserId });
+          return;
+        }
         session.status = 'active';
         if (astrologerId) {
           User.updateOne({ userId: astrologerId }, { isBusy: true }).then(() => {

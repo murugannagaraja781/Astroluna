@@ -7630,6 +7630,9 @@
         if (!state.session) {
           // We are the caller
           initSession(data.sessionId, state.tempTargetId || data.fromUserId, state.tempType || data.type, true, null);
+        } else if (state.session.id === data.sessionId) {
+          console.warn('[Session] Call already initialized for', data.sessionId);
+          return;
         }
 
         console.log('[Session] Starting WebRTC as initiator');
@@ -7883,7 +7886,15 @@
     // Signal Handler
     socket.on('signal', d => {
       if (state.session && d.sessionId === state.session.id && state.peer) {
-        state.peer.signal(d.signal);
+        try {
+          state.peer.signal(d.signal);
+        } catch (e) {
+          if (e.message && e.message.includes('wrong state')) {
+            console.warn('[WebRTC] Signal ignored (wrong state)', e.message.trim());
+          } else {
+            console.error('[WebRTC] Signal error', e);
+          }
+        }
       }
     });
 
