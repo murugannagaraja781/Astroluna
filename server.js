@@ -344,6 +344,10 @@ app.get('/refund-cancellation-policy', (req, res) => res.sendFile(path.join(__di
 app.get('/return-policy', (req, res) => res.sendFile(path.join(__dirname, 'public/return-policy.html')));
 app.get('/shipping-policy', (req, res) => res.sendFile(path.join(__dirname, 'public/shipping-policy.html')));
 
+// Admin Pages
+app.get('/admin/astrologer-requests', (req, res) => res.sendFile(path.join(__dirname, 'public/admin/astrologer-requests.html')));
+app.get('/admin/deletion-requests', (req, res) => res.sendFile(path.join(__dirname, 'public/admin/deletion-requests.html')));
+
 // Routes
 const rasiEngRouter = require("./routes/rasiEng");
 const rasipalanRouter = require("./routes/rasipalan");

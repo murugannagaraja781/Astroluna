@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -102,9 +103,35 @@ fun AstrologerRegistrationScreen(onBack: () -> Unit) {
                 item { CustomTextField(value = gender, onValueChange = { gender = it }, label = "Gender (Male/Female)") }
 
                 item { SectionTitle("Birth Details") }
-                item { CustomTextField(value = dob, onValueChange = { dob = it }, label = "Date of Birth (YYYY-MM-DD)") }
-                item { CustomTextField(value = tob, onValueChange = { tob = it }, label = "Time of Birth (HH:MM)") }
-                item { CustomTextField(value = pob, onValueChange = { pob = it }, label = "Place of Birth") }
+                item {
+                    val datePickerDialog = android.app.DatePickerDialog(
+                        context,
+                        { _, year, month, dayOfMonth ->
+                            dob = "$year-${String.format("%02d", month + 1)}-${String.format("%02d", dayOfMonth)}"
+                        },
+                        1990, 0, 1
+                    )
+                    ReadOnlyTextField(
+                        value = dob,
+                        onClick = { datePickerDialog.show() },
+                        label = "Date of Birth *"
+                    )
+                }
+                item {
+                    val timePickerDialog = android.app.TimePickerDialog(
+                        context,
+                        { _, hourOfDay, minute ->
+                            tob = "${String.format("%02d", hourOfDay)}:${String.format("%02d", minute)}"
+                        },
+                        12, 0, true
+                    )
+                    ReadOnlyTextField(
+                        value = tob,
+                        onClick = { timePickerDialog.show() },
+                        label = "Time of Birth *"
+                    )
+                }
+                item { CustomTextField(value = pob, onValueChange = { pob = it }, label = "Place of Birth *") }
 
                 item { SectionTitle("Contact Details") }
                 item { CustomTextField(value = cell1, onValueChange = { cell1 = it }, label = "Mobile Number 1 *", keyboardType = KeyboardType.Phone) }
@@ -155,6 +182,11 @@ fun AstrologerRegistrationScreen(onBack: () -> Unit) {
 
                             scope.launch {
                                 try {
+                                    if (dob.isBlank() || tob.isBlank() || pob.isBlank()) {
+                                        Toast.makeText(context, "Birth details are required", Toast.LENGTH_SHORT).show()
+                                        isLoading = false
+                                        return@launch
+                                    }
                                     val response = ApiClient.api.registerAstrologer(regData)
                                     if (response.isSuccessful) {
                                         Toast.makeText(context, "Application submitted successfully!", Toast.LENGTH_LONG).show()
@@ -193,6 +225,40 @@ fun SectionTitle(title: String) {
         fontSize = 18.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ReadOnlyTextField(
+    value: String,
+    onClick: () -> Unit,
+    label: String
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {},
+        label = { Text(label, color = Color.LightGray) },
+        modifier = Modifier.fillMaxWidth(),
+        enabled = false, // Disable to make clickable via box or surface wrapper if needed? No, let's keep it simple
+        readOnly = true,
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            disabledBorderColor = Color.LightGray.copy(alpha = 0.5f),
+            disabledLabelColor = Color.LightGray,
+            disabledTextColor = Color.White
+        ),
+        shape = RoundedCornerShape(12.dp),
+        interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() }
+    )
+    // Add a transparent clickable overlay since 'enabled = false' disables clicks on the field itself
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .offset(y = (-56).dp)
+            .background(Color.Transparent)
+            .padding(1.dp)
+            .clickable { onClick() }
     )
 }
 
