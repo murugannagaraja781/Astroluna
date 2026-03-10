@@ -140,6 +140,20 @@ class FCMService : FirebaseMessagingService() {
 
             when (messageType) {
                 "INCOMING_CALL" -> handleIncomingCall(data)
+                "CALL_ENDED" -> {
+                    Log.d(TAG, "Call ended - clearing notification and opening app")
+                    val notificationManager = getSystemService(NotificationManager::class.java)
+                    notificationManager.cancel(CALL_NOTIFICATION_ID)
+
+                    // User Request: Open app when call ends
+                    try {
+                        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+                        launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(launchIntent)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to open app on CALL_ENDED", e)
+                    }
+                }
                 "INCOMING_CHAT" -> {
                     val callerName = data["callerName"] ?: "Unknown"
                     val callerId = data["callerId"] ?: ""

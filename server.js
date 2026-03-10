@@ -2097,6 +2097,19 @@ async function endSessionRecord(sessionId) {
   if (s.clientId) io.to(s.clientId).emit('session-ended', payload);
   if (s.astrologerId) io.to(s.astrologerId).emit('session-ended', payload);
 
+  // User Request: Clear FCM notification on call end
+  // Send CALL_ENDED message to both parties so they clear their notification trays
+  s.users.forEach(async (uid) => {
+    try {
+      const u = await User.findOne({ userId: uid });
+      if (u && u.fcmToken) {
+        sendFcmV1Push(u.fcmToken, { type: 'CALL_ENDED', sessionId }, null);
+      }
+    } catch (e) {
+      console.error(`Error sending CALL_ENDED FCM to ${uid}`, e);
+    }
+  });
+
   // Mark astrologer as NOT busy (Wait for DB update before broadcast)
   User.updateMany({ userId: { $in: s.users }, role: 'astrologer' }, { isBusy: false })
     .then(() => broadcastAstroUpdate())
