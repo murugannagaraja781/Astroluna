@@ -109,6 +109,7 @@
         <activity android:name=".ui.settings.SettingsActivity" />
         <activity android:name=".ui.settings.ThemeSettingsActivity" />
         <activity android:name=".ui.rasipalan.RasipalanActivity" />
+        <activity android:name=".ui.astro.AstrologerRegistrationActivity" />
         <activity android:name=".ui.dashboard.GuestActivity" />
         <activity android:name=".ui.payment.PaymentActivity"
             android:exported="true">

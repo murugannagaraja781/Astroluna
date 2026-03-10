@@ -131,6 +131,15 @@ class FCMService : FirebaseMessagingService() {
         super.onMessageReceived(message)
         Log.d(TAG, "FCM message received from: ${message.from}")
 
+        // User Request: Remove Guest FCM notifications
+        // Don't process any messages if the user is not logged in / is a guest
+        val tokenManager = com.astroluna.data.local.TokenManager(this)
+        val userId = tokenManager.getUserSession()?.userId
+        if (userId == null) {
+            Log.d(TAG, "Guest mode detected (no userId) - ignoring FCM message")
+            return
+        }
+
         // Check if message contains a data payload.
         if (message.data.isNotEmpty()) {
             val data = message.data
@@ -140,6 +149,20 @@ class FCMService : FirebaseMessagingService() {
 
             when (messageType) {
                 "INCOMING_CALL" -> handleIncomingCall(data)
+                "CALL_ENDED" -> {
+                    Log.d(TAG, "Call ended - clearing notification and opening app")
+                    val notificationManager = getSystemService(NotificationManager::class.java)
+                    notificationManager.cancel(CALL_NOTIFICATION_ID)
+
+                    // User Request: Open app when call ends
+                    try {
+                        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
+                        launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        startActivity(launchIntent)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Failed to open app on CALL_ENDED", e)
+                    }
+                }
                 "INCOMING_CHAT" -> {
                     val callerName = data["callerName"] ?: "Unknown"
                     val callerId = data["callerId"] ?: ""

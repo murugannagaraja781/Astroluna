@@ -54,6 +54,7 @@ function getHouseCusps(jd, lat, lng, system = 'Placidus', ayanamsaName = 'Lahiri
         return {
             ...kp,
             signName: sign.name,
+            degreeFormatted: formatLongitude(cusp),
             signAbbr,
             nakshatra: nak.name,
             nakshatraIndex: nak.index,

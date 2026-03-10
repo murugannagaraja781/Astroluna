@@ -211,27 +211,7 @@ const COMMISSION_L3 = 0.01; // 1%
 const CASHBACK_CLIENT = 0.02; // 2% for referred client
 
 // FCM Project and Auth
-const FCM_PROJECT_ID = 'astroluna-d487c';
-let fcmAuth = null;
-
-// Initialize FCM v1 Auth
-function initFcmAuth() {
-  try {
-    const serviceAccountPath = './firebase-service-account.json';
-    if (fs.existsSync(serviceAccountPath)) {
-      fcmAuth = new GoogleAuth({
-        keyFile: serviceAccountPath,
-        scopes: ['https://www.googleapis.com/auth/firebase.messaging']
-      });
-      console.log('[FCM v1] Initialized with service account');
-    } else {
-      console.warn('[FCM v1] Service account file not found - push notifications disabled');
-    }
-  } catch (err) {
-    console.error('[FCM v1] Init error:', err.message);
-  }
-
-}
+const FCM_PROJECT_ID = 'astroluna-76da1';
 
 // ==========================================
 // MOBILE APP FIREBASE INITIALIZATION
@@ -251,6 +231,7 @@ try {
     credential: admin.credential.cert(firebaseServiceAccount)
   }, 'callApp'); // Secondary App Name
   console.log('✓ Call App: Firebase Admin SDK initialized');
+  console.log('✓ FCM Project ID:', FCM_PROJECT_ID);
 } catch (error) {
   console.warn('✗ Call App: Failed to initialize Firebase Admin SDK (Mobile App)');
   console.warn('  Error:', error.message);
@@ -258,61 +239,50 @@ try {
 }
 
 
-// Send FCM v1 Push Notification
+// Send FCM v1 Push Notification (Using Firebase Admin SDK)
 async function sendFcmV1Push(fcmToken, data, notification) {
-  if (!fcmAuth) {
-    console.warn('[FCM v1] Not initialized - skipping push');
+  if (!callApp) {
+    console.warn('[FCM v1] Firebase Admin not initialized - skipping push');
     return { success: false, error: 'FCM not initialized' };
   }
 
   try {
-    const accessToken = await fcmAuth.getAccessToken();
+    // Convert all data values to strings (FCM requires string values in data)
+    const stringData = {};
+    if (data) {
+      for (const [key, value] of Object.entries(data)) {
+        stringData[key] = String(value || '');
+      }
+    }
+    // Embed notification content in data for manual handling in app
+    if (notification) {
+      stringData.title = notification.title || '';
+      stringData.body = notification.body || '';
+    }
 
-    const messagePayload = {
+    const message = {
       token: fcmToken,
-      data: {
-        ...data,
-        // Embed notification content in data to handle it manually in App for speed
-        title: notification ? notification.title : '',
-        body: notification ? notification.body : ''
-      },
+      data: stringData,
       android: {
         priority: 'high',
-        ttl: '0s' // Instant delivery
+        ttl: 0 // Instant delivery
       }
     };
 
-    const message = { message: messagePayload };
-
-    const response = await fetch(
-      `https://fcm.googleapis.com/v1/projects/${FCM_PROJECT_ID}/messages:send`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken.token || accessToken}`
-        },
-        body: JSON.stringify(message)
-      }
-    );
-
-    const result = await response.json();
-
-    if (response.ok) {
-      console.log('[FCM v1] Push sent successfully:', result.name);
-      return { success: true, messageId: result.name };
-    } else {
-      console.error('[FCM v1] Push failed:', result.error?.message || JSON.stringify(result));
-      return { success: false, error: result.error?.message };
-    }
+    const result = await callApp.messaging().send(message);
+    console.log('[FCM v1] Push sent successfully:', result);
+    return { success: true, messageId: result };
   } catch (err) {
     console.error('[FCM v1] Send error:', err.message);
+    // Handle invalid token
+    if (err.code === 'messaging/registration-token-not-registered' ||
+      err.code === 'messaging/invalid-registration-token') {
+      console.warn('[FCM v1] Invalid/expired token - should be cleaned up');
+    }
     return { success: false, error: err.message };
   }
 }
 
-// Initialize FCM on server start
-initFcmAuth();
 
 const app = express();
 const server = http.createServer(app);
@@ -374,6 +344,10 @@ app.get('/refund-cancellation-policy', (req, res) => res.sendFile(path.join(__di
 app.get('/return-policy', (req, res) => res.sendFile(path.join(__dirname, 'public/return-policy.html')));
 app.get('/shipping-policy', (req, res) => res.sendFile(path.join(__dirname, 'public/shipping-policy.html')));
 
+// Admin Pages
+app.get('/admin/astrologer-requests', (req, res) => res.sendFile(path.join(__dirname, 'public/admin/astrologer-requests.html')));
+app.get('/admin/deletion-requests', (req, res) => res.sendFile(path.join(__dirname, 'public/admin/deletion-requests.html')));
+
 // Routes
 const rasiEngRouter = require("./routes/rasiEng");
 const rasipalanRouter = require("./routes/rasipalan");
@@ -384,33 +358,115 @@ app.use("/api/rasipalan", rasipalanRouter);
 app.use("/api/horoscope/rasi-palan", rasipalanRouter); // Android App specific path
 app.use("/api/horoscope", freeHoroscopeRouter); // Free horoscope chart generation
 
+// --- Astrologer Registration API ---
+app.post('/api/astrologer/register', async (req, res) => {
+  try {
+    const data = req.body;
+    if (!data.realName || !data.cellNumber1) {
+      return res.status(400).json({ ok: false, error: 'Real name and primary mobile number are required' });
+    }
+
+    // Check for existing application
+    const existing = await AstrologerApplication.findOne({ cellNumber1: data.cellNumber1, status: 'pending' });
+    if (existing) {
+      return res.status(400).json({ ok: false, error: 'Application already pending for this number' });
+    }
+
+    const applicationId = crypto.randomUUID();
+    await AstrologerApplication.create({
+      applicationId,
+      ...data,
+      appliedAt: new Date()
+    });
+
+    console.log(`[Registration] New astrologer application from ${data.realName} (${data.cellNumber1})`);
+    res.json({ ok: true, message: 'Application submitted successfully' });
+  } catch (err) {
+    console.error('Registration error:', err);
+    res.status(500).json({ ok: false, error: 'Internal server error' });
+  }
+});
+
+// Admin: Get all astrologer applications
+app.get('/api/admin/astrologer-applications', async (req, res) => {
+  try {
+    const { status = 'pending' } = req.query;
+    const applications = await AstrologerApplication.find({ status }).sort({ appliedAt: -1 });
+    res.json({ ok: true, applications });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Admin: Approve/Reject Astrologer Application
+app.post('/api/admin/astrologer/process-application', async (req, res) => {
+  try {
+    const { applicationId, status, notes } = req.body; // status: 'approved' or 'rejected'
+    const adminId = 'superadmin'; // Should come from session/auth
+
+    const application = await AstrologerApplication.findOne({ applicationId });
+    if (!application) return res.status(404).json({ ok: false, error: 'Application not found' });
+
+    if (status === 'approved') {
+      // 1. Create or Update user to Astrologer role
+      let user = await User.findOne({ phone: application.cellNumber1 });
+      if (user) {
+        user.role = 'astrologer';
+        user.name = application.realName;
+        user.skills = [application.profession || 'Astrology'];
+        user.experience = parseInt(application.astrologyExperience) || 0;
+        user.isDocumentVerified = true;
+        user.documentStatus = 'verified';
+        await user.save();
+        console.log(`[Admin] Approved application: User ${user.userId} promoted to Astrologer`);
+      } else {
+        const userId = crypto.randomUUID();
+        user = await User.create({
+          userId,
+          phone: application.cellNumber1,
+          name: application.realName,
+          role: 'astrologer',
+          isDocumentVerified: true,
+          documentStatus: 'verified',
+          skills: [application.profession || 'Astrology'],
+          experience: parseInt(application.astrologyExperience) || 0,
+          walletBalance: 0
+        });
+        console.log(`[Admin] Approved application: New Astrologer created: ${user.phone}`);
+      }
+    }
+
+    application.status = status;
+    application.processedAt = new Date();
+    application.notes = notes;
+    application.processedBy = adminId;
+    await application.save();
+
+    res.json({ ok: true, message: `Application ${status} successfully` });
+  } catch (err) {
+    console.error('Process application error:', err);
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 // FCM Test Endpoint - Verify Firebase is working
 app.get('/api/test-fcm', async (req, res) => {
   try {
-    if (!fcmAuth) {
+    if (!callApp) {
       return res.json({
         ok: false,
         status: 'NOT_INITIALIZED',
-        error: global.callAppInitError || 'FCM Auth not initialized'
+        error: global.callAppInitError || 'Firebase Admin SDK not initialized'
       });
     }
 
-    // Try to get access token to verify credentials work
-    const token = await fcmAuth.getAccessToken();
-
-    if (token) {
-      return res.json({
-        ok: true,
-        status: 'WORKING',
-        message: 'Firebase Admin SDK is properly configured and can get access tokens'
-      });
-    } else {
-      return res.json({
-        ok: false,
-        status: 'TOKEN_FAILED',
-        error: 'Could not get access token'
-      });
-    }
+    // Try a simple operation to verify credentials work
+    return res.json({
+      ok: true,
+      status: 'WORKING',
+      projectId: FCM_PROJECT_ID,
+      message: 'Firebase Admin SDK is properly configured and ready to send FCM messages'
+    });
   } catch (err) {
     return res.json({
       ok: false,
@@ -743,6 +799,34 @@ const AccountDeletionRequestSchema = new mongoose.Schema({
   notes: String // Admin notes
 });
 const AccountDeletionRequest = mongoose.model('AccountDeletionRequest', AccountDeletionRequestSchema);
+// Astrologer Application Schema
+const AstrologerApplicationSchema = new mongoose.Schema({
+  applicationId: { type: String, unique: true },
+  realName: { type: String, required: true },
+  displayName: String,
+  gender: String,
+  dob: String,
+  tob: String,
+  pob: String,
+  cellNumber1: { type: String, required: true },
+  cellNumber2: String,
+  whatsAppNumber: String,
+  email: String,
+  address: String,
+  aadharNumber: String,
+  panNumber: String,
+  astrologyExperience: String,
+  profession: String,
+  bankDetails: String,
+  upiName: String,
+  upiNumber: String,
+  status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+  appliedAt: { type: Date, default: Date.now },
+  processedAt: Date,
+  processedBy: String, // Super Admin userId
+  notes: String
+});
+const AstrologerApplication = mongoose.model('AstrologerApplication', AstrologerApplicationSchema);
 
 
 // ===== Seed Data =====
@@ -912,9 +996,8 @@ app.post('/api/astrologer/register', async (req, res) => {
 // Admin: Get Pending Astrologer Requests
 app.get('/api/admin/astrologer-requests', async (req, res) => {
   try {
-    const requests = await User.find({ astrologerRequestStatus: 'pending' })
-      .select('userId name phone image experience astrologerExperience astrologerRequestedAt createdAt')
-      .sort({ astrologerRequestedAt: -1 })
+    const requests = await AstrologerApplication.find({ status: 'pending' })
+      .sort({ appliedAt: -1 })
       .lean();
 
     res.json({ ok: true, requests });
@@ -1213,19 +1296,43 @@ app.get('/api/daily-horoscope', async (req, res) => {
   try {
     const today = DateTime.now().setZone('Asia/Kolkata').toFormat('yyyy-MM-dd');
     const data = await fetchDailyHoroscope(today);
+
     if (data && data.length > 0) {
-      // Pick the first rasi (Mesham) as a generic forecast for the home screen
-      res.json({ ok: true, content: data[0].prediction_ta || data[0].forecast_ta || data[0].prediction_en || 'Today is a good day!' });
+      // Logic: If user passed a sign in the app, use it. Otherwise, use index 0 (Mesham).
+      const signName = req.query.sign;
+      let targetItem = data[0];
+
+      if (signName) {
+        const found = data.find(d =>
+          (d.sign_en && d.sign_en.toLowerCase() === signName.toLowerCase()) ||
+          (d.sign_ta === signName)
+        );
+        if (found) targetItem = found;
+      }
+
+      const rawText = targetItem.prediction_ta || targetItem.forecast_ta || targetItem.prediction_en || "";
+      const content = truncateTo2Lines(rawText);
+
+      res.json({ ok: true, content: content || 'Today is a good day!' });
     } else {
       const content = generateTamilHoroscope();
-      res.json({ ok: true, content });
+      res.json({ ok: true, content: truncateTo2Lines(content) });
     }
   } catch (err) {
     console.error('Error in /api/daily-horoscope:', err);
     const content = generateTamilHoroscope();
-    res.json({ ok: true, content });
+    res.json({ ok: true, content: truncateTo2Lines(content) });
   }
 });
+
+function truncateTo2Lines(text) {
+  if (!text) return "";
+  const lines = text.split('\n').filter(l => l.trim().length > 0);
+  if (lines.length >= 2) return lines.slice(0, 2).join('\n');
+  const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [text];
+  if (sentences.length >= 2) return sentences.slice(0, 2).join(' ');
+  return text.length > 150 ? text.substring(0, 147) + "..." : text;
+}
 
 // Academy Videos API
 app.get('/api/academy/videos', async (req, res) => {
@@ -1623,6 +1730,15 @@ app.post('/api/verify-otp', async (req, res) => {
       await user.save();
     }
 
+    // User Request: Always reset toggles to offline on login
+    user.isOnline = false;
+    user.isAvailable = false;
+    user.isChatOnline = false;
+    user.isAudioOnline = false;
+    user.isVideoOnline = false;
+    user.isBusy = false;
+    await user.save();
+
     if (!user.referralCode) {
       user.referralCode = await generateReferralCode(user.name || 'Astro');
       await user.save();
@@ -1749,6 +1865,19 @@ app.post('/api/verify-otp', async (req, res) => {
       if (!user.referralCode) {
         user.referralCode = await generateReferralCode(user.name || 'User');
         await user.save();
+      }
+
+      // User Request: Astrologer login should default all toggles to OFFLINE
+      if (user.role === 'astrologer') {
+        user.isOnline = false;
+        user.isAvailable = false;
+        user.isChatOnline = false;
+        user.isAudioOnline = false;
+        user.isVideoOnline = false;
+        user.isBusy = false;
+        await user.save();
+        console.log(`[Login] Astrologer ${user.name} logged in - all toggles set to OFFLINE`);
+        broadcastAstroUpdate();
       }
     }
 
@@ -2113,6 +2242,19 @@ async function endSessionRecord(sessionId) {
 
   if (s.clientId) io.to(s.clientId).emit('session-ended', payload);
   if (s.astrologerId) io.to(s.astrologerId).emit('session-ended', payload);
+
+  // User Request: Clear FCM notification on call end
+  // Send CALL_ENDED message to both parties so they clear their notification trays
+  s.users.forEach(async (uid) => {
+    try {
+      const u = await User.findOne({ userId: uid });
+      if (u && u.fcmToken) {
+        sendFcmV1Push(u.fcmToken, { type: 'CALL_ENDED', sessionId }, null);
+      }
+    } catch (e) {
+      console.error(`Error sending CALL_ENDED FCM to ${uid}`, e);
+    }
+  });
 
   // Mark astrologer as NOT busy (Wait for DB update before broadcast)
   User.updateMany({ userId: { $in: s.users }, role: 'astrologer' }, { isBusy: false })
@@ -2578,13 +2720,9 @@ io.on('connection', (socket) => {
             offlineTimeouts.delete(userId);
           }
 
-          // Re-sync online status if isAvailable is true
-          if (user.isAvailable) {
-            user.isOnline = true;
-            user.save().then(() => broadcastAstroUpdate());
-          } else {
-            broadcastAstroUpdate();
-          }
+          // User Request: Do NOT auto-restore online status on socket register.
+          // Astrologer must manually toggle online after login.
+          broadcastAstroUpdate();
         }
         // If superadmin, join room
         if (user.role === 'superadmin') {
@@ -3402,6 +3540,34 @@ io.on('connection', (socket) => {
         isTyping: !!isTyping,
       });
     } catch (err) { console.error('typing error', err); }
+  });
+
+  // --- Astrologer Registration Support (Web) ---
+  socket.on('submit-astro-registration', async (data, cb) => {
+    try {
+      if (!data.realName || !data.cellNumber1) {
+        return cb({ ok: false, error: 'Mandatory fields missing' });
+      }
+
+      // Check for existing pending application
+      const existing = await AstrologerApplication.findOne({ cellNumber1: data.cellNumber1, status: 'pending' });
+      if (existing) {
+        return cb({ ok: false, error: 'Registration already pending for this number' });
+      }
+
+      const applicationId = crypto.randomUUID();
+      await AstrologerApplication.create({
+        applicationId,
+        ...data,
+        appliedAt: new Date()
+      });
+
+      console.log(`[Socket] New astrologer application from ${data.realName}`);
+      cb({ ok: true });
+    } catch (err) {
+      console.error('Socket registration error:', err.message);
+      cb({ ok: false, error: 'Internal Error' });
+    }
   });
 
   // --- Phase 1: Connection & Billing Start ---

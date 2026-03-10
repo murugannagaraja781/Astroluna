@@ -256,47 +256,56 @@ fun PremiumRasipalanCard(item: RasipalanItem) {
 
 @Composable
 fun StatusIndicatorRow(label: String, status: String?) {
-    Row(
-        modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = Modifier
+            .padding(vertical = 10.dp)
+            .fillMaxWidth()
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = TextSecondary
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.ExtraBold),
+            color = NeonCyan,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
-        StatusChip(status ?: "Moderate")
+
+        StatusBox(status ?: "Moderate")
     }
 }
 
 @Composable
-fun StatusChip(status: String) {
-    val (color, label) = when {
+fun StatusBox(status: String) {
+    val (color, _) = when {
         status.contains("Good", ignoreCase = true) ||
         status.contains("Active", ignoreCase = true) ||
-        status.contains("High", ignoreCase = true) ||
-        status.contains("Growth", ignoreCase = true) ||
-        status.contains("Excellent", ignoreCase = true) -> GoodGlow to status
+        status.contains("Excellent", ignoreCase = true) ||
+        status.contains("நன்று", ignoreCase = true) ||
+        status.contains("சிறப்பு", ignoreCase = true) ||
+        status.contains("மேன்மை", ignoreCase = true) -> GoodGlow to status
 
         status.contains("Weak", ignoreCase = true) ||
         status.contains("Low", ignoreCase = true) ||
         status.contains("Bad", ignoreCase = true) ||
-        status.contains("Critical", ignoreCase = true) -> WeakRed to status
+        status.contains("Critical", ignoreCase = true) ||
+        status.contains("கவனம்", ignoreCase = true) ||
+        status.contains("பாதிப்பு", ignoreCase = true) -> WeakRed to status
 
         else -> ModerateAmber to status
     }
 
     Surface(
-        color = color.copy(alpha = 0.15f),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(50),
-        border = BorderStroke(1.dp, color.copy(alpha = 0.5f))
+        color = color.copy(alpha = 0.1f),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, color.copy(alpha = 0.3f)),
+        modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = label,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            color = color
+            text = status,
+            modifier = Modifier.padding(14.dp),
+            style = MaterialTheme.typography.bodyMedium.copy(
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.Medium
+            ),
+            color = TextPrimary
         )
     }
 }

@@ -76,4 +76,7 @@ interface ApiInterface {
 
     @POST("api/withdraw-referral")
     suspend fun withdrawReferral(@Body request: com.google.gson.JsonObject): Response<com.google.gson.JsonObject>
+
+    @POST("api/astrologer/register")
+    suspend fun registerAstrologer(@Body request: com.astroluna.data.model.AstroRegistration): Response<com.google.gson.JsonObject>
 }

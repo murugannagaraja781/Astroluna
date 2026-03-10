@@ -539,21 +539,32 @@ fun ChatBubble(msg: ChatMessage, amIAstrologer: Boolean, onReply: () -> Unit) {
                             }
                         }
 
-                        Text(displayText, fontSize = 16.sp, color = Color.Black)
+                        Text(
+                            text = displayText,
+                            fontSize = 16.sp,
+                            color = Color.Black,
+                            modifier = Modifier.padding(bottom = if (isMe) 0.dp else 4.dp)
+                        )
 
                         if (isMe) {
                             Row(
-                                modifier = Modifier.align(Alignment.End).padding(top = 4.dp),
-                                 verticalAlignment = Alignment.CenterVertically
+                                modifier = Modifier
+                                    .align(Alignment.End)
+                                    .padding(top = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                val icon = when(msg.status) {
-                                    "read" -> Icons.Default.Done
-                                    "delivered" -> Icons.Default.Done
-                                    else -> Icons.Default.Check
+                                val icon = when (msg.status) {
+                                    "read", "delivered" -> Icons.Default.DoneAll
+                                    else -> Icons.Default.Done
                                 }
-                                val tint = Color(0xFF2196F3)
+                                val tint = if (msg.status == "read") Color(0xFF2196F3) else Color.Gray
 
-                                Icon(icon, null, tint = tint, modifier = Modifier.size(16.dp))
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = msg.status,
+                                    tint = tint,
+                                    modifier = Modifier.size(16.dp)
+                                )
                             }
                         }
                     }
@@ -628,12 +639,13 @@ fun ChatInputBar(
                 OutlinedTextField(
                     value = text,
                     onValueChange = onTextChange,
-                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                    modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
                     shape = RoundedCornerShape(24.dp),
-                    placeholder = { Text("Type a message") },
+                    placeholder = { Text("Type a message...", fontSize = 14.sp) },
+                    maxLines = 4,
                     colors = TextFieldDefaults.colors(
-                       focusedContainerColor = Color.White,
-                       unfocusedContainerColor = Color.White,
+                       focusedContainerColor = Color(0xFFF8F9FA),
+                       unfocusedContainerColor = Color(0xFFF8F9FA),
                        focusedIndicatorColor = Color.Transparent,
                        unfocusedIndicatorColor = Color.Transparent
                     )
