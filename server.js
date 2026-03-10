@@ -3804,6 +3804,102 @@ io.on('connection', (socket) => {
     } catch (e) { cb({ ok: false }); }
   });
 
+  socket.on('admin-get-pending-requests', async (cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    try {
+      const requests = await User.find({ astrologerRequestStatus: 'pending' }).sort({ astrologerRequestedAt: -1 });
+      cb({ ok: true, requests });
+    } catch (e) { cb({ ok: false }); }
+  });
+
+  socket.on('get-slab-rates', async (cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    cb({ ok: true, rates: SLAB_RATES });
+  });
+
+  socket.on('update-slab-rates', async (rates, cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    for (const key in rates) {
+      SLAB_RATES[key] = parseFloat(rates[key]);
+    }
+    cb({ ok: true });
+  });
+
+  socket.on('admin-force-offline', async (data, cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    try {
+      const astro = await User.findOne({ userId: data.userId });
+      if (astro) {
+        astro.isOnline = false;
+        astro.isAvailable = false;
+        astro.isChatOnline = false;
+        astro.isAudioOnline = false;
+        astro.isVideoOnline = false;
+        await astro.save();
+        broadcastAstroUpdate();
+        cb({ ok: true });
+      } else cb({ ok: false, error: 'User not found' });
+    } catch (e) { cb({ ok: false, error: e.message }); }
+  });
+
+  socket.on('admin-get-photo-approvals', async (cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    try {
+      // Find users with a pending image URL. Assuming 'pendingImage' schema or unstructured approach.
+      const pendingUsers = await User.find({ pendingImage: { $exists: true, $ne: '' } });
+      cb({ ok: true, requests: pendingUsers });
+    } catch (e) { cb({ ok: false }); }
+  });
+
+  socket.on('admin-resolve-photo-approval', async (data, cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    try {
+      const user = await User.findOne({ userId: data.userId });
+      if (user && data.action === 'approve') {
+        user.image = user.pendingImage || user.image;
+        user.pendingImage = undefined;
+      } else if (user && data.action === 'reject') {
+        user.pendingImage = undefined;
+      }
+      await user.save();
+      cb({ ok: true });
+    } catch (e) { cb({ ok: false, error: e.message }); }
+  });
+
+  socket.on('send-bulk-fcm', async (data, cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    try {
+      let tokens = [];
+      if (data.allUsers) {
+        const users = await User.find({ fcmToken: { $exists: true, $ne: '' } });
+        tokens = users.map(u => u.fcmToken);
+      } else if (data.userIds && data.userIds.length > 0) {
+        const users = await User.find({ userId: { $in: data.userIds }, fcmToken: { $exists: true, $ne: '' } });
+        tokens = users.map(u => u.fcmToken);
+      }
+      let sentCount = 0;
+      for (const token of tokens) {
+        await sendFcmV1Push(token, { type: 'OFFER', imageUrl: data.imageUrl || '' }, { title: data.title, body: data.body }).then(res => {
+          if (res.success) sentCount++;
+        }).catch(err => console.error(err));
+      }
+      cb({ ok: true, sentCount });
+    } catch (e) { cb({ ok: false }); }
+  });
+
+  socket.on('admin-delete-user', async (data, cb) => {
+    if (!await checkAdmin(socket.id)) return cb({ ok: false });
+    try {
+      const res = await User.deleteOne({ userId: data.userId });
+      if (res.deletedCount > 0) {
+        broadcastAstroUpdate();
+        cb({ ok: true });
+      } else {
+        cb({ ok: false, error: 'User not found' });
+      }
+    } catch (e) { cb({ ok: false, error: e.message }); }
+  });
+
   // Phase 10: Ledger Stats
   socket.on('admin-get-ledger-stats', async (data, cb) => {
     if (!await checkAdmin(socket.id)) return cb({ ok: false });
