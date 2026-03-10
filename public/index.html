@@ -816,42 +816,30 @@
     }
 
     /* --- High-Conversion Astro Card --- */
-    /* ─── PREMIUM ASTRO CARD REDESIGN (SaaS Standard) ─── */
+    /* High-Conversion Astro Card Redesign */
     .astro-card {
       background: #ffffff;
-      border: 1px solid #f1f5f9;
-      /* Slate 100 */
-      border-radius: 20px;
-      padding: 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 24px;
+      padding: 24px;
       position: relative;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       flex-direction: column;
       gap: 16px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
-      margin-bottom: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
       cursor: pointer;
-    }
-
-    .astro-card:hover {
-      transform: translateY(-4px);
-      border-color: #e2e8f0;
-      box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
     }
 
     .card-top-row {
       display: flex;
-      align-items: center;
-      gap: 16px;
-      min-width: 0;
+      gap: 20px;
     }
 
     .astro-img-wrapper {
       position: relative;
-      width: 72px;
-      height: 72px;
-      flex-shrink: 0;
+      width: 80px;
+      height: 80px;
     }
 
     .astro-img {
@@ -859,143 +847,148 @@
       height: 100%;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid #f8fafc;
+      border: 2px solid #f8fafc;
       box-shadow: 0 0 0 1px #e2e8f0;
     }
 
-    .status-badge {
+    .verified-badge {
       position: absolute;
       bottom: 2px;
       right: 2px;
-      width: 14px;
-      height: 14px;
+      background: #3B82F6;
+      /* Azure Blue */
+      color: #fff;
+      width: 22px;
+      height: 22px;
       border-radius: 50%;
-      border: 2px solid #fff;
-      z-index: 5;
-    }
-
-    .status-badge.online {
-      background: #10b981;
-      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
-    }
-
-    .status-badge.busy {
-      background: #f59e0b;
-    }
-
-    .status-badge.offline {
-      background: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      border: 2.5px solid #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .astro-details {
       flex: 1;
-      min-width: 0;
     }
 
     .astro-name {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #0f172a;
-      /* Slate 900 */
-      margin-bottom: 2px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 8px;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #64748b;
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .detail-item i {
+      width: 16px;
+      text-align: center;
+      color: #94a3b8;
+    }
+
+    .card-stats {
+      margin-top: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+    }
+
+    .rating-badge {
       display: flex;
       align-items: center;
       gap: 6px;
-    }
-
-    .astro-expertise {
-      color: #64748b;
-      /* Slate 500 */
-      font-size: 0.85rem;
-      font-weight: 500;
-      margin-bottom: 6px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .rating-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .star-rating {
-      background: #fffbeb;
-      color: #b45309;
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-weight: 700;
-      font-size: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 3px;
-    }
-
-    .card-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 12px;
-      border-top: 1px solid #f1f5f9;
-    }
-
-    .price-tag {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .price-tag .label {
-      font-size: 0.7rem;
-      color: #94a3b8;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.025em;
-    }
-
-    .price-tag .value {
-      font-size: 1.1rem;
       font-weight: 800;
-      color: #0f172a;
+      font-size: 1rem;
+      color: #1e293b;
     }
 
-    .price-tag .unit {
-      font-size: 0.75rem;
+    .rating-badge i {
+      color: #f59e0b;
+    }
+
+    .orders-text {
+      font-size: 0.8rem;
+      color: #94a3b8;
       font-weight: 500;
-      color: #64748b;
+    }
+
+    .price-badge-top {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      text-align: right;
+    }
+
+    .current-price {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #ef4444;
+      /* Alert Red */
+    }
+
+    .old-price {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      text-decoration: line-through;
+      margin-left: 6px;
     }
 
     .card-actions {
       display: flex;
-      gap: 8px;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 8px;
     }
 
-    .cta-btn {
+    .action-btn {
+      flex: 1;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 12px 8px;
-      border-radius: 14px;
-      background: var(--glass);
-      border: 1px solid var(--glass-border);
-      color: var(--text-muted);
-      font-size: 0.7rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      font-family: var(--font-body);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      background: #fff;
+      transition: all 0.2s;
+      border: 2px solid transparent;
     }
 
-    .cta-btn i {
-      font-size: 1.1rem;
-      margin-bottom: 4px;
+    .btn-chat-outline {
+      border-color: #0A74B8;
+      color: #0A74B8;
+    }
+
+    .btn-video-outline {
+      border-color: #D94A38;
+      color: #D94A38;
+    }
+
+    .btn-call-outline {
+      border-color: #27AE60;
+      color: #27AE60;
+    }
+
+    .action-btn:hover:not(.disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      filter: brightness(0.95);
+    }
+
+    .action-btn.disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
     }
 
     .cta-btn {
@@ -7113,67 +7106,76 @@
 
       astrologers.forEach(a => {
         const div = document.createElement('div');
-        div.className = 'astro-card' + (a.isOnline ? ' online-glow' : '');
+        div.className = 'astro-card';
         div.onclick = () => openAstroProfile(a);
 
-        // REAL Trust Markers from DB
-        const orderCount = a.orderCount || Math.floor(Math.random() * 500) + 100; // Fallback if not in DB yet
+        const orderCount = a.orderCount || Math.floor(Math.random() * 500) + 100;
         const languages = a.languages || ['Tamil', 'English'];
-        const isVerified = a.isVerified; // Real DB Value
-        const isDocsVerified = a.isDocumentVerified; // Real DB Value
-        const isTopChoice = a.isTopChoice; // Optional extra field if added later
+        const isVerified = a.isVerified;
+        const rating = (a.rating || 5.0).toFixed(1);
 
         div.innerHTML = `
-      ${isTopChoice ? '<div class="ribbon"><span>Top Choice</span></div>' : ''}
-
-      <!-- Top Row: Avatar & Profile Info -->
-      <div class="card-top-row">
-          <div class="astro-img-wrapper">
-              <img src="${a.image || 'https://ui-avatars.com/api/?name=' + a.name + '&background=random'}"
-                   class="astro-img">
-              <div class="status-badge ${a.isOnline ? 'online' : (a.isBusy ? 'busy' : 'offline')}"></div>
+          <!-- Pricing in Top Right -->
+          <div class="price-badge-top">
+            <span class="current-price">₹${a.price || 0}</span>
+            <span class="old-price">${(a.price || 0) * 2}/Min</span>
           </div>
 
-          <div class="astro-details">
-              <div class="astro-name">
-                ${a.name}
-                ${isVerified ? '<i class="fas fa-check-circle" style="color:#6366F1; font-size:0.9rem;" title="Verified"></i>' : ''}
+          <div class="card-top-row">
+            <div class="astro-img-wrapper">
+              <img src="${a.image || 'https://ui-avatars.com/api/?name=' + a.name + '&background=random'}" class="astro-img">
+              ${isVerified ? '<div class="verified-badge"><i class="fas fa-check"></i></div>' : ''}
+            </div>
+
+            <div class="astro-details">
+              <div class="astro-name">${a.name}</div>
+
+              <div class="detail-item">
+                <i class="fas fa-bolt"></i>
+                <span>${a.skills ? a.skills.slice(0, 2).join(', ') : 'Vedic, Vastu'}</span>
               </div>
 
-              <div class="astro-expertise">${a.skills ? a.skills.join(', ') : 'Vedic Astrology'}</div>
-
-              <div class="rating-row">
-                  <span class="star-rating"><i class="fas fa-star" style="font-size:0.7rem;"></i> 4.9</span>
-                  <span style="color:#94A3B8; font-size:0.75rem; font-weight:500;">(${orderCount}+ orders)</span>
+              <div class="detail-item">
+                <i class="fas fa-language"></i>
+                <span>${languages.join(', ')}</span>
               </div>
-          </div>
-      </div>
 
-      <!-- Footer Row: Pricing & Actions -->
-      <div class="card-footer">
-          <div class="price-tag">
-              <span class="label">Rate</span>
-              <div class="value">₹${a.price || 0}<span class="unit">/min</span></div>
+              <div class="detail-item">
+                <i class="far fa-clock"></i>
+                <span>Exp: ${a.experience || '5'} Years</span>
+              </div>
+
+              <div class="card-stats">
+                <div class="rating-badge">
+                  <span>${rating}</span>
+                  <i class="fas fa-star"></i>
+                </div>
+                <div class="orders-text">${orderCount} Orders</div>
+              </div>
+            </div>
           </div>
 
+          <!-- Actions: Chat, Video, Call -->
           <div class="card-actions">
-               <button class="cta-btn btn-chat ${a.isChatOnline ? '' : 'opacity-50 pointer-events-none'}"
-                    onclick="event.stopPropagation(); checkGuestAction('chat', '${a.userId}')">
-                   <span>Chat</span>
-               </button>
+            <button class="action-btn btn-chat-outline ${a.isChatOnline ? '' : 'disabled'}"
+                    onclick="event.stopPropagation(); if('${a.isChatOnline}' === 'true') checkGuestAction('chat', '${a.userId}')">
+              <i class="far fa-comment-alt"></i>
+              <span>Chat</span>
+            </button>
 
-               <button class="cta-btn btn-call ${a.isAudioOnline ? '' : 'opacity-50 pointer-events-none'}"
-                    onclick="event.stopPropagation(); checkGuestAction('call', '${a.userId}')">
-                   <span>Call</span>
-               </button>
+            <button class="action-btn btn-video-outline ${a.isVideoOnline ? '' : 'disabled'}"
+                    onclick="event.stopPropagation(); if('${a.isVideoOnline}' === 'true') checkGuestAction('video', '${a.userId}')">
+              <i class="fas fa-video-plus"></i>
+              <span>Video</span>
+            </button>
 
-               <button class="cta-btn btn-video ${a.isVideoOnline ? '' : 'opacity-50 pointer-events-none'}"
-                    onclick="event.stopPropagation(); checkGuestAction('video', '${a.userId}')">
-                   <span>Video</span>
-               </button>
-           </div>
-      </div>
-    `;
+            <button class="action-btn btn-call-outline ${a.isAudioOnline ? '' : 'disabled'}"
+                    onclick="event.stopPropagation(); if('${a.isAudioOnline}' === 'true') checkGuestAction('call', '${a.userId}')">
+              <i class="fas fa-phone-alt"></i>
+              <span>Call</span>
+            </button>
+          </div>
+        `;
         if (container) container.appendChild(div);
         if (webContainer) {
           const webDiv = div.cloneNode(true);

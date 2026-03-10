@@ -62,10 +62,11 @@ fun LoginScreen() {
 
     var phoneNumber by remember { mutableStateOf("") }
     var referralCode by remember { mutableStateOf("") }
+    var showReferralInput by remember { mutableStateOf(false) } // Toggle for referral
     var isLoading by remember { mutableStateOf(false) }
     var showError by remember { mutableStateOf(false) }
 
-    val glassShape = RoundedCornerShape(28.dp)
+    val glassShape = RoundedCornerShape(24.dp)
     val glassBorder = Color.White.copy(alpha = 0.35f)
     val glassSurface = Color.White.copy(alpha = 0.14f)
     val glowPrimary = Color(0xFF6BE6FF).copy(alpha = 0.35f)
@@ -221,25 +222,41 @@ fun LoginScreen() {
                     )
                 )
 
-                OutlinedTextField(
-                    value = referralCode,
-                    onValueChange = { referralCode = it.uppercase().take(8) },
-                    label = { Text("Referral Code (Optional)", color = Color.White.copy(alpha = 0.7f)) },
-                    placeholder = { Text("REFERRAL CODE", color = Color.White.copy(alpha = 0.3f)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 28.dp),
-                    singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = Color.White.copy(alpha = 0.7f),
-                        unfocusedBorderColor = Color.White.copy(alpha = 0.35f),
-                        focusedContainerColor = Color.White.copy(alpha = 0.08f),
-                        unfocusedContainerColor = Color.White.copy(alpha = 0.06f),
-                        cursorColor = Color.White
+                if (!showReferralInput) {
+                    TextButton(
+                        onClick = { showReferralInput = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    ) {
+                        Text(
+                            "Have a Referral Code?",
+                            color = Color.White.copy(alpha = 0.8f),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                } else {
+                    OutlinedTextField(
+                        value = referralCode,
+                        onValueChange = { referralCode = it.uppercase().take(8) },
+                        label = { Text("Referral Code", color = Color.White.copy(alpha = 0.7f)) },
+                        placeholder = { Text("REFERRAL CODE", color = Color.White.copy(alpha = 0.3f)) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color.White.copy(alpha = 0.7f),
+                            unfocusedBorderColor = Color.White.copy(alpha = 0.35f),
+                            focusedContainerColor = Color.White.copy(alpha = 0.08f),
+                            unfocusedContainerColor = Color.White.copy(alpha = 0.06f),
+                            cursorColor = Color.White
+                        )
                     )
-                )
+                }
 
                 Button(
                     onClick = {
