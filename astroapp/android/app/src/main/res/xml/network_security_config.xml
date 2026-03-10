@@ -12,7 +12,6 @@
 <network-security-config>
     <!-- Allow cleartext traffic to our server -->
     <domain-config cleartextTrafficPermitted="true">
-        <domain includeSubdomains="true">astroluna.com</domain>
         <domain includeSubdomains="true">astroluna.in</domain>
         <domain includeSubdomains="true">192.168.1.39</domain>
     </domain-config>

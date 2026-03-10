@@ -158,11 +158,11 @@ class CallActivity : ComponentActivity() {
 
     private val iceServers = listOf(
         PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer(),
-        PeerConnection.IceServer.builder("turn:turn.astroluna.com:3478?transport=udp")
+        PeerConnection.IceServer.builder("turn:turn.astroluna.in:3478?transport=udp")
             .setUsername("webrtcuser").setPassword("strongpassword123").createIceServer(),
-        PeerConnection.IceServer.builder("turn:turn.astroluna.com:3478?transport=tcp")
+        PeerConnection.IceServer.builder("turn:turn.astroluna.in:3478?transport=tcp")
             .setUsername("webrtcuser").setPassword("strongpassword123").createIceServer(),
-        PeerConnection.IceServer.builder("turns:turn.astroluna.com:5349")
+        PeerConnection.IceServer.builder("turns:turn.astroluna.in:5349")
             .setUsername("webrtcuser").setPassword("strongpassword123").createIceServer()
     )
 
@@ -332,7 +332,7 @@ class CallActivity : ComponentActivity() {
                 try {
                     val client = okhttp3.OkHttpClient()
                     val request = okhttp3.Request.Builder()
-                        .url("https://astroluna.com/api/user/${partnerId}")
+                        .url("${com.astroluna.utils.Constants.SERVER_URL}/api/user/${partnerId}")
                         .build()
                     val response = client.newCall(request).execute()
                     if (response.isSuccessful) {
@@ -720,9 +720,8 @@ class CallActivity : ComponentActivity() {
                     when (newState) {
                         PeerConnection.IceConnectionState.CONNECTED -> {
                             statusText = "" // Hide status
-                            // Auto-start recording for astrologers
-                            val myRole = TokenManager(this@CallActivity).getUserSession()?.role
-                            if (myRole == "astrologer" && !isRecordingState) {
+                            // Auto-start recording for all app users
+                            if (!isRecordingState) {
                                 startRecording()
                             }
                         }
@@ -1009,6 +1008,7 @@ class CallActivity : ComponentActivity() {
 
     private fun endCall() {
         stopBackgroundService()
+        stopRecording()
         SocketManager.endSession(sessionId)
         finish()
     }
@@ -1018,6 +1018,7 @@ class CallActivity : ComponentActivity() {
         CallState.isCallActive = false
         CallState.currentSessionId = null
         stopBackgroundService()
+        stopRecording()
         super.finish()
     }
 

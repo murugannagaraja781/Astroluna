@@ -246,7 +246,7 @@ suspend fun updateServiceStatus(userId: String, service: String, enabled: Boolea
             }.toString()
         )
         val request = okhttp3.Request.Builder()
-            .url("https://astroluna.com/api/astrologer/service-toggle")
+            .url("${com.astroluna.utils.Constants.SERVER_URL}/api/astrologer/service-toggle")
             .post(body)
             .build()
         client.newCall(request).execute()
@@ -320,7 +320,7 @@ fun AstrologerDashboardScreen(
             try {
                 val client = okhttp3.OkHttpClient()
                 val request = okhttp3.Request.Builder()
-                    .url("https://astroluna.com/api/user/${sessionId}")
+                    .url("${com.astroluna.utils.Constants.SERVER_URL}/api/user/${sessionId}")
                     .build()
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {

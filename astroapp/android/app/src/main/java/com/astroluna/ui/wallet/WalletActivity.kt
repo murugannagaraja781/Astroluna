@@ -133,7 +133,7 @@ class WalletActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val request = Request.Builder()
-                    .url("https://astroluna.com/api/payment/history/$userId")
+                    .url("${com.astroluna.utils.Constants.SERVER_URL}/api/payment/history/$userId")
                     .get()
                     .build()
 

@@ -57,7 +57,7 @@ fun HistoryScreen(userId: String, onBack: () -> Unit) {
             try {
                 val client = okhttp3.OkHttpClient()
                 val request = okhttp3.Request.Builder()
-                    .url("https://astroluna.com/api/astrology/history/$userId")
+                    .url("${com.astroluna.utils.Constants.SERVER_URL}/api/astrology/history/$userId")
                     .build()
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
