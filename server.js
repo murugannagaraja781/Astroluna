@@ -1609,14 +1609,16 @@ app.post('/api/verify-otp', async (req, res) => {
         role: 'astrologer',
         walletBalance: 5000,
         totalEarnings: 0,
-        isOnline: true,
-        isAvailable: true,
+        isOnline: false, // User Request: Default should be offline
+        isAvailable: false,
+        isChatOnline: false,
+        isAudioOnline: false,
+        isVideoOnline: false,
         ratePerMinute: 10
       });
     } else if (user.role !== 'astrologer') {
       user.role = 'astrologer';
-      user.isOnline = true;
-      user.isAvailable = true;
+      // User Request: Never force online magically.
       user.ratePerMinute = user.ratePerMinute || 10;
       await user.save();
     }
