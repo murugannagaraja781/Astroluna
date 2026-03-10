@@ -619,6 +619,12 @@ class CallActivity : ComponentActivity() {
                              put("sessionId", sessionId)
                         }
                         SocketManager.getSocket()?.emit("session-connect", connectPayload)
+
+                        // NEW: Start WebRTC connection immediately as initiator
+                        if (::peerConnection.isInitialized) {
+                            createOffer()
+                            Log.d(TAG, "Initiator creating initial offer")
+                        }
                     }
                 }
             }
@@ -841,12 +847,9 @@ class CallActivity : ComponentActivity() {
             runOnUiThread {
                 statusText = "🔴 Billing Active"
                 isBillingActive = true
-                if (isInitiator && ::peerConnection.isInitialized) {
-                    createOffer()
-                }
+                // Removed duplicate createOffer here to avoid race conditions
                 androidx.core.os.HandlerCompat.postDelayed(android.os.Handler(android.os.Looper.getMainLooper()), {
-                   if(statusText == "🔴 Billing Active") statusText = "" // Hide after valid
-                   isBillingActive = false // keep UI indicator small or different
+                   if(statusText == "🔴 Billing Active") statusText = ""
                 }, null, 3000)
             }
         }

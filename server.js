@@ -1211,7 +1211,7 @@ app.get('/api/daily-horoscope', async (req, res) => {
     const data = await fetchDailyHoroscope(today);
     if (data && data.length > 0) {
       // Pick the first rasi (Mesham) as a generic forecast for the home screen
-      res.json({ ok: true, content: data[0].forecast_ta });
+      res.json({ ok: true, content: data[0].prediction_ta || data[0].forecast_ta || data[0].prediction_en || 'Today is a good day!' });
     } else {
       const content = generateTamilHoroscope();
       res.json({ ok: true, content });
@@ -2639,16 +2639,27 @@ io.on('connection', (socket) => {
       if (data.type === 'audio') update.isAudioOnline = !!data.online;
       if (data.type === 'video') update.isVideoOnline = !!data.online;
 
-      // We first get the user to calculate global isOnline
       let user = await User.findOne({ userId });
       if (user) {
-        Object.assign(user, update);
-        user.isOnline = user.isChatOnline || user.isAudioOnline || user.isVideoOnline;
-        user.isAvailable = user.isOnline; // Sync isAvailable with manual toggle
-        user.lastSeen = new Date();
-        await user.save();
-        broadcastAstroUpdate();
-        console.log(`[Presence] ${user.name} toggled ${data.type}: ${data.online}`);
+        // If type is 'online' (generic), don't touch individual services
+        // Just ensure astrologer stays with their current service statuses
+        if (data.type === 'online') {
+          // Don't modify any service status - just update lastSeen
+          user.lastSeen = new Date();
+          user.isOnline = user.isChatOnline || user.isAudioOnline || user.isVideoOnline;
+          user.isAvailable = user.isOnline;
+          await user.save();
+          broadcastAstroUpdate();
+          console.log(`[Presence] ${user.name} post-session refresh (services unchanged)`);
+        } else {
+          Object.assign(user, update);
+          user.isOnline = user.isChatOnline || user.isAudioOnline || user.isVideoOnline;
+          user.isAvailable = user.isOnline;
+          user.lastSeen = new Date();
+          await user.save();
+          broadcastAstroUpdate();
+          console.log(`[Presence] ${user.name} toggled ${data.type}: ${data.online}`);
+        }
       }
     } catch (e) { console.error(e); }
   });
