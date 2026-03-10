@@ -131,6 +131,15 @@ class FCMService : FirebaseMessagingService() {
         super.onMessageReceived(message)
         Log.d(TAG, "FCM message received from: ${message.from}")
 
+        // User Request: Remove Guest FCM notifications
+        // Don't process any messages if the user is not logged in / is a guest
+        val tokenManager = com.astroluna.data.local.TokenManager(this)
+        val userId = tokenManager.getUserSession()?.userId
+        if (userId == null) {
+            Log.d(TAG, "Guest mode detected (no userId) - ignoring FCM message")
+            return
+        }
+
         // Check if message contains a data payload.
         if (message.data.isNotEmpty()) {
             val data = message.data
