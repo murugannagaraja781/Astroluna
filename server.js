@@ -1174,19 +1174,43 @@ app.get('/api/daily-horoscope', async (req, res) => {
   try {
     const today = DateTime.now().setZone('Asia/Kolkata').toFormat('yyyy-MM-dd');
     const data = await fetchDailyHoroscope(today);
+
     if (data && data.length > 0) {
-      // Pick the first rasi (Mesham) as a generic forecast for the home screen
-      res.json({ ok: true, content: data[0].prediction_ta || data[0].forecast_ta || data[0].prediction_en || 'Today is a good day!' });
+      // Logic: If user passed a sign in the app, use it. Otherwise, use index 0 (Mesham).
+      const signName = req.query.sign;
+      let targetItem = data[0];
+
+      if (signName) {
+        const found = data.find(d =>
+          (d.sign_en && d.sign_en.toLowerCase() === signName.toLowerCase()) ||
+          (d.sign_ta === signName)
+        );
+        if (found) targetItem = found;
+      }
+
+      const rawText = targetItem.prediction_ta || targetItem.forecast_ta || targetItem.prediction_en || "";
+      const content = truncateTo2Lines(rawText);
+
+      res.json({ ok: true, content: content || 'Today is a good day!' });
     } else {
       const content = generateTamilHoroscope();
-      res.json({ ok: true, content });
+      res.json({ ok: true, content: truncateTo2Lines(content) });
     }
   } catch (err) {
     console.error('Error in /api/daily-horoscope:', err);
     const content = generateTamilHoroscope();
-    res.json({ ok: true, content });
+    res.json({ ok: true, content: truncateTo2Lines(content) });
   }
 });
+
+function truncateTo2Lines(text) {
+  if (!text) return "";
+  const lines = text.split('\n').filter(l => l.trim().length > 0);
+  if (lines.length >= 2) return lines.slice(0, 2).join('\n');
+  const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [text];
+  if (sentences.length >= 2) return sentences.slice(0, 2).join(' ');
+  return text.length > 150 ? text.substring(0, 147) + "..." : text;
+}
 
 // Academy Videos API
 app.get('/api/academy/videos', async (req, res) => {

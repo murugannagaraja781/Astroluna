@@ -35,8 +35,8 @@ router.get('/', async (req, res) => {
                 signNameTa: item.sign_ta,
                 date: today,
                 prediction: {
-                    ta: truncateTo3Lines(item.forecast_ta),
-                    en: truncateTo3Lines(item.forecast_en)
+                    ta: item.prediction_ta || item.forecast_ta || "",
+                    en: item.prediction_en || item.forecast_en || ""
                 },
                 details: {
                     career: item.career_ta,
@@ -65,23 +65,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-function truncateTo3Lines(text) {
-    if (!text) return "";
-    // If text has newlines, take first 3 lines
-    const lines = text.split('\n').filter(l => l.trim().length > 0);
-    if (lines.length >= 3) {
-        return lines.slice(0, 3).join('\n');
-    }
-    // If it's one long paragraph, take first 3 sentences or ~250 chars
-    const sentences = text.match(/[^\.!\?]+[\.!\?]+/g) || [text];
-    if (sentences.length >= 3) {
-        return sentences.slice(0, 3).join(' ');
-    }
-    // Default: truncate to 250 characters if still too long
-    if (text.length > 250) {
-        return text.substring(0, 247) + "...";
-    }
-    return text;
-}
+// Helper removed from here as we want full text for the list view
+
 
 module.exports = router;

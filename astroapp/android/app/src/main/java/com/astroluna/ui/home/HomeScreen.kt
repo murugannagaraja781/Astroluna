@@ -153,11 +153,11 @@ fun BannerSection(banners: List<Banner>) {
                         if (!banner.subtitle.isNullOrEmpty()) {
                             Text(
                                 text = banner.subtitle,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.White.copy(alpha=0.9f)
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                        }
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.8f),
+                            maxLines = 2,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        )}
 
                         // CTA Pill
                         if (!banner.ctaText.isNullOrEmpty()) {
@@ -1466,7 +1466,9 @@ fun DailyHoroscopeCard(content: String) {
                     lineHeight = 22.sp,
                     letterSpacing = 0.2.sp
                 ),
-                color = Color(0xFF475569) // Slate 600
+                color = Color(0xFF475569), // Slate 600
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
