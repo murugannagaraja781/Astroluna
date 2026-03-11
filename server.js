@@ -376,8 +376,8 @@ const freeHoroscopeRouter = require("./routes/freeHoroscope");
 
 app.use("/api/rasi-eng", rasiEngRouter);
 app.use("/api/rasipalan", rasipalanRouter);
-app.use("/api/horoscope/rasi-palan", rasipalanRouter); // Android App specific path
-app.use("/api/horoscope", freeHoroscopeRouter); // Free horoscope chart generation
+app.use("/rasi-eng/horoscope/daily", rasipalanRouter); // Android App specific path
+app.use("/rasi-eng/horoscope", freeHoroscopeRouter); // Free horoscope chart generation
 
 // --- Astrologer Registration API ---
 app.post('/api/astrologer/register', async (req, res) => {
