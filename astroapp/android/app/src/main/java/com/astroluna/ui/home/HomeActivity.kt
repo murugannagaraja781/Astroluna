@@ -415,22 +415,30 @@ class HomeActivity : AppCompatActivity() {
 
     private fun handleServiceClick(serviceName: String) {
         when (serviceName.replace("\n", " ")) {
-            "Free  horoscope" -> {
+            "Free Horoscope" -> {
                 val intent = Intent(this, com.astroluna.ui.horoscope.FreeHoroscopeActivity::class.java)
                 startActivity(intent)
             }
             "Horoscope Match" -> {
-                Toast.makeText(this, "Horoscope Match - Coming Soon!", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, com.astroluna.ui.intake.IntakeActivity::class.java).apply {
+                    putExtra("type", "match")
+                }
+                startActivity(intent)
             }
             "Daily Horoscope" -> {
                 val intent = Intent(this, com.astroluna.ui.rasipalan.RasipalanActivity::class.java)
                 startActivity(intent)
             }
             "Astro Academy" -> {
-                Toast.makeText(this, "Astro Academy - Coming Soon!", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, com.astroluna.ui.academy.AcademyActivity::class.java)
+                startActivity(intent)
             }
-            "Free  Star Services" -> {
-                Toast.makeText(this, "Free Star Services - Coming Soon!", Toast.LENGTH_SHORT).show()
+            "Free Services" -> {
+                android.app.AlertDialog.Builder(this)
+                    .setTitle("Contact Us")
+                    .setMessage("For free services, contact us at: info@astroluna.in")
+                    .setPositiveButton("OK", null)
+                    .show()
             }
             else -> {
                 Toast.makeText(this, "$serviceName clicked", Toast.LENGTH_SHORT).show()

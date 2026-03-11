@@ -1316,33 +1316,39 @@ app.delete('/api/admin/academy/videos/:id', async (req, res) => {
 app.get('/api/daily-horoscope', async (req, res) => {
   try {
     const today = DateTime.now().setZone('Asia/Kolkata').toFormat('yyyy-MM-dd');
-    const data = await fetchDailyHoroscope(today);
+    let data = await fetchDailyHoroscope(today);
 
-    if (data && data.length > 0) {
-      // Logic: If user passed a sign in the app, use it. Otherwise, use index 0 (Mesham).
-      const signName = req.query.sign;
-      let targetItem = data[0];
-
-      if (signName) {
-        const found = data.find(d =>
-          (d.sign_en && d.sign_en.toLowerCase() === signName.toLowerCase()) ||
-          (d.sign_ta === signName)
-        );
-        if (found) targetItem = found;
-      }
-
-      const rawText = targetItem.prediction_ta || targetItem.forecast_ta || targetItem.prediction_en || "";
-      const content = truncateTo2Lines(rawText);
-
-      res.json({ ok: true, content: content || 'Today is a good day!' });
-    } else {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      console.warn('No daily horoscope data available for today, using fallback generator.');
       const content = generateTamilHoroscope();
-      res.json({ ok: true, content: truncateTo2Lines(content) });
+      return res.json({ ok: true, content: truncateTo2Lines(content) });
     }
+
+    // Logic: If user passed a sign in the app, use it. Otherwise, use index 0 (Mesham).
+    const signName = req.query.sign;
+    let targetItem = data[0];
+
+    if (signName) {
+      const searchStr = signName.toLowerCase();
+      const found = data.find(d =>
+        (d.sign_en && d.sign_en.toLowerCase() === searchStr) ||
+        (d.sign_ta === signName)
+      );
+      if (found) targetItem = found;
+    }
+
+    const rawText = targetItem.prediction_ta || targetItem.forecast_ta || targetItem.prediction_en || "Today is looking promising!";
+    const content = truncateTo2Lines(rawText);
+
+    res.json({ ok: true, content: content || 'Today is a good day!' });
   } catch (err) {
     console.error('Error in /api/daily-horoscope:', err);
-    const content = generateTamilHoroscope();
-    res.json({ ok: true, content: truncateTo2Lines(content) });
+    try {
+      const content = generateTamilHoroscope();
+      res.json({ ok: true, content: truncateTo2Lines(content) });
+    } catch (innerErr) {
+      res.status(500).json({ ok: false, content: "Check back later for your daily insight." });
+    }
   }
 });
 

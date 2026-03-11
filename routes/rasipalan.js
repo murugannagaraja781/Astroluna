@@ -25,50 +25,61 @@ router.get('/', async (req, res) => {
         const today = DateTime.now().setZone('Asia/Kolkata').toFormat('yyyy-MM-dd');
         console.log(`Fetching Rasipalan data for: ${today}`);
 
-        const externalData = await fetchDailyHoroscope(today);
+        let externalData = await fetchDailyHoroscope(today);
 
-        if (externalData && Array.isArray(externalData)) {
-            // Map external data to our app's expected format (RasipalanModel.kt)
-            const mappedData = externalData.map((item, index) => {
-                const predictionTa = item.prediction_ta || item.forecast_ta || item.details?.career || "";
-                const predictionEn = item.prediction_en || item.forecast_en || item.details?.career_en || "";
-
-                if (index === 0) console.log(`Sample item prediction_ta: ${item.prediction_ta?.substring(0, 50)}`);
-
-                return {
-                    signId: index + 1,
-                    signNameEn: item.sign_en,
-                    signNameTa: item.sign_ta,
-                    date: today,
-                    prediction: {
-                        ta: predictionTa,
-                        en: predictionEn
-                    },
-                    details: {
-                        career: item.career_ta || item.details?.career || "",
-                        finance: item.finance_ta || item.details?.finance || "",
-                        health: item.health_ta || item.details?.health || ""
-                    },
-                    lucky: {
-                        number: String(item.lucky_number || ""),
-                        color: {
-                            ta: item.lucky_color_ta || "",
-                            en: item.lucky_color_en || ""
-                        }
-                    }
-                };
-            });
-
-            console.log("Fetched and mapped Rasi Engine horoscope data for Android successfully.");
-            // Android app expects the array directly
-            return res.json(mappedData);
-        } else {
-            console.error("Failed to fetch horoscope data from Rasi Engine source.");
-            return res.status(500).json([]);
+        // If data is null or not an array, try to return an empty array with 200 OK
+        // to avoid crashing the app with 500 errors.
+        if (!externalData || !Array.isArray(externalData)) {
+            console.error("No horoscope data found for today or yesterday.");
+            return res.json([]);
         }
+
+        // Map external data to our app's expected format (RasipalanModel.kt)
+        const mappedData = externalData.map((item, index) => {
+            const predictionTa = item.prediction_ta || item.forecast_ta || item.details?.career || "";
+            const predictionEn = item.prediction_en || item.forecast_en || item.details?.career_en || "";
+
+            return {
+                signId: index + 1,
+                signNameEn: item.sign_en || "",
+                signNameTa: item.sign_ta || "",
+                date: today,
+                prediction: {
+                    ta: predictionTa,
+                    en: predictionEn
+                },
+                details: {
+                    career: item.career_ta || item.details?.career || "Moderate",
+                    finance: item.finance_ta || item.details?.finance || "Stable",
+                    health: item.health_ta || item.details?.health || "Good"
+                },
+                lucky: {
+                    number: String(item.lucky_number || ""),
+                    color: {
+                        ta: item.lucky_color_ta || "",
+                        en: item.lucky_color_en || ""
+                    }
+                }
+            };
+        });
+
+        // Filter by sign if provided in query (useful for testing)
+        const signQuery = req.query.sign;
+        if (signQuery) {
+            const searchStr = signQuery.toLowerCase();
+            const filtered = mappedData.filter(d =>
+                (d.signNameEn && d.signNameEn.toLowerCase() === searchStr) ||
+                (d.signNameTa === signQuery)
+            );
+            return res.json(filtered);
+        }
+
+        console.log(`Successfully fetched and mapped ${mappedData.length} Rasi items.`);
+        return res.json(mappedData);
     } catch (error) {
         console.error("Error in Rasipalan route:", error.message);
-        return res.status(500).json([]);
+        // Always return an empty array instead of a 500 status to prevent app from ignoring the response body
+        return res.json([]);
     }
 });
 

@@ -413,7 +413,7 @@ fun HomeScreen(
                     ) {
                         // ... existing items ...
                         if (selectedTab == 0) {
-                            item { TopServicesSection() }
+                            item { TopServicesSection(onServiceClick) }
                         }
                         if (selectedTab == 0) {
                             item { DailyHoroscopeCard(horoscope) }
@@ -1686,7 +1686,7 @@ fun StarField() {
 }
 
 @Composable
-fun TopServicesSection() {
+fun TopServicesSection(onServiceClick: (String) -> Unit = {}) {
     val context = LocalContext.current
     val services: List<Pair<String, Int>> = listOf(
         "Free\nHoroscope" to com.astroluna.R.drawable.ic_free_kundali,
@@ -1705,33 +1705,7 @@ fun TopServicesSection() {
     ) {
         services.forEach { (name, icon) ->
             ServiceItem(name, icon) {
-                when(name) {
-                    "Free\nHoroscope" -> {
-                        val intent = Intent(context, com.astroluna.ui.horoscope.FreeHoroscopeActivity::class.java)
-                        context.startActivity(intent)
-                    }
-                    "Horoscope\nMatch" -> {
-                        val intent = Intent(context, com.astroluna.ui.intake.IntakeActivity::class.java).apply {
-                            putExtra("type", "match")
-                        }
-                        context.startActivity(intent)
-                    }
-                    "Daily\nHoroscope" -> {
-                        val intent = Intent(context, com.astroluna.ui.rasipalan.RasipalanActivity::class.java)
-                        context.startActivity(intent)
-                    }
-                    "Astro\nAcademy" -> {
-                        val intent = Intent(context, com.astroluna.ui.academy.AcademyActivity::class.java)
-                        context.startActivity(intent)
-                    }
-                    "Free\nServices" -> {
-                        android.app.AlertDialog.Builder(context)
-                            .setTitle("Contact Us")
-                            .setMessage("For free services, contact us at: info@astroluna.in")
-                            .setPositiveButton("OK", null)
-                            .show()
-                    }
-                }
+                onServiceClick(name)
             }
         }
     }

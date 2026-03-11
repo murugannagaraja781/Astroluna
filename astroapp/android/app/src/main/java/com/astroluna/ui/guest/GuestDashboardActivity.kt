@@ -60,12 +60,19 @@ class GuestDashboardActivity : AppCompatActivity() {
                     onWalletClick = { redirectToLogin() },
                     onChatClick = { redirectToLogin() },
                     onCallClick = { _, _ -> redirectToLogin() },
-                    onRasiClick = { item -> selectedRasiItem = item },
+                    onRasiClick = { item ->
+                        val intent = Intent(this@GuestDashboardActivity, com.astroluna.ui.rasipalan.RasipalanActivity::class.java).apply {
+                            putExtra("signId", item.id)
+                            putExtra("signName", item.name)
+                        }
+                        startActivity(intent)
+                    },
                     onLogoutClick = { redirectToLogin() }, // Acts as Login button
                     onDrawerItemClick = { item ->
                          if (item == "Login" || item == "Logout") redirectToLogin()
                          else redirectToLogin() // Guest redirects to login for everything ideally
                     },
+                    onServiceClick = { serviceName -> handleServiceClick(serviceName) },
                     isGuest = true
                 )
             }
@@ -153,13 +160,17 @@ class GuestDashboardActivity : AppCompatActivity() {
             .get()
             .build()
 
-        client.newCall(request).execute().use { response ->
-            if (response.isSuccessful) {
-                val json = JSONObject(response.body?.string() ?: "{}")
-                json.optString("content", "Today is a good day!")
-            } else {
-                "Today is a good day!"
+        try {
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val json = JSONObject(response.body?.string() ?: "{}")
+                    json.optString("content", "Today is a good day!")
+                } else {
+                    "Today is a good day!"
+                }
             }
+        } catch (e: Exception) {
+            "Today is a good day!"
         }
     }
 
@@ -206,9 +217,6 @@ class GuestDashboardActivity : AppCompatActivity() {
              }
          }
 
-         // Map "charges" to "price" if needed, assuming API structure is consistent
-         // Guest logic used "charges", Home logic uses "price".
-         // I'll check if "price" exists, fallback to "charges"
          val price = if (json.has("price")) json.getInt("price") else json.optInt("charges", 15)
 
          return Astrologer(
@@ -230,7 +238,7 @@ class GuestDashboardActivity : AppCompatActivity() {
 
     private fun handleServiceClick(serviceName: String) {
         when (serviceName.replace("\n", " ")) {
-            "Free  horoscope" -> {
+            "Free Horoscope" -> {
                 val intent = Intent(this, com.astroluna.ui.horoscope.FreeHoroscopeActivity::class.java)
                 startActivity(intent)
             }
@@ -242,10 +250,15 @@ class GuestDashboardActivity : AppCompatActivity() {
                 startActivity(intent)
             }
             "Astro Academy" -> {
-                Toast.makeText(this, "Astro Academy - Basic content available!", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, com.astroluna.ui.academy.AcademyActivity::class.java)
+                startActivity(intent)
             }
-            "Free  Star Services" -> {
-                Toast.makeText(this, "Free Star Services - Available for guests!", Toast.LENGTH_SHORT).show()
+            "Free Services" -> {
+                android.app.AlertDialog.Builder(this)
+                    .setTitle("Contact Us")
+                    .setMessage("For free services, contact us at: info@astroluna.in")
+                    .setPositiveButton("OK", null)
+                    .show()
             }
             else -> {
                 Toast.makeText(this, "$serviceName clicked", Toast.LENGTH_SHORT).show()

@@ -73,6 +73,7 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
     var dataList by remember { mutableStateOf<List<RasipalanItem>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
         try {
             val response = withContext(Dispatchers.IO) {
@@ -80,16 +81,28 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
             }
             if (response.isSuccessful && response.body() != null) {
                 val fullList = response.body()!!
+                if (fullList.isEmpty()) {
+                    Toast.makeText(context, "No horoscope data available at the moment.", Toast.LENGTH_LONG).show()
+                }
                 // Filter if targetSignId is valid
                 dataList = if (targetSignId != -1) {
-                    fullList.filter { it.signId == targetSignId }
+                    val filtered = fullList.filter { it.signId == targetSignId }
+                    if (filtered.isEmpty() && fullList.isNotEmpty()) {
+                        Toast.makeText(context, "Data for this sign is not available yet.", Toast.LENGTH_SHORT).show()
+                        fullList // Show all if filter fails
+                    } else {
+                        filtered
+                    }
                 } else {
                     fullList
                 }
+            } else {
+                Toast.makeText(context, "Failed to load horoscope. Please try again later.", Toast.LENGTH_LONG).show()
             }
         } catch (e: Exception) {
             e.printStackTrace()
             android.util.Log.e("Rasipalan", "Error fetching data", e)
+            Toast.makeText(context, "Connection error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
         } finally {
             isLoading = false
         }
