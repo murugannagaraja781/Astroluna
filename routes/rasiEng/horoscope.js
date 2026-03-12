@@ -45,8 +45,13 @@ router.get('/daily', async (req, res) => {
             data = dummyData;
         }
 
+        const mappedData = data.map((item, index) => ({
+            ...item,
+            signId: index + 1
+        }));
+
         if (sign) {
-            const signData = getSignHoroscope(data, sign);
+            const signData = getSignHoroscope(mappedData, sign);
             if (!signData) {
                 return res.status(404).json({
                     success: false,
@@ -62,9 +67,10 @@ router.get('/daily', async (req, res) => {
         res.json({
             success: true,
             date,
-            count: data.length,
-            data
+            count: mappedData.length,
+            data: mappedData
         });
+
     } catch (error) {
         console.error('Daily Horoscope API error:', error);
         res.status(500).json({
@@ -111,8 +117,13 @@ router.post('/daily', async (req, res) => {
             data = dummyData;
         }
 
+        const mappedData = data.map((item, index) => ({
+            ...item,
+            signId: index + 1
+        }));
+
         if (sign) {
-            const signData = getSignHoroscope(data, sign);
+            const signData = getSignHoroscope(mappedData, sign);
             if (!signData) {
                 return res.status(404).json({
                     success: false,
@@ -128,9 +139,10 @@ router.post('/daily', async (req, res) => {
         res.json({
             success: true,
             date,
-            count: data.length,
-            data
+            count: mappedData.length,
+            data: mappedData
         });
+
     } catch (error) {
         console.error('Daily Horoscope API error:', error);
         res.status(500).json({

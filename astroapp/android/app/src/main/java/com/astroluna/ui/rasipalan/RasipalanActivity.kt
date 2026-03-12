@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.Alignment
@@ -68,6 +69,7 @@ class RasipalanActivity : ComponentActivity() {
 fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit) {
     var dataList by remember { mutableStateOf<List<RasipalanItem>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var errorMsg by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
         try {
@@ -75,28 +77,44 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
                 ApiClient.api.getRasipalan()
             }
             if (response.isSuccessful) {
-                val fullList = response.body()?.data ?: emptyList()
+                val body = response.body()
+                val fullList = body?.data ?: emptyList()
+
+                android.util.Log.d("Rasipalan", "Success: ${body?.success}, Count: ${fullList.size}")
+
+                if (fullList.isEmpty()) {
+                    errorMsg = "No horoscope data received from server."
+                }
 
                 // Filter logic
                 dataList = if (targetSignId != -1) {
-                    // Try to filter by signId if present, otherwise by mapping index or using displayTitle as fallback
                     val filtered = fullList.filter { it.signId == targetSignId }
-                    if (filtered.isNotEmpty()) filtered
-                    else {
+                    if (filtered.isNotEmpty()) {
+                        android.util.Log.d("Rasipalan", "Filtered by signId: $targetSignId")
+                        filtered
+                    } else {
                         // Fallback: search by name in displayTitle
                         val searchName = displayTitle.split(" ").firstOrNull()?.lowercase() ?: ""
+                        android.util.Log.d("Rasipalan", "Filtering by name: $searchName")
                         val match = fullList.filter {
                             (it.signNameEn?.lowercase()?.contains(searchName) ?: false) ||
                             (it.signNameTa?.contains(displayTitle) ?: false)
                         }
-                        if (match.isNotEmpty()) match else fullList
+                        if (match.isNotEmpty()) match else {
+                            android.util.Log.d("Rasipalan", "No match found, showing all")
+                            fullList
+                        }
                     }
                 } else {
                     fullList
                 }
+            } else {
+                errorMsg = "Server error: ${response.code()}"
+                android.util.Log.e("Rasipalan", "Response not successful: ${response.code()}")
             }
         } catch (e: Exception) {
             e.printStackTrace()
+            errorMsg = "Connection error: ${e.message}"
             android.util.Log.e("Rasipalan", "Error fetching data", e)
         } finally {
             isLoading = false
@@ -141,11 +159,32 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
                     modifier = Modifier.align(Alignment.Center),
                     color = GoldAccent
                 )
+            } else if (errorMsg != null) {
+                Column(
+                    modifier = Modifier.align(Alignment.Center).padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(text = errorMsg!!, color = Color.White, textAlign = TextAlign.Center)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { isLoading = true; errorMsg = null }, colors = ButtonDefaults.buttonColors(containerColor = GoldAccent)) {
+                        Text("Retry", color = MysticBg)
+                    }
+                }
             } else {
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
+                    if (dataList.isEmpty()) {
+                        item {
+                            Text(
+                                "No data found for $displayTitle",
+                                color = MysticTextSecondary,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+                    }
+
                     items(dataList) { item ->
                         PremiumRasipalanCard(item)
                     }
@@ -250,7 +289,7 @@ fun PremiumRasipalanCard(item: RasipalanItem) {
 }
 
 // Extension to get sign name for comparison or display
-fun RasipalanItem.signValue(): String? = signNameTa ?: signNameEn
+fun RasipalanItem.signValue(): String? = signNameEn
 
 @Composable
 fun StatusIndicatorRow(label: String, status: String?) {
