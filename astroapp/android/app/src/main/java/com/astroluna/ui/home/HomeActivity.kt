@@ -209,13 +209,27 @@ class HomeActivity : AppCompatActivity() {
 
     private suspend fun fetchHoroscope(): String = withContext(Dispatchers.IO) {
         val request = Request.Builder()
-            .url("$SERVER_URL/api/daily-horoscope")
+            .url("$SERVER_URL/api/rasi-eng/horoscope/daily")
             .get()
             .build()
         client.newCall(request).execute().use { response ->
             if (response.isSuccessful) {
-                val json = JSONObject(response.body?.string() ?: "{}")
-                json.optString("content", "Today is a good day!")
+                val resString = response.body?.string() ?: "[]"
+                try {
+                    val jsonArray = org.json.JSONArray(resString)
+                    if (jsonArray.length() > 0) {
+                        jsonArray.getJSONObject(0).optString("prediction_ta", "Today is a good day!")
+                    } else {
+                        "Today is a good day!"
+                    }
+                } catch (e: Exception) {
+                    try {
+                        val jsonObj = org.json.JSONObject(resString)
+                        jsonObj.optString("prediction_ta", jsonObj.optString("content", "Today is a good day!"))
+                    } catch (e2: Exception) {
+                        "Today is a good day!"
+                    }
+                }
             } else {
                 "Today is a good day!"
             }
