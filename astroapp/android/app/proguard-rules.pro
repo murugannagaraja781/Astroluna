@@ -1,16 +1,21 @@
-# ProGuard rules for FCM Call App
-
+# ProGuard rules for Astroluna
 # Keep Firebase classes
 -keep class com.google.firebase.** { *; }
 -keep class com.google.android.gms.** { *; }
 
-# Keep our service classes
--keep class com.astroluna.app.FCMService { *; }
--keep class com.astroluna.app.CallForegroundService { *; }
+# Keep our models
+-keep class com.astroluna.data.model.** { *; }
+
+# Keep Retrofit and Gson
+-keep class retrofit2.** { *; }
+-keep class com.google.gson.** { *; }
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn okio.**
+-dontwarn javax.annotation.**
 
 # OkHttp
 -dontwarn okhttp3.**
--dontwarn okio.**
 -keep class okhttp3.** { *; }
 -keep interface okhttp3.** { *; }
 

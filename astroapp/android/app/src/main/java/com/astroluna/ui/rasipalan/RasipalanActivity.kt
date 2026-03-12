@@ -68,11 +68,14 @@ class RasipalanActivity : ComponentActivity() {
 @Composable
 fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit) {
     var dataList by remember { mutableStateOf<List<RasipalanItem>>(emptyList()) }
+    var retryTrigger by remember { mutableIntStateOf(0) }
     var isLoading by remember { mutableStateOf(true) }
     var errorMsg by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(retryTrigger) {
         try {
+            isLoading = true
+            errorMsg = null
             val response = withContext(Dispatchers.IO) {
                 ApiClient.api.getRasipalan()
             }
@@ -109,12 +112,13 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
                     fullList
                 }
             } else {
-                errorMsg = "Server error: ${response.code()}"
+                errorMsg = "Server error: ${response.code()}\n${response.errorBody()?.string()?.take(100)}"
                 android.util.Log.e("Rasipalan", "Response not successful: ${response.code()}")
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            errorMsg = "Connection error: ${e.message}"
+            // Improved error message with class name
+            errorMsg = "Connection error: ${e::class.simpleName}\n${e.message ?: "No details available"}"
             android.util.Log.e("Rasipalan", "Error fetching data", e)
         } finally {
             isLoading = false
@@ -166,11 +170,15 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
                 ) {
                     Text(text = errorMsg!!, color = Color.White, textAlign = TextAlign.Center)
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { isLoading = true; errorMsg = null }, colors = ButtonDefaults.buttonColors(containerColor = GoldAccent)) {
+                    Button(
+                        onClick = { retryTrigger++ },
+                        colors = ButtonDefaults.buttonColors(containerColor = GoldAccent)
+                    ) {
                         Text("Retry", color = MysticBg)
                     }
                 }
             } else {
+
                 LazyColumn(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
