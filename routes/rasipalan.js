@@ -58,46 +58,45 @@ router.get('/', async (req, res) => {
 
         // Map external data to our app's expected format (RasipalanModel.kt)
         const mappedData = externalData.map((item, index) => {
-            const predictionTa = item.prediction_ta || item.forecast_ta || item.details?.career || "";
-            const predictionEn = item.prediction_en || item.forecast_en || item.details?.career_en || "";
-
             return {
                 signId: index + 1,
-                signNameEn: item.sign_en || "",
-                signNameTa: item.sign_ta || "",
+                sign_en: item.sign_en || "",
+                sign_ta: item.sign_ta || "",
                 date: today,
-                prediction: {
-                    ta: predictionTa,
-                    en: predictionEn
-                },
-                details: {
-                    career: item.career_ta || item.details?.career || "Moderate",
-                    finance: item.finance_ta || item.details?.finance || "Stable",
-                    health: item.health_ta || item.details?.health || "Good"
-                },
-                lucky: {
-                    number: String(item.lucky_number || ""),
-                    color: {
-                        ta: item.lucky_color_ta || "",
-                        en: item.lucky_color_en || ""
-                    }
-                }
+                prediction_ta: item.prediction_ta || item.forecast_ta || "",
+                prediction_en: item.prediction_en || item.forecast_en || "",
+                career_ta: item.career_ta || "சிறப்பு",
+                career_en: item.career_en || "Good",
+                finance_ta: item.finance_ta || "நன்று",
+                finance_en: item.finance_en || "Good",
+                health_ta: item.health_ta || "சிறப்பு",
+                health_en: item.health_en || "Good",
+                lucky_number: String(item.lucky_number || ""),
+                lucky_color_ta: item.lucky_color_ta || "",
+                lucky_color_en: item.lucky_color_en || ""
             };
         });
+
+        // Wrap in success object
+        const finalResponse = {
+            success: true,
+            data: mappedData
+        };
 
         // Filter by sign if provided in query (useful for testing)
         const signQuery = req.query.sign;
         if (signQuery) {
             const searchStr = signQuery.toLowerCase();
             const filtered = mappedData.filter(d =>
-                (d.signNameEn && d.signNameEn.toLowerCase() === searchStr) ||
-                (d.signNameTa === signQuery)
+                (d.sign_en && d.sign_en.toLowerCase() === searchStr) ||
+                (d.sign_ta === signQuery)
             );
-            return res.json(filtered);
+            return res.json({ success: true, data: filtered });
         }
 
         console.log(`Successfully fetched and mapped ${mappedData.length} Rasi items.`);
-        return res.json(mappedData);
+        return res.json(finalResponse);
+
     } catch (error) {
         console.error("Error in Rasipalan route:", error.message);
         // Always return an empty array instead of a 500 status to prevent app from ignoring the response body

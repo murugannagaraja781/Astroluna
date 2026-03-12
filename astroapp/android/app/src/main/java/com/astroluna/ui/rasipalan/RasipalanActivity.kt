@@ -1,4 +1,3 @@
-
 package com.astroluna.ui.rasipalan
 
 import android.os.Bundle
@@ -7,11 +6,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
@@ -33,19 +30,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// PREMIUM BLUE THEME TOKENS
-private val DeepSpaceNavy = Color(0xFF000B18)
-private val PremiumBlue = Color(0xFF001F3F)
-private val ElectricBlue = Color(0xFF0074D9)
-private val NeonCyan = Color(0xFF7FDBFF)
-private val GlassWhite = Color.White.copy(alpha = 0.1f)
-private val TextPrimary = Color(0xFFF2F4FF)
-private val TextSecondary = Color(0xFFA8B3AF)
+// PREMIUM COLOR TOKENS
+private val EmeraldStart = Color(0xFF0F3D2E)
+private val EmeraldEnd = Color(0xFF145A41)
+private val GoldAccent = Color(0xFFD4AF37)
+private val MysticBg = Color(0xFF0B1410)
+private val MysticTextPrimary = Color(0xFFF5F7F6)
+private val MysticTextSecondary = Color(0xFFA8B3AF)
 
 // Status Colors
-private val GoodGlow = Color(0xFF00FF9F) // Neon Green
-private val ModerateAmber = Color(0xFFFFB347)
-private val WeakRed = Color(0xFFFF4B2B)
+private val GoodGlow = Color(0xFF22C55E)
+private val ModerateAmber = Color(0xFFF59E0B)
+private val WeakRed = Color(0xFFEF4444)
 
 class RasipalanActivity : ComponentActivity() {
 
@@ -73,36 +69,35 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
     var dataList by remember { mutableStateOf<List<RasipalanItem>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
 
-    val context = LocalContext.current
     LaunchedEffect(Unit) {
         try {
             val response = withContext(Dispatchers.IO) {
                 ApiClient.api.getRasipalan()
             }
-            if (response.isSuccessful && response.body() != null) {
-                val fullList = response.body()!!
-                if (fullList.isEmpty()) {
-                    Toast.makeText(context, "No horoscope data available at the moment.", Toast.LENGTH_LONG).show()
-                }
-                // Filter if targetSignId is valid
+            if (response.isSuccessful) {
+                val fullList = response.body()?.data ?: emptyList()
+
+                // Filter logic
                 dataList = if (targetSignId != -1) {
+                    // Try to filter by signId if present, otherwise by mapping index or using displayTitle as fallback
                     val filtered = fullList.filter { it.signId == targetSignId }
-                    if (filtered.isEmpty() && fullList.isNotEmpty()) {
-                        Toast.makeText(context, "Data for this sign is not available yet.", Toast.LENGTH_SHORT).show()
-                        fullList // Show all if filter fails
-                    } else {
-                        filtered
+                    if (filtered.isNotEmpty()) filtered
+                    else {
+                        // Fallback: search by name in displayTitle
+                        val searchName = displayTitle.split(" ").firstOrNull()?.lowercase() ?: ""
+                        val match = fullList.filter {
+                            (it.signNameEn?.lowercase()?.contains(searchName) ?: false) ||
+                            (it.signNameTa?.contains(displayTitle) ?: false)
+                        }
+                        if (match.isNotEmpty()) match else fullList
                     }
                 } else {
                     fullList
                 }
-            } else {
-                Toast.makeText(context, "Failed to load horoscope. Please try again later.", Toast.LENGTH_LONG).show()
             }
         } catch (e: Exception) {
             e.printStackTrace()
             android.util.Log.e("Rasipalan", "Error fetching data", e)
-            Toast.makeText(context, "Connection error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
         } finally {
             isLoading = false
         }
@@ -116,54 +111,52 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
                         Text(
                             text = displayTitle,
                             style = MaterialTheme.typography.titleLarge.copy(
-                                fontWeight = FontWeight.ExtraBold,
-                                color = NeonCyan,
-                                letterSpacing = 1.sp
+                                fontWeight = FontWeight.Bold,
+                                color = GoldAccent
                             )
                         )
                         Text(
-                            text = "Daily Spiritual Insights",
+                            text = "Elegant Tamil + English Guide",
                             style = MaterialTheme.typography.labelSmall,
-                            color = NeonCyan.copy(alpha = 0.6f)
+                            color = GoldAccent.copy(alpha = 0.7f)
                         )
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = NeonCyan)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = GoldAccent)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                     containerColor = Color.Transparent,
-                     titleContentColor = NeonCyan
+                     containerColor = MysticBg,
+                     titleContentColor = GoldAccent
                 )
             )
         },
-        containerColor = DeepSpaceNavy
+        containerColor = MysticBg
     ) { padding ->
-        Box(modifier = Modifier.padding(padding).fillMaxSize().background(
-            Brush.verticalGradient(listOf(DeepSpaceNavy, PremiumBlue))
-        )) {
+        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
-                    color = NeonCyan
+                    color = GoldAccent
                 )
             } else {
                 LazyColumn(
-                    contentPadding = PaddingValues(bottom = 32.dp, start = 16.dp, end = 16.dp, top = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                     items(dataList) { item ->
                         PremiumRasipalanCard(item)
                     }
 
                     item {
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Future Insights",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            color = NeonCyan,
-                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                            text = "More Insights",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = GoldAccent,
+                            modifier = Modifier.padding(vertical = 8.dp)
                         )
                     }
 
@@ -179,146 +172,160 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
 
 @Composable
 fun PremiumRasipalanCard(item: RasipalanItem) {
-    var expanded by remember { mutableStateOf(false) }
-    val predictionText = item.prediction?.ta ?: ""
-    val hasMore = predictionText.length > 250
-
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp), // Box model as requested
-        colors = CardDefaults.cardColors(containerColor = PremiumBlue.copy(alpha = 0.6f)),
-        border = BorderStroke(1.dp, NeonCyan.copy(alpha = 0.2f))
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        border = BorderStroke(1.dp, GoldAccent.copy(alpha = 0.4f))
     ) {
-        Column(
+        Box(
             modifier = Modifier
-                .padding(20.dp)
-        ) {
-            // Header
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = item.signNameTa ?: item.signNameEn ?: "",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        color = NeonCyan
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(EmeraldStart, EmeraldEnd)
                     )
                 )
-                Text(
-                    text = item.date ?: "",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = TextSecondary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Prediction Text with "Read More" logic
-            Text(
-                text = predictionText,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    lineHeight = 24.sp,
-                    color = TextPrimary
-                ),
-                maxLines = if (expanded) Int.MAX_VALUE else 5,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-            )
-
-            if (hasMore) {
-                Text(
-                    text = if (expanded) "Read Less" else "...Read More",
-                    color = ElectricBlue,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .clickable { expanded = !expanded },
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Divider(color = NeonCyan.copy(alpha = 0.1f), thickness = 1.dp)
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Status Indicators
-            StatusIndicatorRow("தொழில் (Career)", item.details?.career)
-            StatusIndicatorRow("நிதி (Finance)", item.details?.finance)
-            StatusIndicatorRow("ஆரோக்கியம் (Health)", item.details?.health)
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Lucky Stats Section (Glass Box)
-            Surface(
-                color = Color.White.copy(alpha = 0.05f),
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(0.5.dp, NeonCyan.copy(alpha = 0.1f))
-            ) {
+                .padding(24.dp)
+        ) {
+            Column {
+                // Header
                 Row(
-                    modifier = Modifier.padding(12.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    LuckyStat("அதிர்ஷ்ட எண்", item.lucky?.number ?: "-")
-                    LuckyStat("நிறம்", item.lucky?.color?.ta ?: "-")
+                    Text(
+                        text = item.signNameTa ?: item.signValue() ?: "",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MysticTextPrimary
+                        )
+                    )
+                    Text(
+                        text = item.date ?: "",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = GoldAccent
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Short daily message
+                Text(
+                    text = item.predictionTa ?: "",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        lineHeight = 28.sp,
+                        color = MysticTextPrimary
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(color = GoldAccent.copy(alpha = 0.3f), thickness = 0.5.dp)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 3 Status Indicators
+                StatusIndicatorRow("தொழில் (Career)", item.careerTa)
+                StatusIndicatorRow("நிதி (Finance)", item.financeTa)
+                StatusIndicatorRow("ஆரோக்கியம் (Health)", item.healthTa)
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Lucky Section
+                Surface(
+                    color = Color.Black.copy(alpha = 0.2f),
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                    border = BorderStroke(0.5.dp, GoldAccent.copy(alpha = 0.2f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround
+                    ) {
+                        LuckyStat("அதிர்ஷ்ட எண்", item.luckyNumber ?: "-")
+                        LuckyStat("அதிர்ஷ்ட நிறம்", item.luckyColorTa ?: "-")
+                    }
                 }
             }
         }
     }
 }
 
+// Extension to get sign name for comparison or display
+fun RasipalanItem.signValue(): String? = signNameTa ?: signNameEn
+
 @Composable
 fun StatusIndicatorRow(label: String, status: String?) {
-    Column(
-        modifier = Modifier
-            .padding(vertical = 10.dp)
-            .fillMaxWidth()
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.ExtraBold),
-            color = NeonCyan,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+    val text = status ?: "Moderate"
+    val isLongText = text.length > 20
 
-        StatusBox(status ?: "Moderate")
+    if (isLongText) {
+        Column(
+            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth()
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleSmall,
+                color = GoldAccent,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Surface(
+                color = EmeraldStart.copy(alpha = 0.3f),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, GoldAccent.copy(alpha = 0.3f))
+            ) {
+                Text(
+                    text = text,
+                    modifier = Modifier.padding(12.dp),
+                    style = MaterialTheme.typography.bodyMedium.copy(lineHeight = 22.sp),
+                    color = MysticTextPrimary
+                )
+            }
+        }
+    } else {
+        Row(
+            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MysticTextSecondary
+            )
+            StatusChip(text)
+        }
     }
 }
 
 @Composable
-fun StatusBox(status: String) {
-    val (color, _) = when {
+fun StatusChip(status: String) {
+    val (color, label) = when {
         status.contains("Good", ignoreCase = true) ||
         status.contains("Active", ignoreCase = true) ||
+        status.contains("High", ignoreCase = true) ||
+        status.contains("Growth", ignoreCase = true) ||
         status.contains("Excellent", ignoreCase = true) ||
-        status.contains("நன்று", ignoreCase = true) ||
         status.contains("சிறப்பு", ignoreCase = true) ||
-        status.contains("மேன்மை", ignoreCase = true) -> GoodGlow to status
+        status.contains("நன்று", ignoreCase = true) -> GoodGlow to status
 
         status.contains("Weak", ignoreCase = true) ||
         status.contains("Low", ignoreCase = true) ||
         status.contains("Bad", ignoreCase = true) ||
-        status.contains("Critical", ignoreCase = true) ||
-        status.contains("கவனம்", ignoreCase = true) ||
-        status.contains("பாதிப்பு", ignoreCase = true) -> WeakRed to status
+        status.contains("Critical", ignoreCase = true) -> WeakRed to status
 
         else -> ModerateAmber to status
     }
 
     Surface(
-        color = color.copy(alpha = 0.1f),
-        shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.dp, color.copy(alpha = 0.3f)),
-        modifier = Modifier.fillMaxWidth()
+        color = color.copy(alpha = 0.15f),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(50),
+        border = BorderStroke(1.dp, color.copy(alpha = 0.5f))
     ) {
         Text(
-            text = status,
-            modifier = Modifier.padding(14.dp),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                lineHeight = 20.sp,
-                fontWeight = FontWeight.Medium
-            ),
-            color = TextPrimary
+            text = label,
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+            color = color
         )
     }
 }
@@ -326,25 +333,25 @@ fun StatusBox(status: String) {
 @Composable
 fun LuckyStat(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, style = MaterialTheme.typography.labelSmall, color = TextSecondary)
-        Text(text = value, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.ExtraBold), color = NeonCyan)
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = MysticTextSecondary)
+        Text(text = value, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = GoldAccent)
     }
 }
 
 @Composable
 fun ComingSoonCard(title: String) {
     Card(
-        modifier = Modifier.fillMaxWidth().height(90.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.03f)),
-        border = BorderStroke(0.5.dp, NeonCyan.copy(alpha = 0.1f))
+        modifier = Modifier.fillMaxWidth().height(100.dp),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = EmeraldStart.copy(alpha = 0.4f)),
+        border = BorderStroke(0.5.dp, GoldAccent.copy(alpha = 0.2f))
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(Icons.Default.Lock, contentDescription = null, tint = NeonCyan.copy(alpha = 0.3f), modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Lock, contentDescription = null, tint = GoldAccent.copy(alpha = 0.5f), modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(text = title, style = MaterialTheme.typography.labelLarge, color = TextPrimary.copy(alpha = 0.7f))
-                Text(text = "Unlocking Soon", style = MaterialTheme.typography.labelSmall, color = TextSecondary.copy(alpha = 0.5f))
+                Text(text = title, style = MaterialTheme.typography.titleSmall, color = MysticTextPrimary.copy(alpha = 0.8f))
+                Text(text = "Feature under preparation", style = MaterialTheme.typography.labelSmall, color = MysticTextSecondary.copy(alpha = 0.6f))
             }
         }
     }

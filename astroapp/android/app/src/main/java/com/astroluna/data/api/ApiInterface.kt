@@ -66,8 +66,9 @@ interface ApiInterface {
     @retrofit2.http.GET("api/chat/history/{sessionId}")
     suspend fun getChatHistory(@retrofit2.http.Path("sessionId") sessionId: String): Response<com.google.gson.JsonObject>
 
-    @retrofit2.http.GET("api/horoscope/rasi-palan")
-    suspend fun getRasipalan(): Response<List<com.astroluna.data.model.RasipalanItem>>
+    @retrofit2.http.GET("api/rasi-eng/horoscope/daily")
+    suspend fun getRasipalan(): Response<com.astroluna.data.model.RasipalanResponse>
+
 
     @POST("api/horoscope/generate-chart")
     suspend fun generateRasiChart(@Body request: com.google.gson.JsonObject): Response<com.google.gson.JsonObject>

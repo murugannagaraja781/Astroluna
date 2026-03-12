@@ -216,16 +216,30 @@ class HomeActivity : AppCompatActivity() {
             if (response.isSuccessful) {
                 val resString = response.body?.string() ?: "[]"
                 try {
-                    val jsonArray = org.json.JSONArray(resString)
-                    if (jsonArray.length() > 0) {
-                        jsonArray.getJSONObject(0).optString("prediction_ta", "Today is a good day!")
+                    val jsonObj = org.json.JSONObject(resString)
+                    val dataArray = if (jsonObj.has("data")) {
+                        jsonObj.getJSONArray("data")
+                    } else if (jsonObj.has("list")) {
+                        jsonObj.getJSONArray("list")
                     } else {
-                        "Today is a good day!"
+                        null
                     }
+
+                    if (dataArray != null && dataArray.length() > 0) {
+                        // Return the first one or find a default
+                        return@withContext dataArray.getJSONObject(0).optString("prediction_ta", "Today is a good day!")
+                    }
+
+                    // Fallback to old format
+                    jsonObj.optString("prediction_ta", jsonObj.optString("content", "Today is a good day!"))
                 } catch (e: Exception) {
                     try {
-                        val jsonObj = org.json.JSONObject(resString)
-                        jsonObj.optString("prediction_ta", jsonObj.optString("content", "Today is a good day!"))
+                        val jsonArray = org.json.JSONArray(resString)
+                        if (jsonArray.length() > 0) {
+                            jsonArray.getJSONObject(0).optString("prediction_ta", "Today is a good day!")
+                        } else {
+                            "Today is a good day!"
+                        }
                     } catch (e2: Exception) {
                         "Today is a good day!"
                     }
@@ -235,6 +249,7 @@ class HomeActivity : AppCompatActivity() {
             }
         }
     }
+
 
     private fun loadAstrologers() {
         _isLoading.value = true

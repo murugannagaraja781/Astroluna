@@ -2,31 +2,25 @@ package com.astroluna.data.model
 
 import com.google.gson.annotations.SerializedName
 
-// Response is a direct List<RasipalanItem>, so we don't strictly need a wrapper class for the root response if we change the return type in ApiInterface.
-// However, creating the Item model correctly is key.
+data class RasipalanResponse(
+    @SerializedName("success") val success: Boolean,
+    @SerializedName("data") val data: List<RasipalanItem>?
+)
 
 data class RasipalanItem(
-    @SerializedName("signId") val signId: Int,
-    @SerializedName("signNameEn") val signNameEn: String?,
-    @SerializedName("signNameTa") val signNameTa: String?,
+    @SerializedName("signId") val signId: Int? = null,
+    @SerializedName("sign_en") val signNameEn: String?,
+    @SerializedName("sign_ta") val signNameTa: String?,
     @SerializedName("date") val date: String?,
-    @SerializedName("prediction") val prediction: RasipalanPrediction?,
-    @SerializedName("details") val details: RasipalanDetails?,
-    @SerializedName("lucky") val lucky: RasipalanLucky?
-)
-
-data class RasipalanPrediction(
-    @SerializedName("ta") val ta: String?,
-    @SerializedName("en") val en: String?
-)
-
-data class RasipalanDetails(
-    @SerializedName("career") val career: String?,
-    @SerializedName("finance") val finance: String?,
-    @SerializedName("health") val health: String?
-)
-
-data class RasipalanLucky(
-    @SerializedName("number") val number: String?,
-    @SerializedName("color") val color: RasipalanPrediction? // Reusing Prediction for ta/en pair
+    @SerializedName("prediction_ta") val predictionTa: String?,
+    @SerializedName("prediction_en") val predictionEn: String?,
+    @SerializedName("career_ta") val careerTa: String?,
+    @SerializedName("career_en") val careerEn: String?,
+    @SerializedName("finance_ta") val financeTa: String?,
+    @SerializedName("finance_en") val financeEn: String?,
+    @SerializedName("health_ta") val healthTa: String?,
+    @SerializedName("health_en") val healthEn: String?,
+    @SerializedName("lucky_number") val luckyNumber: String?,
+    @SerializedName("lucky_color_ta") val luckyColorTa: String?,
+    @SerializedName("lucky_color_en") val luckyColorEn: String?
 )
