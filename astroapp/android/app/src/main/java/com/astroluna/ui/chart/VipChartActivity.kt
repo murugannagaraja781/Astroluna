@@ -85,6 +85,8 @@ data class ChartData(
 data class Planet(
     val name: String,
     val signName: String,
+    val longitude: Double = 0.0,
+    val isRetrograde: Boolean = false,
     val signIndex: Int = 0,
     val house: Int = 0,
     val nakshatra: String? = null,
@@ -242,6 +244,28 @@ fun VipChartScreen(birthData: JSONObject, onBack: () -> Unit) {
                         0 -> if (chartState != null) ChartsTab(chartState!!, birthData)
                         1 -> if (chartState != null) PlanetsTab(chartState!!)
                         2 -> if (chartState?.dasha != null) DashaListTab(chartState!!.dasha!!)
+                    }
+                }
+            } else if (!isLoading) {
+                // Not Loading and no state = Error
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("தரவு பெற முடியவில்லை", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text("Data Fetch Failed", color = Color.White.copy(0.6f), fontSize = 12.sp)
+                        Spacer(Modifier.height(16.dp))
+                        Button(onClick = {
+                            isLoading = true
+                            scope.launch {
+                                try {
+                                    val result = fetchFullChart(birthData)
+                                    chartState = result
+                                } finally {
+                                    isLoading = false
+                                }
+                            }
+                         }, colors = ButtonDefaults.buttonColors(containerColor = NeonCyan)) {
+                            Text("Retry / மீண்டும் முயற்சி செய்", color = Color.Black)
+                        }
                     }
                 }
             }

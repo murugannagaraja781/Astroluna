@@ -110,7 +110,7 @@ router.post('/full', async (req, res) => {
             name: p.name,
             signName: getNavamsaSign(p.longitude)
         }));
-        const navamsaAscSign = getNavamsaSign(houses.ascendant.longitude);
+        const navamsaAscSign = getNavamsaSign(houses.ascendant);
 
         const { getVimshottariDasha, getSubPeriods } = require('../../utils/rasiEng/dashaCalculations');
         const moonLon = moon ? moon.longitude : 0;
