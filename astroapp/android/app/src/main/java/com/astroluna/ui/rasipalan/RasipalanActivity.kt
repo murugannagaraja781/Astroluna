@@ -117,8 +117,10 @@ fun RasipalanScreen(targetSignId: Int, displayTitle: String, onBack: () -> Unit)
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            // Improved error message with class name
-            errorMsg = "Connection error: ${e::class.simpleName}\n${e.message ?: "No details available"}"
+            // Show detailed stack trace to debug what's causing "null"
+            val stack = android.util.Log.getStackTraceString(e)
+            errorMsg = "Error: ${e::class.java.simpleName}\nMsg: ${e.message}\nCause: ${e.cause?.message}\nStack: ${stack.take(150)}"
+
             android.util.Log.e("Rasipalan", "Error fetching data", e)
         } finally {
             isLoading = false

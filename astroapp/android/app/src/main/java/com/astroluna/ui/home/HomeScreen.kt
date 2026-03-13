@@ -1182,7 +1182,7 @@ fun RasiItemView(item: ComposeRasiItem, onClick: (ComposeRasiItem) -> Unit) {
         Text(
             text = Localization.get(item.name.lowercase(), true),
             style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-            color = Color.DarkGray, // Visible on White Container
+            color = Color.White.copy(alpha = 0.9f), // Visible on Dark Cosmic container
             textAlign = TextAlign.Center,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -1492,20 +1492,20 @@ fun RasiGridSection(onClick: (ComposeRasiItem) -> Unit) {
     )
 
     // User Request: "12 rasi contain have one box that box bf use that bg" (Customer Style)
+    // User Request: "12 rasi contain have one box that box bf use that bg"
     Card(
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray.copy(alpha=0.5f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f)),
+        border = androidx.compose.foundation.BorderStroke(1.dp, PeacockGreen.copy(alpha = 0.15f)),
+        modifier = Modifier.padding(16.dp).fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(vertical = 16.dp, horizontal = 4.dp)) {
+        Column(modifier = Modifier.padding(top = 24.dp, bottom = 12.dp, start = 8.dp, end = 8.dp)) {
             val rows = rasiItems.chunked(4)
             for (rowItems in rows) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 12.dp),
+                        .padding(bottom = 20.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     for (item in rowItems) {

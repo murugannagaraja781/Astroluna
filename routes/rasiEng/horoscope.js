@@ -20,7 +20,7 @@ router.get('/daily', async (req, res) => {
             date = DateTime.now().setZone('Asia/Kolkata').toFormat('yyyy-MM-dd');
         }
 
-        const data = await fetchDailyHoroscope(date);
+        let data = await fetchDailyHoroscope(date);
 
         if (!data || !Array.isArray(data) || data.length === 0) {
             console.error("No horoscope data found for today or yesterday. Sending dummy data.");
@@ -92,7 +92,7 @@ router.post('/daily', async (req, res) => {
             date = DateTime.now().setZone('Asia/Kolkata').toFormat('yyyy-MM-dd');
         }
 
-        const data = await fetchDailyHoroscope(date);
+        let data = await fetchDailyHoroscope(date);
 
         if (!data || !Array.isArray(data) || data.length === 0) {
             console.error("No horoscope data found for today or yesterday. Sending dummy data.");

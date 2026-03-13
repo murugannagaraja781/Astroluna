@@ -72,12 +72,12 @@ val planetAbbrTamil = mapOf(
 // --- Updated Data Models ---
 data class ChartResponse(val success: Boolean, val data: ChartData)
 data class ChartData(
-    val planets: List<Planet>,
-    val houses: HouseData,
-    val panchanga: Panchanga,
-    val dasha: List<DashaPeriod>,
-    val transits: List<Transit>,
-    val tamilDate: TamilDate?,
+    val planets: List<Planet>? = null,
+    val houses: HouseData? = null,
+    val panchanga: Panchanga? = null,
+    val dasha: List<DashaPeriod>? = null,
+    val transits: List<Transit>? = null,
+    val tamilDate: TamilDate? = null,
     val kpSignificators: KPSignificators? = null,
     val navamsa: NavamsaData? = null
 )
@@ -85,10 +85,10 @@ data class ChartData(
 data class Planet(
     val name: String,
     val signName: String,
-    val signIndex: Int,
-    val house: Int,
-    val nakshatra: String,
-    val nakshatraPada: Int,
+    val signIndex: Int = 0,
+    val house: Int = 0,
+    val nakshatra: String? = null,
+    val nakshatraPada: Int = 0,
     val degreeFormatted: String? = null,
     val signLord: String? = null,
     val starLord: String? = null,
@@ -132,7 +132,10 @@ data class DashaPeriod(
 )
 data class Transit(val name: String, val signName: String, val isRetrograde: Boolean)
 data class TamilDate(val day: Int, val month: String, val year: String)
-data class NavamsaData(val planets: List<Planet>? = null)
+data class NavamsaData(
+    val planets: List<Planet>? = null,
+    val ascendantSign: String? = null
+)
 data class KPSignificators(val planetView: List<KPPlanet>?, val houseView: List<KPHouse>?)
 data class KPPlanet(val name: String, val levelA: List<Int>, val levelB: List<Int>, val levelC: List<Int>, val levelD: List<Int>)
 data class KPHouse(val house: Int, val level1: List<String>, val level2: List<String>, val level3: List<String>, val level4: List<String>, val lord: String)
@@ -236,9 +239,9 @@ fun VipChartScreen(birthData: JSONObject, onBack: () -> Unit) {
 
                 Box(modifier = Modifier.weight(1f)) {
                     when (selectedTab) {
-                        0 -> ChartsTab(chartState!!, birthData)
-                        1 -> PlanetsTab(chartState!!)
-                        2 -> DashaListTab(chartState!!.dasha)
+                        0 -> if (chartState != null) ChartsTab(chartState!!, birthData)
+                        1 -> if (chartState != null) PlanetsTab(chartState!!)
+                        2 -> if (chartState?.dasha != null) DashaListTab(chartState!!.dasha!!)
                     }
                 }
             }
@@ -252,13 +255,13 @@ fun ChartsTab(data: ChartData, birthData: JSONObject) {
 
         Text("ராசி கட்டம் (Rasi Chart)", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = NeonCyan)
         Spacer(Modifier.height(12.dp))
-        SouthIndianGridEnhanced(data.planets, data.houses.ascendantDetails.signName, "Rasi", birthData, data.panchanga.nakshatra?.name ?: "")
+        SouthIndianGridEnhanced(data.planets ?: emptyList(), data.houses?.ascendantDetails?.signName ?: "", "Rasi", birthData, data.panchanga?.nakshatra?.name ?: "")
 
         Spacer(Modifier.height(32.dp))
 
         Text("நவாம்ச கட்டம் (Navamsa - D9)", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = NeonCyan)
         Spacer(Modifier.height(12.dp))
-        SouthIndianGridEnhanced(data.navamsa?.planets ?: emptyList(), "", "Navamsa", birthData, "")
+        SouthIndianGridEnhanced(data.navamsa?.planets ?: emptyList(), data.navamsa?.ascendantSign ?: "", "Navamsa", birthData, "")
 
         Spacer(Modifier.height(40.dp))
     }
@@ -347,12 +350,13 @@ fun SouthIndianGridEnhanced(planets: List<Planet>, ascSign: String, title: Strin
 
                                     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
                                         occupants.forEach { pName ->
+                                            val fontSize = if (occupants.size > 3) 10.sp else 12.sp
                                             Text(
                                                 text = planetAbbrTamil[pName] ?: pName.take(3),
-                                                fontSize = 13.sp,
+                                                fontSize = fontSize,
                                                 fontWeight = FontWeight.Bold,
                                                 color = if(pName == "As") Color.Blue else Color.Black,
-                                                lineHeight = 14.sp
+                                                lineHeight = (fontSize.value + 1).sp
                                             )
                                         }
                                     }
@@ -391,13 +395,14 @@ fun getMonthName(m: Int): String = listOf("", "Jan", "Feb", "Mar", "Apr", "May",
 
 @Composable
 fun PlanetsTab(data: ChartData) {
+    val planetList = data.planets ?: emptyList()
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             Text("கிரகங்களின் விரிவான நிலைகள்", fontWeight = FontWeight.Bold, color = TraditionalRed, fontSize = 18.sp)
             Spacer(Modifier.height(8.dp))
         }
 
-        items(data.planets) { planet ->
+        items(planetList) { planet ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f)),
@@ -420,7 +425,7 @@ fun PlanetsTab(data: ChartData) {
                     }
                     Divider(Modifier.padding(vertical = 12.dp), color = Color.White.copy(alpha = 0.1f))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        PlanetDetailSub("நட்சத்திரம்", planet.nakshatra)
+                        PlanetDetailSub("நட்சத்திரம்", planet.nakshatra ?: "N/A")
                         PlanetDetailSub("நட்சத்திர அதிபதி", planet.starLord ?: "N/A")
                         PlanetDetailSub("உப அதிபதி", planet.subLord ?: "N/A")
                     }

@@ -104,20 +104,18 @@ router.post('/full', async (req, res) => {
 
         const tamilDateData = await getTamilDate(dt, ayanamsa);
 
-        // Calculate Navamsa Data
-        const navamsaPlanets = planets.map(p => {
-            const { getNavamsaSign } = require('../../utils/rasiEng/calculations');
-            return {
-                name: p.name,
-                signName: getNavamsaSign(p.longitude)
-            };
-        });
+        // navamsaPlanets already defined above or we redefine it cleaner
+        const { getNavamsaSign } = require('../../utils/rasiEng/calculations');
+        const navamsaPlanets = planets.map(p => ({
+            name: p.name,
+            signName: getNavamsaSign(p.longitude)
+        }));
+        const navamsaAscSign = getNavamsaSign(houses.ascendant.longitude);
 
         const { getVimshottariDasha, getSubPeriods } = require('../../utils/rasiEng/dashaCalculations');
         const moonLon = moon ? moon.longitude : 0;
         const dashaPeriods = getVimshottariDasha(moonLon, dt);
 
-        // Add 3 levels of nesting (Mahadasha > Bhukti > Antara). Level 4 removed for performance.
         const detailedDasha = dashaPeriods.map(md => {
             const bhuktis = getSubPeriods(md.start, md.end, md.lord, 1);
             return {
@@ -142,7 +140,10 @@ router.post('/full', async (req, res) => {
             dasha: detailedDasha,
             transits,
             tamilDate: tamilDateData,
-            navamsa: { planets: navamsaPlanets }
+            navamsa: {
+                planets: navamsaPlanets,
+                ascendantSign: navamsaAscSign
+            }
         };
 
         res.json({
