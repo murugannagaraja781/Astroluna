@@ -45,15 +45,26 @@ router.get('/', async (req, res) => {
                 { id: 12, en: "Pisces", ta: "மீனம்", predTa: "உடல் சோர்வு நீங்கி புத்துணர்ச்சி பெறுவீர்கள்.", predEn: "Fatigue will disappear and you will be refreshed." }
             ];
 
-            return res.json(dummyData.map(item => ({
-                signId: item.id,
-                signNameEn: item.en,
-                signNameTa: item.ta,
-                date: today,
-                prediction: { ta: item.predTa, en: item.predEn },
-                details: { career: "Good", finance: "Stable", health: "Good" },
-                lucky: { number: "5", color: { ta: "வெள்ளை", en: "White" } }
-            })));
+            return res.json({
+                success: true,
+                data: dummyData.map(item => ({
+                    signId: item.id,
+                    sign_en: item.en,
+                    sign_ta: item.ta,
+                    date: today,
+                    prediction_ta: item.predTa,
+                    prediction_en: item.predEn,
+                    career_ta: "சிறப்பு",
+                    career_en: "Good",
+                    finance_ta: "நன்று",
+                    finance_en: "Stable",
+                    health_ta: "சிறப்பு",
+                    health_en: "Good",
+                    lucky_number: "5",
+                    lucky_color_ta: "வெள்ளை",
+                    lucky_color_en: "White"
+                }))
+            });
         }
 
         // Map external data to our app's expected format (RasipalanModel.kt)
@@ -99,8 +110,8 @@ router.get('/', async (req, res) => {
 
     } catch (error) {
         console.error("Error in Rasipalan route:", error.message);
-        // Always return an empty array instead of a 500 status to prevent app from ignoring the response body
-        return res.json([]);
+        // Always return expected object structure instead of an array to prevent Retrofit parsing crashes
+        return res.json({ success: false, data: [] });
     }
 });
 
