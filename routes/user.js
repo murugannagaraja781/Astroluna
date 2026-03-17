@@ -82,7 +82,7 @@ router.post('/intake', async (req, res) => {
   try {
     const { userId, ...intakeData } = req.body;
     if (!userId) return res.status(400).json({ success: false, error: 'userId required' });
-    const user = await User.findOneAndUpdate({ userId }, { $set: { intakeDetails: intakeData } }, { new: true });
+    const user = await User.findOneAndUpdate({ userId }, { $set: { intakeDetails: intakeData } }, { returnDocument: 'after' });
     if (!user) return res.status(404).json({ success: false, error: 'User not found' });
     res.json({ success: true, data: user.intakeDetails });
   } catch (err) {

@@ -132,7 +132,7 @@ async function endSessionRecord(sessionId) {
 
   s.users.forEach(async uid => {
     const u = await User.findOne({ userId: uid });
-    if (u?.fcmToken) sendFcmV1Push(u.fcmToken, { type: 'CALL_ENDED', sessionId }, null);
+    if (u?.fcmToken) sendFcmV1Push(u.fcmToken, { type: 'CALL_ENDED', sessionId }, null, uid);
   });
 
   User.updateMany({ userId: { $in: s.users }, role: 'astrologer' }, { isBusy: false }).then(() => broadcastAstroUpdate());

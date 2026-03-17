@@ -183,7 +183,7 @@ app.post('/register', async (req, res) => {
     const { userId, fcmToken } = req.body;
     if (!userId || !fcmToken) return res.json({ ok: false, error: 'userId and fcmToken required' });
     const { User } = require('./models');
-    await User.findOneAndUpdate({ userId }, { fcmToken }, { new: true });
+    await User.findOneAndUpdate({ userId }, { fcmToken }, { returnDocument: 'after' });
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });

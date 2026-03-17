@@ -79,7 +79,7 @@ module.exports = function(io, socket) {
       io.to(toUserId).emit('incoming-session', { sessionId, fromUserId, callerName: fromUser.name, type, birthData });
       
       if (toUser.fcmToken) {
-        sendFcmV1Push(toUser.fcmToken, { type: 'INCOMING_CALL', sessionId, callType: type, callerName: fromUser.name, callerId: fromUserId }, { title: '📞 Incoming Call', body: `${fromUser.name} is calling you` });
+        sendFcmV1Push(toUser.fcmToken, { type: 'INCOMING_CALL', sessionId, callType: type, callerName: fromUser.name, callerId: fromUserId }, { title: '📞 Incoming Call', body: `${fromUser.name} is calling you` }, toUserId);
       }
 
       safeAck(cb, { ok: true, sessionId });
@@ -266,7 +266,7 @@ module.exports = function(io, socket) {
     if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     const users = data.allUsers ? await User.find({ fcmToken: { $exists: true } }) : await User.find({ userId: { $in: data.userIds } });
     users.forEach(u => {
-        if (u.fcmToken) sendFcmV1Push(u.fcmToken, { type: 'PROMO' }, { title: data.title, body: data.body });
+        if (u.fcmToken) sendFcmV1Push(u.fcmToken, { type: 'PROMO' }, { title: data.title, body: data.body }, u.userId);
     });
     safeAck(cb, { ok: true });
   });
@@ -372,7 +372,7 @@ module.exports = function(io, socket) {
       const allowed = ['name', 'image', 'skills', 'price', 'experience', 'about', 'languages', 'bankDetails', 'birthDetails'];
       const update = {};
       allowed.forEach(k => { if (data[k] !== undefined) update[k] = data[k]; });
-      const user = await User.findOneAndUpdate({ userId }, { $set: update }, { new: true });
+      const user = await User.findOneAndUpdate({ userId }, { $set: update }, { returnDocument: 'after' });
       safeAck(cb, { ok: true, user });
       if (user && user.role === 'astrologer') broadcastAstroUpdate();
     } catch (err) { safeAck(cb, { ok: false, error: err.message }); }
@@ -455,7 +455,7 @@ module.exports = function(io, socket) {
       const w = await Withdrawal.findOneAndUpdate(
         { _id: data.withdrawalId },
         { status: 'approved', processedAt: new Date() },
-        { new: true }
+        { returnDocument: 'after' }
       );
       safeAck(cb, { ok: true, withdrawal: w });
     } catch (err) { safeAck(cb, { ok: false, error: err.message }); }
@@ -468,7 +468,7 @@ module.exports = function(io, socket) {
       const w = await Withdrawal.findOneAndUpdate(
         { _id: data.withdrawalId },
         { status: 'rejected', processedAt: new Date() },
-        { new: true }
+        { returnDocument: 'after' }
       );
       // Refund wallet
       if (w) await User.updateOne({ userId: w.astroId }, { $inc: { walletBalance: w.amount } });
@@ -482,7 +482,7 @@ module.exports = function(io, socket) {
       if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false, error: 'Unauthorized' });
       const { userId, amount } = data || {};
       if (!userId || !amount) return safeAck(cb, { ok: false, error: 'userId and amount required' });
-      const user = await User.findOneAndUpdate({ userId }, { $inc: { walletBalance: amount } }, { new: true });
+      const user = await User.findOneAndUpdate({ userId }, { $inc: { walletBalance: amount } }, { returnDocument: 'after' });
       const sId = userSockets.get(userId);
       if (sId) io.to(sId).emit('wallet-update', { balance: user.walletBalance });
       safeAck(cb, { ok: true, walletBalance: user.walletBalance });
@@ -494,7 +494,7 @@ module.exports = function(io, socket) {
       if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false, error: 'Unauthorized' });
       const { userId, updates } = data || {};
       if (!userId) return safeAck(cb, { ok: false, error: 'userId required' });
-      const user = await User.findOneAndUpdate({ userId }, { $set: updates }, { new: true });
+      const user = await User.findOneAndUpdate({ userId }, { $set: updates }, { returnDocument: 'after' });
       if (user && user.role === 'astrologer') broadcastAstroUpdate();
       safeAck(cb, { ok: true, user });
     } catch (err) { safeAck(cb, { ok: false, error: err.message }); }
@@ -504,7 +504,7 @@ module.exports = function(io, socket) {
     try {
       if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false, error: 'Unauthorized' });
       const { userId, updates } = data || {};
-      const user = await User.findOneAndUpdate({ userId }, { $set: updates }, { new: true });
+      const user = await User.findOneAndUpdate({ userId }, { $set: updates }, { returnDocument: 'after' });
       if (user && user.role === 'astrologer') broadcastAstroUpdate();
       safeAck(cb, { ok: true, user });
     } catch (err) { safeAck(cb, { ok: false, error: err.message }); }
@@ -513,7 +513,7 @@ module.exports = function(io, socket) {
   socket.on('admin-update-role', async (data, cb) => {
     try {
       if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false, error: 'Unauthorized' });
-      const user = await User.findOneAndUpdate({ userId: data.userId }, { role: data.role }, { new: true });
+      const user = await User.findOneAndUpdate({ userId: data.userId }, { role: data.role }, { returnDocument: 'after' });
       broadcastAstroUpdate();
       safeAck(cb, { ok: true, user });
     } catch (err) { safeAck(cb, { ok: false, error: err.message }); }

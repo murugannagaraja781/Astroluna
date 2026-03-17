@@ -21,7 +21,7 @@ try {
   console.warn('✗ FCM Service: Failed to initialize Firebase Admin SDK', error.message);
 }
 
-async function sendFcmV1Push(fcmToken, data, notification) {
+async function sendFcmV1Push(fcmToken, data, notification, userId = null) {
   if (!callApp) {
     console.warn('[FCM] Firebase Admin not initialized');
     return { success: false, error: 'Firebase not initialized' };
@@ -52,6 +52,14 @@ async function sendFcmV1Push(fcmToken, data, notification) {
     return { success: true, result };
   } catch (err) {
     console.error('[FCM] Send Error:', err.message);
+    
+    // Clear invalid tokens from DB to stop spamming
+    if (userId && (err.code === 'messaging/registration-token-not-registered' || err.message.includes('Requested entity was not found'))) {
+      const { User } = require('../models');
+      console.log(`[FCM] Clearing invalid token for user ${userId}`);
+      await User.updateOne({ userId }, { $unset: { fcmToken: 1 } });
+    }
+    
     return { success: false, error: err.message };
   }
 }
@@ -73,7 +81,7 @@ async function sendChatMessagePush(toUserId, fromUserId, messageText, sessionId,
         messageId: messageId || Date.now().toString(),
         timestamp: Date.now().toString()
       };
-      await sendFcmV1Push(toUser.fcmToken, payload, null);
+      await sendFcmV1Push(toUser.fcmToken, payload, null, toUserId);
     }
   } catch (e) {
     console.error('Chat Push Error:', e);
@@ -96,7 +104,7 @@ async function sendChatPush(toUserId, fromUserId, messageText, sessionId) {
           timestamp: Date.now().toString()
        };
        const notification = { title: `Message from ${fromUser?.name}`, body: messageText.substring(0, 100) };
-       await sendFcmV1Push(toUser.fcmToken, payload, notification);
+       await sendFcmV1Push(toUser.fcmToken, payload, notification, toUserId);
     }
   } catch (e) { console.error('Chat Push Error:', e); }
 }

@@ -65,7 +65,7 @@ router.post('/review', async (req, res) => {
     const newReview = await Review.findOneAndUpdate(
       { sessionId },
       { sessionId, clientId, clientName, astrologerId, astrologerName, rating, review },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
 
     // Real-time update for dashboards
