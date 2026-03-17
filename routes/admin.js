@@ -16,7 +16,7 @@ router.get('/astrologer-requests', async (req, res) => {
 router.get('/banners', async (req, res) => {
   try {
     const banners = await Banner.find().sort({ order: 1 });
-    res.json({ ok: true, banners });
+    res.json({ ok: true, data: banners });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
@@ -26,7 +26,7 @@ router.post('/banners', async (req, res) => {
   try {
     const banner = new Banner(req.body);
     await banner.save();
-    res.json({ ok: true, banner });
+    res.json({ ok: true, data: banner });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
@@ -35,7 +35,7 @@ router.post('/banners', async (req, res) => {
 router.put('/banners/:id', async (req, res) => {
   try {
     const banner = await Banner.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json({ ok: true, banner });
+    res.json({ ok: true, data: banner });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
@@ -45,6 +45,15 @@ router.delete('/banners/:id', async (req, res) => {
   try {
     await Banner.findByIdAndDelete(req.params.id);
     res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+router.get('/academy/videos', async (req, res) => {
+  try {
+    const videos = await AcademyVideo.find().sort({ order: 1 });
+    res.json({ ok: true, videos });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }

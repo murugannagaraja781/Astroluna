@@ -6656,7 +6656,7 @@
       btn.disabled = true;
 
       try {
-        const res = await fetch('/api/send-otp', {
+        const res = await fetch('/api/auth/send-otp', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ phone })
         }).then(r => r.json());
@@ -6678,7 +6678,7 @@
       const phone = document.getElementById('inputPhone').value;
       const otp = document.getElementById('inputOtp').value;
       const refCode = document.getElementById('inputReferral').value;
-      const res = await fetch('/api/verify-otp', {
+      const res = await fetch('/api/auth/verify-otp', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, otp, referralCode: refCode || state.referralCodePrefill })
       }).then(r => r.json());
@@ -6841,7 +6841,7 @@
       if (!wrapper) return;
 
       try {
-        const res = await fetch('/api/home/banners');
+        const res = await fetch('/api/admin/banners');
         const data = await res.json();
         if (data.ok) {
           renderHomeSlider(data.data || []);
@@ -8204,7 +8204,7 @@
       list.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-circle-notch fa-spin"></i> Loading...</div>';
 
       try {
-        const res = await fetch('/api/academy/videos');
+        const res = await fetch('/api/admin/academy/videos');
         const data = await res.json();
         if (data.ok && data.videos.length > 0) {
           list.innerHTML = data.videos.map(v => `
@@ -8280,7 +8280,7 @@
 
     async function fetchAcademyVideosAdmin() {
       try {
-        const res = await fetch('/api/academy/videos');
+        const res = await fetch('/api/admin/academy/videos');
         const data = await res.json();
         if (data.ok) {
           renderAcademyVideos(data.videos);
@@ -9260,7 +9260,7 @@
 
       citySearchTimeout = setTimeout(async () => {
         try {
-          const response = await fetch('/api/city-autocomplete', {
+          const response = await fetch('/api/charts/city-autocomplete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query: query.trim() })
@@ -9302,7 +9302,7 @@
       document.getElementById('clientChartLon').value = longitude;
 
       try {
-        const response = await fetch('/api/city-timezone', {
+        const response = await fetch('/api/charts/city-timezone', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ latitude, longitude })
@@ -9677,7 +9677,7 @@
         const originalContent = panel.innerHTML;
         panel.innerHTML = '<div style="text-align:center; padding:60px 20px;"><div class="spinner-astro"></div><div style="margin-top:20px; font-weight:500; color:#d97706; font-size:1.1rem;">Analyzing Planets...</div></div>';
 
-        const res = await fetch('/api/rasi-eng/charts/full', {
+        const res = await fetch('/api/charts/birth-chart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -9870,7 +9870,7 @@
       }
 
       try {
-        const res = await fetch('/api/rasi-eng/charts/full', {
+        const res = await fetch('/api/charts/birth-chart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -10311,7 +10311,7 @@
 
       matchCityTimeout = setTimeout(async () => {
         try {
-          const response = await fetch('/api/city-autocomplete', {
+          const response = await fetch('/api/charts/city-autocomplete', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query })
@@ -10375,7 +10375,7 @@
       document.getElementById('poruthamResults').style.display = 'none';
 
       try {
-        const res = await fetch('/api/rasi-eng/matching', {
+        const res = await fetch('/api/charts/porutham', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -10473,7 +10473,7 @@
 
       try {
         // Use our internal Rasi Engine API
-        const res = await fetch(`/api/rasi-eng/horoscope/daily?sign=${signObj.api}`)
+        const res = await fetch(`/api/astrology/daily-horoscope?sign=${signObj.api}`)
           .then(r => r.json());
 
         if (res.success && res.data) {
@@ -11186,7 +11186,7 @@
       btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Submitting...';
 
       try {
-        const response = await fetch('/api/astrologer/register', {
+        const response = await fetch('/api/auth/register-astrologer', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, phone, experience: exp, about: bio, bankDetails: bank })

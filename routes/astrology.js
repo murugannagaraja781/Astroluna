@@ -97,9 +97,18 @@ router.get('/daily-horoscope', async (req, res) => {
     }
 
     const rawText = targetItem.prediction_ta || targetItem.prediction_en || "Today is looking promising!";
-    res.json({ ok: true, content: rawText });
+    
+    res.json({ 
+      success: true, 
+      data: {
+        date: today,
+        forecast_ta: targetItem.prediction_ta || rawText,
+        forecast_en: targetItem.prediction_en || rawText,
+        ...targetItem
+      }
+    });
   } catch (err) {
-    res.status(500).json({ ok: false, content: "Check back later for your daily insight." });
+    res.status(500).json({ success: false, error: "Check back later for your daily insight." });
   }
 });
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const { User } = require('../models');
+const { User, AstrologerApplication } = require('../models');
 const { logActivity } = require('../utils/logger');
 const { generateReferralCode, sendMsg91 } = require('../utils/authHelpers');
 const { otpStore } = require('../utils/registry');
@@ -212,6 +212,31 @@ router.post('/verify-otp', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ ok: false, error: 'Login Error' });
+  }
+});
+
+// Astrologer Application Submission
+router.post('/register-astrologer', async (req, res) => {
+  try {
+    const { name, phone, experience, about, bankDetails } = req.body;
+    if (!name || !phone) return res.json({ ok: false, error: 'Name and phone required' });
+
+    const newApp = await AstrologerApplication.create({
+      applicationId: crypto.randomUUID(),
+      name,
+      phone,
+      experience,
+      about,
+      bankDetails,
+      status: 'pending',
+      appliedAt: new Date()
+    });
+
+    logActivity('auth', 'New Astrologer Application', { name, phone });
+    res.json({ ok: true, application: newApp });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, error: 'Submission Error' });
   }
 });
 
