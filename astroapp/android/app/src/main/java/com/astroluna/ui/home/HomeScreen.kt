@@ -62,6 +62,7 @@ import com.astroluna.data.model.Banner
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import com.astroluna.ui.profile.UserHistoryActivity
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 
@@ -1007,7 +1008,7 @@ fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
         Spacer(modifier = Modifier.height(8.dp))
 
         // Drawer Items
-        val items = listOf("Home", "Profile", "Astrologer Registration", "Terms & Conditions", "Privacy Policy", "Settings", "Logout")
+        val items = listOf("Home", "Profile", "Call History", "Astrologer Registration", "Terms & Conditions", "Privacy Policy", "Settings", "Logout")
         items.forEach { item ->
             NavigationDrawerItem(
                 label = {
@@ -1020,6 +1021,10 @@ fun AppDrawer(onItemClick: (String) -> Unit, onClose: () -> Unit) {
                 selected = false,
                 onClick = {
                     when (item) {
+                        "Call History" -> {
+                            onClose()
+                            context.startActivity(Intent(context, UserHistoryActivity::class.java))
+                        }
                         "Terms & Conditions" -> {
                             onClose()
                             context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://astroluna.in/terms-condition.html")))
@@ -1687,7 +1692,7 @@ fun TopServicesSection(onServiceClick: (String) -> Unit = {}) {
         "Horoscope\nMatch" to com.astroluna.R.drawable.ic_match,
         "Daily\nHoroscope" to com.astroluna.R.drawable.ic_daily_horoscope,
         "Astro\nAcademy" to com.astroluna.R.drawable.ic_academy,
-        "Free\nServices" to com.astroluna.R.drawable.ic_free_services
+        "Free\nService" to com.astroluna.R.drawable.ic_free_services
     )
 
     Row(
@@ -1744,36 +1749,66 @@ fun ServiceItem(name: String, iconRes: Int, onClick: () -> Unit) {
 
 @Composable
 fun CustomerStoriesSection() {
-    val stories = listOf(
-        Triple("Akshay Sharma", "Sharjah, Dubai", "I talked to Asha ma'am on Anytime..."),
-        Triple("Priya Singh", "Mumbai, India", "Very accurate prediction about my..."),
-        Triple("Rahul Verma", "Delhi, India", "Helped me resolve my marriage...")
-    )
+    var reviews by remember { mutableStateOf<List<HomeReviewItem>>(emptyList()) }
+    
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val client = okhttp3.OkHttpClient()
+                val request = okhttp3.Request.Builder()
+                    .url("${com.astroluna.utils.Constants.SERVER_URL}/api/astrology/reviews")
+                    .build()
+                val response = client.newCall(request).execute()
+                if (response.isSuccessful) {
+                    val body = response.body?.string()
+                    val json = JSONObject(body ?: "{}")
+                    val array = json.optJSONArray("reviews")
+                    if (array != null) {
+                        val list = mutableListOf<HomeReviewItem>()
+                        for (i in 0 until array.length()) {
+                            val obj = array.getJSONObject(i)
+                            list.add(HomeReviewItem(
+                                name = obj.optString("clientName", "User"),
+                                astrologer = obj.optString("astrologerName", "Astrologer"),
+                                review = obj.optString("review", ""),
+                                rating = obj.optDouble("rating", 5.0).toFloat()
+                            ))
+                        }
+                        reviews = list
+                    }
+                }
+            } catch (e: Exception) { e.printStackTrace() }
+        }
+    }
 
-    Column(modifier = Modifier.padding(vertical = 16.dp)) {
-        Text(
-            text = "Customer Stories",
-            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            color = Color.Black,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
+    if (reviews.isNotEmpty()) {
+        Column(modifier = Modifier.padding(vertical = 16.dp)) {
+            Text(
+                text = "Customer Stories / வாடிக்கையாளர் அனுபவங்கள்",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = Color.Black,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            stories.forEach { (name, loc, review) ->
-                CustomerStoryCard(name, loc, review)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                reviews.forEach { item ->
+                    CustomerStoryCard(item.name, item.astrologer, item.review, item.rating)
+                }
             }
         }
     }
 }
 
+data class HomeReviewItem(val name: String, val astrologer: String, val review: String, val rating: Float)
+
 @Composable
-fun CustomerStoryCard(name: String, loc: String, review: String) {
+fun CustomerStoryCard(name: String, astrologer: String, review: String, rating: Float) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -1795,12 +1830,15 @@ fun CustomerStoryCard(name: String, loc: String, review: String) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = name, style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Spacer(modifier = Modifier.weight(1f))
-                    Icon(imageVector = Icons.Default.Menu, contentDescription=null, modifier=Modifier.size(16.dp), tint=Color.Gray) // 3-dot placeholder
+                    Row {
+                        repeat(rating.toInt()) {
+                            Icon(imageVector = Icons.Default.Star, contentDescription=null, modifier=Modifier.size(14.dp), tint=Color(0xFFFBC02D))
+                        }
+                    }
                 }
-                Text(text = loc, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = review, style = MaterialTheme.typography.bodySmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                Text(text = "more", style = MaterialTheme.typography.labelSmall, color = Color.Red)
+                Text(text = "Consulted: $astrologer", style = MaterialTheme.typography.labelSmall, color = Color.Gray, fontWeight = FontWeight.SemiBold)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = review, style = MaterialTheme.typography.bodySmall, maxLines = 3, overflow = TextOverflow.Ellipsis, color = Color.DarkGray)
             }
         }
     }

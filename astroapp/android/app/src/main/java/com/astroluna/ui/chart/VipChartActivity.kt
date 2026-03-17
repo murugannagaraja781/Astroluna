@@ -70,6 +70,11 @@ val planetAbbrTamil = mapOf(
     "Ketu" to "கேது", "Ascendant" to "லக்", "As" to "லக்", "Mandi" to "மாந்தி"
 )
 
+val varaTamil = mapOf(
+    "Sunday" to "ஞாயிறு", "Monday" to "திங்கள்", "Tuesday" to "செவ்வாய்",
+    "Wednesday" to "புதன்", "Thursday" to "வியாழன்", "Friday" to "வெள்ளி", "Saturday" to "சனி"
+)
+
 // --- Updated Data Models ---
 data class ChartResponse(val success: Boolean, val data: ChartData)
 data class ChartData(
@@ -108,10 +113,15 @@ data class HouseDetail(
     val signName: String,
     val signAbbr: String? = null,
     val nakshatra: String? = null,
+    val nakshatraPada: Int = 0,
     val starLord: String? = null,
     val subLord: String? = null,
     val degreeFormatted: String? = null
 )
+
+data class CaseValue(val name: String) // Generic for simple name fields
+data class PanchangaValue(val name: String)
+data class Muhurta(val start: String, val end: String)
 
 data class Panchanga(
     val tithi: PanchangaValue? = null,
@@ -122,10 +132,11 @@ data class Panchanga(
     val sunrise: String? = null,
     val sunset: String? = null,
     val moonSign: String? = null,
-    val sunSign: String? = null
+    val sunSign: String? = null,
+    val rahukalam: Muhurta? = null,
+    val yamagandam: Muhurta? = null,
+    val gulikai: Muhurta? = null
 )
-
-data class PanchangaValue(val name: String)
 data class DashaPeriod(
     val lord: String,
     val start: String,
@@ -282,7 +293,13 @@ fun ChartsTab(data: ChartData, birthData: JSONObject) {
         Spacer(Modifier.height(12.dp))
         SouthIndianGridEnhanced(data.planets ?: emptyList(), data.houses?.ascendantDetails?.signName ?: "", "Rasi", birthData, data.panchanga?.nakshatra?.name ?: "")
 
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(24.dp))
+        
+        // --- Panchangam Section ---
+        if (data.panchanga != null) {
+            PanchangaSection(data.panchanga)
+            Spacer(Modifier.height(24.dp))
+        }
 
         Text("நவாம்ச கட்டம் (Navamsa - D9)", fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = NeonCyan)
         Spacer(Modifier.height(12.dp))
@@ -290,6 +307,103 @@ fun ChartsTab(data: ChartData, birthData: JSONObject) {
 
         Spacer(Modifier.height(40.dp))
     }
+}
+
+@Composable
+fun PanchangaSection(p: Panchanga) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+            .border(1.dp, NeonCyan.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+            .padding(16.dp)
+    ) {
+        Text("பஞ்சாங்கம் (Panchangam)", color = NeonCyan, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+        Spacer(Modifier.height(12.dp))
+
+        // Basic Panchanga Grid
+        val items = listOf(
+            "வாரம்" to (varaTamil[p.vara?.name] ?: p.vara?.name ?: "-"),
+            "திதி" to translateTithi(p.tithi?.name),
+            "நட்சத்திரம்" to (p.nakshatra?.name ?: "-"),
+            "யோகம்" to (p.yoga?.name ?: "-"),
+            "கரணம்" to (p.karana?.name ?: "-"),
+            "சூரியோதயம்" to (p.sunrise ?: "-"),
+            "சூரியாஸ்தமனம்" to (p.sunset ?: "-")
+        )
+
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            items.chunked(2).forEach { row ->
+                Row(Modifier.fillMaxWidth()) {
+                    row.forEach { (label, value) ->
+                        Column(Modifier.weight(1f)) {
+                            Text(label, color = Color.White.copy(alpha = 0.6f), fontSize = 11.sp)
+                            Text(value, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        }
+                    }
+                    if (row.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+        Divider(color = NeonCyan.copy(alpha = 0.1f))
+        Spacer(Modifier.height(16.dp))
+
+        // Muhurtas Section
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            MuhurtaItem("ராகு காலம்", p.rahukalam, Modifier.weight(1f))
+            MuhurtaItem("எமகண்டம்", p.yamagandam, Modifier.weight(1f))
+            MuhurtaItem("குளிகை", p.gulikai, Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+fun MuhurtaItem(label: String, m: Muhurta?, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(Color.Black.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(label, color = NeonCyan, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        Text(
+            if (m != null) "${m.start} - ${m.end}" else "-",
+            color = Color.White,
+            fontSize = 10.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+fun translateTithi(tithi: String?): String {
+    if (tithi == null) return "-"
+    var res = tithi
+    val map = mapOf(
+        "Shukla" to "வளர்பிறை",
+        "Krishna" to "தேய்பிறை",
+        "Pratipada" to "பிரதமை",
+        "Dwitiya" to "துவிதியை",
+        "Tritiya" to "திருதியை",
+        "Chaturthi" to "சதுர்த்தி",
+        "Panchami" to "பஞ்சமி",
+        "Shashthi" to "சஷ்டி",
+        "Saptami" to "சப்தமி",
+        "Ashtami" to "அஷ்டமி",
+        "Navami" to "நவமி",
+        "Dashami" to "தசமி",
+        "Ekadashi" to "ஏகாதசி",
+        "Dwadashi" to "துவாதசி",
+        "Trayodashi" to "திரயோதசி",
+        "Chaturdashi" to "சதுர்த்தசி",
+        "Purnima" to "பௌர்ணமி",
+        "Amavasya" to "அமாவாசை"
+    )
+    map.forEach { (en, ta) ->
+        res = res.replace(en, ta, ignoreCase = true)
+    }
+    return res
 }
 
 @Composable

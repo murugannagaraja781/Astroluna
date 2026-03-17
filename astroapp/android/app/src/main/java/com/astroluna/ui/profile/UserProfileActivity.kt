@@ -159,6 +159,22 @@ fun UserProfileScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Call History Button
+            OutlinedButton(
+                onClick = {
+                    context.startActivity(Intent(context, UserHistoryActivity::class.java))
+                },
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF004D40)),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF004D40))
+            ) {
+                Icon(Icons.Default.Phone, null)
+                Spacer(Modifier.width(8.dp))
+                Text("Call History / அழைப்பு வரலாறு", fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             // Save Button
             Button(
                 onClick = {

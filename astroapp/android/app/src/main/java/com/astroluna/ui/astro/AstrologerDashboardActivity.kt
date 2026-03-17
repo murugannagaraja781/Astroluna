@@ -106,6 +106,12 @@ class AstrologerDashboardActivity : ComponentActivity() {
     }
 
     private fun performLogout() {
+        // Automatically set offline when logging out
+        val session = tokenManager.getUserSession()
+        session?.userId?.let { uid ->
+            SocketManager.updateStatus(uid, false)
+        }
+
         tokenManager.clearSession()
         SocketManager.disconnect()
         val intent = Intent(this, GuestDashboardActivity::class.java)

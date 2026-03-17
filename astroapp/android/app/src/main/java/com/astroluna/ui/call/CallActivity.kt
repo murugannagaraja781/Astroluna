@@ -50,6 +50,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.astroluna.utils.CallState
 import org.json.JSONObject
 import org.webrtc.*
@@ -96,6 +97,16 @@ class CallActivity : ComponentActivity() {
     private var audioFile: File? = null
 
     private var isWebRTCInitialized = false
+    private var backPressedTime: Long = 0
+
+    override fun onBackPressed() {
+        if (backPressedTime + 2000 > System.currentTimeMillis()) {
+            endCall()
+        } else {
+            Toast.makeText(this, "Press back again to end call / அழைப்பை முடிக்க மீண்டும் கிளிக் செய்யவும்", Toast.LENGTH_SHORT).show()
+        }
+        backPressedTime = System.currentTimeMillis()
+    }
 
     // Proximity Sensor for Audio Calls
     private var proximityWakeLock: android.os.PowerManager.WakeLock? = null
@@ -871,12 +882,19 @@ class CallActivity : ComponentActivity() {
                 }
 
                 try {
-                    androidx.appcompat.app.AlertDialog.Builder(this)
+                    val builder = androidx.appcompat.app.AlertDialog.Builder(this)
                         .setTitle(if (reason == "insufficient_funds") "⚠️ Low Balance" else "📞 Call Summary")
                         .setMessage(message)
-                        .setPositiveButton("OK") { _, _ -> finish() }
                         .setCancelable(false)
-                        .show()
+
+                    if (session?.role == "client") {
+                        builder.setPositiveButton("Next / Review") { _, _ ->
+                            showReviewDialog(deducted)
+                        }
+                    } else {
+                        builder.setPositiveButton("OK") { _, _ -> finish() }
+                    }
+                    builder.show()
                 } catch (e: Exception) {
                     Log.e(TAG, "Failed to show call summary dialog", e)
                     finish()
@@ -1013,6 +1031,64 @@ class CallActivity : ComponentActivity() {
         stopBackgroundService()
         stopRecording()
         SocketManager.endSession(sessionId)
+        finish()
+    }
+
+    private fun showReviewDialog(deducted: Double) {
+        val dialogView = android.view.LayoutInflater.from(this).inflate(com.astroluna.R.layout.dialog_review, null)
+        val ratingBar = dialogView.findViewById<android.widget.RatingBar>(com.astroluna.R.id.ratingBar)
+        val commentEdit = dialogView.findViewById<android.widget.EditText>(com.astroluna.R.id.commentEdit)
+
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Rate your experience")
+            .setView(dialogView)
+            .setCancelable(false)
+            .setPositiveButton("Submit / பகிரவும்") { _, _ ->
+                val rating = ratingBar.rating
+                val review = commentEdit.text.toString()
+                submitReview(rating, review)
+            }
+            .setNegativeButton("Skip") { _, _ ->
+                navigateToHome()
+            }
+            .show()
+    }
+
+    private fun submitReview(rating: Float, review: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val client = okhttp3.OkHttpClient()
+                val json = JSONObject().apply {
+                    put("sessionId", sessionId)
+                    put("clientId", session?.userId)
+                    put("clientName", session?.name)
+                    put("astrologerId", partnerId)
+                    put("astrologerName", partnerName)
+                    put("rating", rating)
+                    put("review", review)
+                }
+                val body = okhttp3.RequestBody.create(
+                    okhttp3.MediaType.parse("application/json; charset=utf-8"),
+                    json.toString()
+                )
+                val request = okhttp3.Request.Builder()
+                    .url("${com.astroluna.utils.Constants.SERVER_URL}/api/astrology/review")
+                    .post(body)
+                    .build()
+                client.newCall(request).execute()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            withContext(Dispatchers.Main) {
+                navigateToHome()
+            }
+        }
+    }
+
+    private fun navigateToHome() {
+        val intent = android.content.Intent(this, com.astroluna.ui.home.HomeActivity::class.java)
+        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
         finish()
     }
 
@@ -1211,67 +1287,98 @@ fun CallScreen(
             }
         }
 
-        // Bottom Controls Container (Grid)
+        // Bottom Controls Container
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
-                .padding(16.dp)
+                .padding(bottom = 24.dp, start = 16.dp, end = 16.dp)
                 .fillMaxWidth()
                 .shadow(16.dp, RoundedCornerShape(32.dp))
-                .background(Color.White, RoundedCornerShape(32.dp))
-                .padding(20.dp),
+                .background(Color.White.copy(alpha = 0.95f), RoundedCornerShape(32.dp))
+                .padding(vertical = 16.dp, horizontal = 12.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Media Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
+                // LEFT SIDE: Mute and Speaker
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     ControlBtnItem(onClick = onToggleMic, icon = if (!isMuted) Icons.Default.Phone else Icons.Default.Phone, label = "Mute", active = !isMuted)
-                    if (callType == "video") {
-                        ControlBtnItem(onClick = onToggleCamera, icon = if (isVideoEnabled) Icons.Default.PlayArrow else Icons.Default.PlayArrow, label = "Video", active = isVideoEnabled)
-                    }
                     ControlBtnItem(onClick = onToggleSpeaker, icon = if (isSpeakerOn) Icons.Default.Refresh else Icons.Default.Refresh, label = "Speaker", active = isSpeakerOn)
                 }
 
-                // Actions Row
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
+                // CENTER: Logo (Top) + Cut & Recording (Bottom)
+                Column(
+                    modifier = Modifier.weight(1.5f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    if (role == "astrologer") {
-                        ControlBtnItem(onClick = onShowRasi, icon = android.R.drawable.ic_menu_gallery, label = "Chart", active = true)
-                    } else {
-                        Spacer(modifier = Modifier.size(48.dp))
-                    }
+                    // Logo in the center top of this column
+                    Image(
+                        painter = painterResource(id = com.astroluna.R.drawable.logo_mayil),
+                        contentDescription = "Logo",
+                        modifier = Modifier.size(64.dp)
+                    )
 
-                    // End Call
-                    IconButton(
-                        onClick = onEndCall,
-                        modifier = Modifier
-                            .size(64.dp)
-                            .shadow(8.dp, CircleShape)
-                            .background(Color(0xFFFF5252), CircleShape)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Phone, "End", tint = Color.White, modifier = Modifier.size(32.dp))
-                    }
+                        // End Call (Cut Button)
+                        IconButton(
+                            onClick = onEndCall,
+                            modifier = Modifier
+                                .size(64.dp)
+                                .shadow(8.dp, CircleShape)
+                                .background(Color(0xFFFF5252), CircleShape)
+                        ) {
+                            Icon(Icons.Default.Phone, "End", tint = Color.White, modifier = Modifier.size(32.dp))
+                        }
 
-                    if (role == "astrologer") {
-                        ControlBtnItem(
-                            onClick = onToggleRecording,
-                            icon = if (isRecording) Icons.Default.Check else Icons.Default.AddCircle,
-                            label = if (isRecording) "Stop" else "REC",
-                            active = isRecording
-                        )
-                    } else {
-                        ControlBtnItem(onClick = onEditIntake, icon = Icons.Default.Edit, label = "Edit", active = false)
+                        // Recording Button (for astrologer)
+                        if (role == "astrologer") {
+                            ControlBtnItem(
+                                onClick = onToggleRecording,
+                                icon = if (isRecording) Icons.Default.Check else Icons.Default.AddCircle,
+                                label = if (isRecording) "Stop" else "REC",
+                                active = isRecording
+                            )
+                        }
+                    }
+                }
+
+                // RIGHT SIDE: Edit and Chart
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Show Chart on right
+                    ControlBtnItem(
+                        onClick = onShowRasi, 
+                        icon = com.astroluna.R.drawable.ic_chart, 
+                        label = "Chart", 
+                        active = (role == "astrologer")
+                    )
+                    
+                    // Show Edit on right
+                    ControlBtnItem(
+                        onClick = onEditIntake, 
+                        icon = com.astroluna.R.drawable.ic_edit, 
+                        label = "Edit", 
+                        active = false
+                    )
+
+                    // Video toggle if applicable
+                    if (callType == "video") {
+                        ControlBtnItem(onClick = onToggleCamera, icon = if (isVideoEnabled) Icons.Default.PlayArrow else Icons.Default.PlayArrow, label = "Video", active = isVideoEnabled)
                     }
                 }
             }

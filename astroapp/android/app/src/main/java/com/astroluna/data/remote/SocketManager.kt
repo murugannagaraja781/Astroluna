@@ -251,6 +251,14 @@ object SocketManager {
         socket?.emit("update-service-status", data)
     }
 
+    fun updateStatus(userId: String, isOnline: Boolean) {
+        val data = JSONObject().apply {
+            put("userId", userId)
+            put("isOnline", isOnline)
+        }
+        socket?.emit("update-status", data)
+    }
+
     fun onAstrologerUpdate(listener: (JSONObject) -> Unit) {
         socket?.on("astrologer-update") { args ->
             if (args != null && args.isNotEmpty()) {

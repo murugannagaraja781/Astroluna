@@ -464,11 +464,22 @@ class HomeActivity : AppCompatActivity() {
                 val intent = Intent(this, com.astroluna.ui.academy.AcademyActivity::class.java)
                 startActivity(intent)
             }
-            "Free Services" -> {
+            "Free Service" -> {
                 android.app.AlertDialog.Builder(this)
-                    .setTitle("Contact Us")
-                    .setMessage("For free services, contact us at: info@astroluna.in")
-                    .setPositiveButton("OK", null)
+                    .setTitle("Contact Astroluna")
+                    .setMessage("வசதி மற்றும் சேவைகளுக்கு எங்களை தொடர்பு கொள்ளவும்:\n\nEmail: info@astroluna.in")
+                    .setPositiveButton("Send Email") { _, _ ->
+                        try {
+                            val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = Uri.parse("mailto:info@astroluna.in")
+                                putExtra(Intent.EXTRA_SUBJECT, "Free Service Inquiry")
+                            }
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            Toast.makeText(this, "No email app found", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    .setNegativeButton("OK", null)
                     .show()
             }
             else -> {

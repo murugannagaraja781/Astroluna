@@ -197,18 +197,81 @@ class ChatActivity : ComponentActivity() {
             val durationStr = String.format("%02d:%02d", minutes, seconds)
 
             try {
-                androidx.appcompat.app.AlertDialog.Builder(this)
+                val builder = androidx.appcompat.app.AlertDialog.Builder(this)
                     .setTitle("Chat Summary")
                     .setMessage("Duration: $durationStr\nDeducted: ₹${String.format("%.2f", summary.deducted)}")
-                    .setPositiveButton("OK") { _, _ ->
+                    .setCancelable(false)
+                
+                val userSession = TokenManager(this).getUserSession()
+                if (userSession?.role == "client") {
+                    builder.setPositiveButton("Next / Review") { _, _ ->
+                         showReviewDialog(summary.deducted)
+                    }
+                } else {
+                    builder.setPositiveButton("OK") { _, _ ->
                         navigateToDashboard()
                     }
-                    .setCancelable(false)
-                    .show()
+                }
+                builder.show()
             } catch (e: Exception) {
                 e.printStackTrace()
                 navigateToDashboard()
             }
+        }
+    }
+
+    private fun showReviewDialog(deducted: Double) {
+        val dialogView = android.view.LayoutInflater.from(this).inflate(com.astroluna.R.layout.dialog_review, null)
+        val ratingBar = dialogView.findViewById<android.widget.RatingBar>(com.astroluna.R.id.ratingBar)
+        val commentEdit = dialogView.findViewById<android.widget.EditText>(com.astroluna.R.id.commentEdit)
+        val partnerName = intent?.getStringExtra("toUserName") ?: "Astrologer"
+
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Rate your experience")
+            .setView(dialogView)
+            .setCancelable(false)
+            .setPositiveButton("Submit / பகிரவும்") { _, _ ->
+                val rating = ratingBar.rating
+                val review = commentEdit.text.toString()
+                submitReview(rating, review, partnerName)
+            }
+            .setNegativeButton("Skip") { _, _ ->
+                navigateToDashboard()
+            }
+            .show()
+    }
+
+    private fun submitReview(rating: Float, review: String, partnerName: String) {
+        val userSession = TokenManager(this).getUserSession()
+        androidx.lifecycle.lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val client = okhttp3.OkHttpClient()
+                val json = JSONObject().apply {
+                    put("sessionId", sessionId)
+                    put("clientId", userSession?.userId)
+                    put("clientName", userSession?.name)
+                    put("astrologerId", toUserId)
+                    put("astrologerName", partnerName)
+                    put("rating", rating)
+                    put("review", review)
+                }
+                val body = okhttp3.RequestBody.create(
+                    okhttp3.MediaType.parse("application/json; charset=utf-8"),
+                    json.toString()
+                )
+                val request = okhttp3.Request.Builder()
+                    .url("${com.astroluna.utils.Constants.SERVER_URL}/api/astrology/review")
+                    .post(body)
+                    .build()
+                client.newCall(request).execute()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                navigateToDashboard()
+            }
+        }
+    }
         }
         viewModel.sessionEnded.observe(this) { ended ->
             if (ended && viewModel.sessionSummary.value == null) {

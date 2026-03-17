@@ -9,9 +9,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -29,9 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.astroluna.data.local.ThemeManager
-import com.astroluna.ui.theme.AppTheme
 import com.astroluna.ui.theme.CosmicAppTheme
-import com.astroluna.ui.theme.ThemePalette
 
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,10 +44,7 @@ class SettingsActivity : ComponentActivity() {
 @Composable
 fun ThemeSelectionScreen(onBack: () -> Unit) {
     val context = LocalContext.current
-    val currentTheme by ThemeManager.currentTheme.collectAsState()
     val customBgColor by ThemeManager.customBgColor.collectAsState()
-
-    val themes = AppTheme.values()
 
     // Predefined Custom Colors for selection
     val customColors = listOf(
@@ -81,7 +73,7 @@ fun ThemeSelectionScreen(onBack: () -> Unit) {
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Appearance & Theme",
+                    text = "Appearance Settings",
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                     color = CosmicAppTheme.colors.textPrimary
                 )
@@ -96,34 +88,9 @@ fun ThemeSelectionScreen(onBack: () -> Unit) {
                 .padding(16.dp)
         ) {
 
-            // 1. Theme Selection
+            // 1. Custom Background Override
             Text(
-                "Select App Theme",
-                style = MaterialTheme.typography.titleMedium,
-                color = CosmicAppTheme.colors.textSecondary,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.weight(1f) // Take available space
-            ) {
-                items(themes) { theme ->
-                    val isSelected = theme == currentTheme && customBgColor == 0
-                    ThemeCard(theme, isSelected) {
-                        ThemeManager.setTheme(context, theme)
-                        ThemeManager.setCustomBackground(context, 0) // Reset custom BG on theme switch
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // 2. Custom Background Override
-            Text(
-                "Override Background Color",
+                "Customize Background Color",
                 style = MaterialTheme.typography.titleMedium,
                 color = CosmicAppTheme.colors.textSecondary,
                 modifier = Modifier.padding(bottom = 12.dp)
@@ -170,55 +137,11 @@ fun ThemeSelectionScreen(onBack: () -> Unit) {
                 }
             }
             Spacer(modifier = Modifier.height(32.dp))
-
-            // 3. Advanced Page Customization
-            Button(
-                onClick = {
-                    context.startActivity(android.content.Intent(context, ThemeSettingsActivity::class.java))
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = CosmicAppTheme.colors.accent)
-            ) {
-                Text("Browse All Themes & Colors", color = Color.White)
-            }
-        }
-    }
-}
-
-@Composable
-fun ThemeCard(theme: AppTheme, isSelected: Boolean, onClick: () -> Unit) {
-    val themeColors = ThemePalette.getColors(theme)
-
-    Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = themeColors.cardBg),
-        border = androidx.compose.foundation.BorderStroke(2.dp, if (isSelected) CosmicAppTheme.colors.accent else themeColors.cardStroke),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Column(
-             modifier = Modifier.padding(12.dp),
-             horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Preview Circle
-            Box(
-                 modifier = Modifier
-                     .size(40.dp)
-                     .clip(CircleShape)
-                     .background(
-                         androidx.compose.ui.graphics.Brush.linearGradient(
-                             listOf(themeColors.headerStart, themeColors.bgEnd)
-                         )
-                     )
-                     .border(1.dp, themeColors.accent, CircleShape)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            
             Text(
-                text = theme.title,
-                style = MaterialTheme.typography.bodyMedium,
-                color = themeColors.textPrimary,
-                maxLines = 1,
-                fontSize = 12.sp
+                "More settings will be available in future updates.",
+                style = MaterialTheme.typography.bodySmall,
+                color = CosmicAppTheme.colors.textSecondary.copy(alpha=0.6f)
             )
         }
     }
