@@ -239,22 +239,20 @@ try {
 }
 
 
-// Send FCM v1 Push Notification (Using Firebase Admin SDK)
+// Send FCM v1 Push Notification (Using Firebase Admin SDK) with Legacy Fallback
 async function sendFcmV1Push(fcmToken, data, notification) {
   if (!callApp) {
-    console.warn('[FCM v1] Firebase Admin not initialized - skipping push');
-    return { success: false, error: 'FCM not initialized' };
+    console.warn('[FCM] Firebase Admin not initialized - trying legacy fallback');
+    return await sendFcmLegacy(fcmToken, data, notification);
   }
 
   try {
-    // Convert all data values to strings (FCM requires string values in data)
     const stringData = {};
     if (data) {
       for (const [key, value] of Object.entries(data)) {
         stringData[key] = String(value || '');
       }
     }
-    // Embed notification content in data for manual handling in app
     if (notification) {
       stringData.title = notification.title || '';
       stringData.body = notification.body || '';
@@ -265,7 +263,7 @@ async function sendFcmV1Push(fcmToken, data, notification) {
       data: stringData,
       android: {
         priority: 'high',
-        ttl: 0 // Instant delivery
+        ttl: 0
       }
     };
 
@@ -273,12 +271,40 @@ async function sendFcmV1Push(fcmToken, data, notification) {
     console.log('[FCM v1] Push sent successfully:', result);
     return { success: true, messageId: result };
   } catch (err) {
-    console.error('[FCM v1] Send error:', err.message);
-    // Handle invalid token
-    if (err.code === 'messaging/registration-token-not-registered' ||
-      err.code === 'messaging/invalid-registration-token') {
-      console.warn('[FCM v1] Invalid/expired token - should be cleaned up');
+    console.error('[FCM v1] Send error:', err.message, '- attempting legacy fallback');
+    return await sendFcmLegacy(fcmToken, data, notification);
+  }
+}
+
+// Legacy FCM logic (FCM v1 Fallback)
+async function sendFcmLegacy(token, data, notification) {
+  const SERVER_KEY = process.env.FCM_SERVER_KEY;
+  if (!SERVER_KEY) {
+    console.warn('[FCM Legacy] Missing SERVER_KEY in .env');
+    return { success: false, error: 'Missing Server Key' };
+  }
+  try {
+    const payload = {
+      to: token,
+      data: data,
+      priority: 'high'
+    };
+    if (notification) {
+      payload.notification = notification;
     }
+    const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+      method: 'POST',
+      headers: {
+        'Authorization': `key=${SERVER_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    const result = await response.json();
+    console.log('[FCM Legacy] Sent result:', result);
+    return { success: true, result };
+  } catch (err) {
+    console.error('[FCM Legacy] Error:', err.message);
     return { success: false, error: err.message };
   }
 }
@@ -409,6 +435,39 @@ app.post('/api/astrologer/register', async (req, res) => {
 });
 
 // Admin: Get all astrologer applications
+// --- Admin Notifications & Activity ---
+app.get('/api/admin/notifications', async (req, res) => {
+  try {
+    const notifications = await Notification.find().sort({ createdAt: -1 }).limit(50);
+    res.json({ ok: true, notifications });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+app.post('/api/admin/notifications/read', async (req, res) => {
+  try {
+    await Notification.updateMany({ read: false }, { read: true });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
+app.get('/api/admin/astrologers/attended', async (req, res) => {
+  try {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const attendedAstroIds = await Session.distinct('astrologerId', {
+      startTime: { $gte: startOfDay },
+      $or: [{ duration: { $gt: 0 } }, { status: 'connected' }]
+    });
+    res.json({ ok: true, attendedAstroIds });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 app.get('/api/admin/astrologer-applications', async (req, res) => {
   try {
     const { status = 'pending' } = req.query;
@@ -848,6 +907,17 @@ const AstrologerApplicationSchema = new mongoose.Schema({
   notes: String
 });
 const AstrologerApplication = mongoose.model('AstrologerApplication', AstrologerApplicationSchema);
+
+const NotificationSchema = new mongoose.Schema({
+  userId: String,
+  type: { type: String, default: 'system' }, // 'missed_call', 'status', 'system'
+  title: String,
+  message: String,
+  details: Object,
+  read: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now }
+});
+const Notification = mongoose.model('Notification', NotificationSchema);
 
 
 // ===== Seed Data =====
@@ -3147,6 +3217,15 @@ io.on('connection', (socket) => {
 
           // Broadcast MISSED update to Super Admin (Status remains unchanged as per User Request)
           if (astrologerId) {
+            // Persistent Notification for Super Admin
+            Notification.create({
+              userId: astrologerId,
+              type: 'missed_call',
+              title: 'Missed Call Alert',
+              message: `Astrologer missed a call from ${fromUser?.name || 'Client'}.`,
+              details: { sessionId, fromUserId, toUserId, type }
+            }).catch(e => console.error('Notification creation error', e));
+
             io.to('superadmin').emit('admin-notification', {
               title: 'Call Missed',
               message: `Astrologer missed a call, but remained online (User Request).`,

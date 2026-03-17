@@ -50,20 +50,33 @@ router.post('/full', async (req, res) => {
         const utc = dt.toUTC();
         const jd = swissEph.julday(utc.year, utc.month, utc.day, utc.hour + utc.minute / 60 + utc.second / 3600);
 
-        // Calculate all data
-        const houses = getHouseCusps(jd, lat, lng, 'Placidus', ayanamsa);
+        // Calculate all data in parallel for speed
+        const [houses, panchanga, transitJD, tamilDateData] = await Promise.all([
+            getHouseCusps(jd, lat, lng, 'Placidus', ayanamsa),
+            getPanchanga(jd, lat, lng, ayanamsa),
+            swissEph.julday(DateTime.now().toUTC().year, DateTime.now().toUTC().month, DateTime.now().toUTC().day, DateTime.now().toUTC().hour + DateTime.now().toUTC().minute / 60),
+            getTamilDate(dt, ayanamsa)
+        ]);
 
-        // Map planets to include degreeFormatted as expected by App
+        const muhurtas = getMuhurtas(jd, lat, lng);
+
+        // Map planets (depends on houses)
         const planets = getPlanetsWithDetails(jd, houses.cusps, ayanamsa).map(p => ({
             ...p,
             degreeFormatted: formatLongitude(p.longitude)
         }));
 
-        const panchanga = getPanchanga(jd, lat, lng, ayanamsa);
-        const muhurtas = getMuhurtas(jd, lat, lng);
-
-        // Calculate detailed Dasha for App
+        // Calculate detailed Dasha
         const moon = planets.find(p => p.name === 'Moon');
+        const moonLon = moon ? moon.longitude : 0;
+
+        const { getFullDashaBreakdown, getVimshottariDasha, getSubPeriods } = require('../../utils/rasiEng/dashaCalculations');
+
+        const [dashaBreakdown, dashaPeriods] = await Promise.all([
+            getFullDashaBreakdown(moonLon, dt),
+            getVimshottariDasha(moonLon, dt)
+        ]);
+
         let dashaInfo = {
             mahadashaName: "Ketu",
             bhuktiName: "Ketu",
@@ -72,26 +85,18 @@ router.post('/full', async (req, res) => {
             endsAt: ""
         };
 
-        if (moon) {
-            const { getFullDashaBreakdown, getCurrentDasha } = require('../../utils/rasiEng/dashaCalculations');
-            const breakdown = getFullDashaBreakdown(moon.longitude, dt);
-            const now = DateTime.now();
-
-            if (breakdown.currentMahadasha) {
-                const end = DateTime.fromISO(breakdown.currentMahadasha.end);
-                dashaInfo = {
-                    mahadashaName: breakdown.currentMahadasha.lord,
-                    bhuktiName: breakdown.currentBhukti ? breakdown.currentBhukti.lord : breakdown.currentMahadasha.lord,
-                    antaramName: breakdown.currentAntara ? breakdown.currentAntara.lord : (breakdown.currentBhukti ? breakdown.currentBhukti.lord : ""),
-                    remainingYearsInCurrentDasha: Math.max(0, end.diff(now, 'years').years),
-                    endsAt: breakdown.currentMahadasha.end
-                };
-            }
+        if (dashaBreakdown.currentMahadasha) {
+            const end = DateTime.fromISO(dashaBreakdown.currentMahadasha.end);
+            dashaInfo = {
+                mahadashaName: dashaBreakdown.currentMahadasha.lord,
+                bhuktiName: dashaBreakdown.currentBhukti ? dashaBreakdown.currentBhukti.lord : dashaBreakdown.currentMahadasha.lord,
+                antaramName: dashaBreakdown.currentAntara ? dashaBreakdown.currentAntara.lord : (dashaBreakdown.currentBhukti ? dashaBreakdown.currentBhukti.lord : ""),
+                remainingYearsInCurrentDasha: Math.max(0, end.diff(DateTime.now(), 'years').years),
+                endsAt: dashaBreakdown.currentMahadasha.end
+            };
         }
 
-        // Get Current Transits and format for App
-        const now = DateTime.now().toUTC();
-        const transitJD = swissEph.julday(now.year, now.month, now.day, now.hour + now.minute / 60);
+        // Get Current Transits
         const rawTransits = swissEph.getAllPlanets(transitJD, ayanamsa);
         const transits = rawTransits.map(t => {
             const sign = swissEph.getSign(t.longitude);
@@ -102,19 +107,13 @@ router.post('/full', async (req, res) => {
             };
         });
 
-        const tamilDateData = await getTamilDate(dt, ayanamsa);
-
-        // navamsaPlanets already defined above or we redefine it cleaner
+        // Navamsa
         const { getNavamsaSign } = require('../../utils/rasiEng/calculations');
         const navamsaPlanets = planets.map(p => ({
             name: p.name,
             signName: getNavamsaSign(p.longitude)
         }));
         const navamsaAscSign = getNavamsaSign(houses.ascendant);
-
-        const { getVimshottariDasha, getSubPeriods } = require('../../utils/rasiEng/dashaCalculations');
-        const moonLon = moon ? moon.longitude : 0;
-        const dashaPeriods = getVimshottariDasha(moonLon, dt);
 
         const detailedDasha = dashaPeriods.map(md => {
             const bhuktis = getSubPeriods(md.start, md.end, md.lord, 1);

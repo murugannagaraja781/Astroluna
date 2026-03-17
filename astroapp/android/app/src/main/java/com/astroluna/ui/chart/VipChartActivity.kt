@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,13 +61,13 @@ val signTamil = mapOf(
 val planetTamil = mapOf(
     "Sun" to "சூரியன்", "Moon" to "சந்திரன்", "Mars" to "செவ்வாய்", "Mercury" to "புதன்",
     "Jupiter" to "குரு", "Venus" to "சுக்கிரன்", "Saturn" to "சனி", "Rahu" to "ராகு",
-    "Ketu" to "கேது", "Ascendant" to "லக்னம்"
+    "Ketu" to "கேது", "Ascendant" to "லக்னம்", "Mandi" to "மாந்தி"
 )
 
 val planetAbbrTamil = mapOf(
-    "Sun" to "சூ", "Moon" to "சந்", "Mars" to "செவ்", "Mercury" to "பு",
-    "Jupiter" to "குரு", "Venus" to "சுக்", "Saturn" to "சனி", "Rahu" to "ரா",
-    "Ketu" to "கே", "Ascendant" to "ல", "As" to "ல"
+    "Sun" to "சூரி", "Moon" to "சந்", "Mars" to "செவ்", "Mercury" to "புத",
+    "Jupiter" to "குரு", "Venus" to "சுக்", "Saturn" to "சனி", "Rahu" to "ராகு",
+    "Ketu" to "கேது", "Ascendant" to "லக்", "As" to "லக்", "Mandi" to "மாந்தி"
 )
 
 // --- Updated Data Models ---
@@ -242,7 +243,7 @@ fun VipChartScreen(birthData: JSONObject, onBack: () -> Unit) {
                 Box(modifier = Modifier.weight(1f)) {
                     when (selectedTab) {
                         0 -> if (chartState != null) ChartsTab(chartState!!, birthData)
-                        1 -> if (chartState != null) PlanetsTab(chartState!!)
+                        1 -> if (chartState != null) PlanetGridTab(chartState!!)
                         2 -> if (chartState?.dasha != null) DashaListTab(chartState!!.dasha!!)
                     }
                 }
@@ -418,53 +419,124 @@ fun SouthIndianGridEnhanced(planets: List<Planet>, ascSign: String, title: Strin
 fun getMonthName(m: Int): String = listOf("", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")[m]
 
 @Composable
-fun PlanetsTab(data: ChartData) {
-    val planetList = data.planets ?: emptyList()
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item {
-            Text("கிரகங்களின் விரிவான நிலைகள்", fontWeight = FontWeight.Bold, color = TraditionalRed, fontSize = 18.sp)
-            Spacer(Modifier.height(8.dp))
+fun PlanetGridTab(data: ChartData) {
+    val rawPlanets = data.planets ?: emptyList()
+
+    // Add Ascendant to the list
+    val asc = data.houses?.ascendantDetails
+    val planets = mutableListOf<Planet>()
+
+    if (asc != null) {
+        planets.add(Planet(
+            name = "Ascendant",
+            signName = asc.signName,
+            degreeFormatted = asc.degreeFormatted,
+            nakshatra = asc.nakshatra,
+            nakshatraPada = asc.nakshatraPada,
+            starLord = asc.starLord
+        ))
+    }
+    planets.addAll(rawPlanets)
+
+    val sun = rawPlanets.find { it.name == "Sun" }
+
+    Column(modifier = Modifier.fillMaxSize().padding(12.dp).background(Color.White, RoundedCornerShape(8.dp)).border(1.dp, Color.LightGray, RoundedCornerShape(8.dp))) {
+        // Table Header
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(0xFF2E7D32), RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)) // Green Background
+                .padding(vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val headerStyle = TextStyle(color = Color.White, fontWeight = FontWeight.Bold, fontSize = 11.sp, textAlign = TextAlign.Center)
+            Text("கிரகம்", modifier = Modifier.weight(1.5f), style = headerStyle)
+            Text("பாகை", modifier = Modifier.weight(2.5f), style = headerStyle)
+            Text("நட்சத்திரம்", modifier = Modifier.weight(2.5f), style = headerStyle)
+            Text("பாதம்", modifier = Modifier.weight(1f), style = headerStyle)
+            Text("ந அ", modifier = Modifier.weight(1f), style = headerStyle)
+            Text("நிலை", modifier = Modifier.weight(2f), style = headerStyle)
         }
 
-        items(planetList) { planet ->
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f)),
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Column(Modifier.padding(16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Surface(shape = CircleShape, color = ElectricBlue, modifier = Modifier.size(36.dp)) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text(planetAbbrTamil[planet.name] ?: planet.name.take(1), color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                            }
-                        }
-                        Spacer(Modifier.width(12.dp))
-                        Column(Modifier.weight(1f)) {
-                            Text(planetTamil[planet.name] ?: planet.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
-                            Text("${signTamil[planet.signName] ?: planet.signName} - ${planet.degreeFormatted ?: ""}", fontSize = 12.sp, color = Color.White.copy(alpha = 0.6f))
-                        }
-                        Text("${planet.house}-ம் வீடு", fontWeight = FontWeight.Bold, color = NeonCyan)
+        // Data Rows
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(planets) { p ->
+                val isCombust = if (sun != null && p.name != "Sun" && p.name != "Rahu" && p.name != "Ketu" && p.name != "Ascendant") {
+                    // Logic for combustion - using a simple degree difference
+                    val pLon = p.longitude
+                    val sLon = sun.longitude
+                    val diff = Math.min(Math.abs(pLon - sLon), 360 - Math.abs(pLon - sLon))
+                    val limit = when(p.name) {
+                        "Moon" -> 12.0
+                        "Mars" -> 17.0
+                        "Mercury" -> 13.0
+                        "Jupiter" -> 11.0
+                        "Venus" -> 9.0
+                        "Saturn" -> 15.0
+                        else -> 0.0
                     }
-                    Divider(Modifier.padding(vertical = 12.dp), color = Color.White.copy(alpha = 0.1f))
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        PlanetDetailSub("நட்சத்திரம்", planet.nakshatra ?: "N/A")
-                        PlanetDetailSub("நட்சத்திர அதிபதி", planet.starLord ?: "N/A")
-                        PlanetDetailSub("உப அதிபதி", planet.subLord ?: "N/A")
+                    diff < limit
+                } else false
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(0.5.dp, Color.LightGray)
+                        .padding(vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Planet Name (Red)
+                    Row(modifier = Modifier.weight(1.5f), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = planetAbbrTamil[p.name] ?: p.name.take(3),
+                            color = Color.Red,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                        if (p.isRetrograde) {
+                            Text(" (வ)", color = Color.Red, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        }
+                        if (isCombust) {
+                            Text(" (அ)", color = Color.Red, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
+
+                    val detailStyle = TextStyle(color = Color.Blue, fontSize = 11.sp, textAlign = TextAlign.Center, fontWeight = FontWeight.Medium)
+
+                    // Degree (Blue)
+                    Text(text = formatDegreeOnly(p.degreeFormatted), modifier = Modifier.weight(2.5f), style = detailStyle)
+
+                    // Nakshatra (Blue)
+                    val nakName = p.nakshatra ?: "-"
+                    Text(text = nakName, modifier = Modifier.weight(2.5f), style = detailStyle)
+
+                    // Pada (Blue)
+                    Text(text = p.nakshatraPada.toString(), modifier = Modifier.weight(1f), style = detailStyle)
+
+                    // Star Lord (Blue)
+                    Text(text = planetAbbrTamil[p.starLord ?: ""] ?: p.starLord?.take(2) ?: "-", modifier = Modifier.weight(1f), style = detailStyle)
+
+                    // Sign (Blue)
+                    Text(text = signTamil[p.signName] ?: p.signName, modifier = Modifier.weight(2f), style = detailStyle)
                 }
             }
         }
     }
 }
 
+fun formatDegreeOnly(degreeStr: String?): String {
+    if (degreeStr == null) return ""
+    // degreeStr is "Leo 15° 30' 45\"" or "Leo 15°30'45\""
+    val regex = """(\d+°\s*\d+'\s*\d+")""".toRegex()
+    val match = regex.find(degreeStr)
+    return match?.value ?: degreeStr.split(" ").last()
+}
+
 @Composable
-fun PlanetDetailSub(label: String, value: String) {
-    Column {
-        Text(label, fontSize = 10.sp, color = Color.Gray)
-        Text(value, fontSize = 12.sp, fontWeight = FontWeight.Medium)
-    }
+fun PlanetsTab(data: ChartData) {
+    // Legacy - replaced by PlanetGridTab
+    PlanetGridTab(data)
 }
 
 @Composable

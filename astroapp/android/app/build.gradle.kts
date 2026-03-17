@@ -11,11 +11,11 @@ plugins {
 
 android {
     namespace = "com.astroluna"
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         applicationId = "com.astroluna"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 20260311
         versionName = "7.0.0"
         multiDexEnabled = true
@@ -76,6 +76,12 @@ android {
         disable += "DuplicatePlatformClasses"
         checkReleaseBuilds = true
         abortOnError = false
+    }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
     }
 }
 

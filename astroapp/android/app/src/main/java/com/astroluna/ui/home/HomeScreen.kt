@@ -1335,36 +1335,30 @@ fun AstrologerCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    if (showChat) {
-                        AstrologerActionButton(
-                            text = "Chat",
-                            icon = Icons.Default.Chat,
-                            isBusy = astro.isBusy,
-                            isOnline = astro.isChatOnline,
-                            baseColor = Color(0xFF0074D9),
-                            onClick = { onChatClick(astro) }
-                        )
-                    }
-                    if (showVideo) {
-                        AstrologerActionButton(
-                            text = "Video",
-                            icon = Icons.Default.Videocam,
-                            isBusy = astro.isBusy,
-                            isOnline = astro.isVideoOnline,
-                            baseColor = Color(0xFFE44D3A),
-                            onClick = { onCallClick(astro, "Video") }
-                        )
-                    }
-                    if (showCall) {
-                        AstrologerActionButton(
-                            text = "Call",
-                            icon = Icons.Default.Call,
-                            isBusy = astro.isBusy,
-                            isOnline = astro.isAudioOnline,
-                            baseColor = Color(0xFF2ECC40),
-                            onClick = { onCallClick(astro, "Audio") }
-                        )
-                    }
+                    AstrologerActionButton(
+                        text = "Chat",
+                        icon = Icons.Default.Chat,
+                        isBusy = astro.isBusy,
+                        isOnline = astro.isChatOnline,
+                        baseColor = Color(0xFF0074D9),
+                        onClick = { onChatClick(astro) }
+                    )
+                    AstrologerActionButton(
+                        text = "Video",
+                        icon = Icons.Default.Videocam,
+                        isBusy = astro.isBusy,
+                        isOnline = astro.isVideoOnline,
+                        baseColor = Color(0xFFE44D3A),
+                        onClick = { onCallClick(astro, "Video") }
+                    )
+                    AstrologerActionButton(
+                        text = "Call",
+                        icon = Icons.Default.Call,
+                        isBusy = astro.isBusy,
+                        isOnline = astro.isAudioOnline,
+                        baseColor = Color(0xFF2ECC40),
+                        onClick = { onCallClick(astro, "Audio") }
+                    )
                 }
             }
         }

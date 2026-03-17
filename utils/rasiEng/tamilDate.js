@@ -60,24 +60,10 @@ async function getTamilDate(date, ayanamsaName = 'Lahiri') {
         const sunLon = sun.longitude;
         const monthIndex = Math.floor(sunLon / 30) % 12;
 
-        // Calculate day of the month by counting backwards to month start
-        let dayCount = 1;
-        let scanDate = activeDate.minus({ days: 1 });
-
-        for (let i = 0; i < 33; i++) {
-            const scanJd = dateTimeToJd(scanDate);
-            const scanSunriseJd = swissEph.getSunrise(scanJd, CHENNAI.lat, CHENNAI.lng);
-            const scanSun = swissEph.calcPlanetSidereal(scanSunriseJd, 0, ayanamsaName);
-
-            if (!scanSun) break;
-
-            const scanMonthIdx = Math.floor(scanSun.longitude / 30) % 12;
-            if (scanMonthIdx !== monthIndex) {
-                break;
-            }
-            dayCount++;
-            scanDate = scanDate.minus({ days: 1 });
-        }
+        // DIRECT CALCULATION: Degree within the sign is the day of the month
+        // In Tamil calendar, day changes at sunrise.
+        // The degree passed since entering the sign (0-30) corresponds to the date.
+        const dayCount = Math.floor(sunLon % 30) + 1;
 
         // Calculate Tamil year
         let tamilYearGregorian = activeDate.year;

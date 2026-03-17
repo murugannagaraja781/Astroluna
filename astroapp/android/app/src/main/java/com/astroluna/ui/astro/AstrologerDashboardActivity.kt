@@ -19,6 +19,7 @@ import android.os.Build
 import android.app.AlertDialog
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -82,6 +83,7 @@ class AstrologerDashboardActivity : ComponentActivity() {
     private lateinit var tokenManager: TokenManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         tokenManager = TokenManager(this)
         val session = tokenManager.getUserSession()

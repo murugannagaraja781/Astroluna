@@ -80,4 +80,16 @@ interface ApiInterface {
 
     @POST("api/astrologer/register")
     suspend fun registerAstrologer(@Body request: com.astroluna.data.model.AstroRegistration): Response<com.google.gson.JsonObject>
+
+    @retrofit2.http.GET("api/admin/notifications")
+    suspend fun getAdminNotifications(): Response<com.google.gson.JsonObject>
+
+    @POST("api/admin/notifications/read")
+    suspend fun markNotificationsRead(): Response<com.google.gson.JsonObject>
+
+    @retrofit2.http.GET("api/admin/astrologers/attended")
+    suspend fun getAttendedAstrologers(): Response<com.google.gson.JsonObject>
+
+    @retrofit2.http.GET("api/astrology/astrologers")
+    suspend fun getAstrologers(): Response<com.google.gson.JsonObject>
 }
