@@ -21,6 +21,7 @@ const io = new Server(server, {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Attach io to app for use in routes
@@ -47,7 +48,7 @@ app.use('/api/admin', require('./routes/admin'));
 app.use('/api/charts', require('./routes/charts'));
 
 // Basic Routes
-app.get('/', (req, res) => res.send('Astroluna Server Running'));
+// Root served by express.static('public')
 
 // File Upload
 const upload = multer({ dest: 'uploads/' });
