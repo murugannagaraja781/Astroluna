@@ -379,7 +379,6 @@ fun MuhurtaItem(label: String, m: Muhurta?, modifier: Modifier = Modifier) {
 
 fun translateTithi(tithi: String?): String {
     if (tithi == null) return "-"
-    var res = tithi
     val map = mapOf(
         "Shukla" to "வளர்பிறை",
         "Krishna" to "தேய்பிறை",
@@ -400,10 +399,7 @@ fun translateTithi(tithi: String?): String {
         "Purnima" to "பௌர்ணமி",
         "Amavasya" to "அமாவாசை"
     )
-    map.forEach { (en, ta) ->
-        res = res.replace(en, ta, ignoreCase = true)
-    }
-    return res
+    return map.entries.fold(tithi) { acc, (en, ta) -> acc.replace(en, ta, ignoreCase = true) }
 }
 
 @Composable

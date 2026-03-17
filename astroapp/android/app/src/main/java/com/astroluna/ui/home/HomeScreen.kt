@@ -63,6 +63,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import com.astroluna.ui.profile.UserHistoryActivity
+import org.json.JSONObject
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 
@@ -1767,12 +1768,17 @@ fun CustomerStoriesSection() {
                         val list = mutableListOf<HomeReviewItem>()
                         for (i in 0 until array.length()) {
                             val obj = array.getJSONObject(i)
-                            list.add(HomeReviewItem(
-                                name = obj.optString("clientName", "User"),
-                                astrologer = obj.optString("astrologerName", "Astrologer"),
-                                review = obj.optString("review", ""),
-                                rating = obj.optDouble("rating", 5.0).toFloat()
-                            ))
+                            val clientName = obj.optString("clientName", "").trim()
+                            val reviewText = obj.optString("review", "").trim()
+                            // Skip entries with no real content
+                            if (clientName.isNotEmpty() && reviewText.isNotEmpty()) {
+                                list.add(HomeReviewItem(
+                                    name = clientName,
+                                    astrologer = obj.optString("astrologerName", "Astrologer").trim(),
+                                    review = reviewText,
+                                    rating = obj.optDouble("rating", 5.0).toFloat().coerceIn(1f, 5f)
+                                ))
+                            }
                         }
                         reviews = list
                     }
@@ -1781,10 +1787,11 @@ fun CustomerStoriesSection() {
         }
     }
 
+    // Only show when real reviews exist in database — no dummy data shown
     if (reviews.isNotEmpty()) {
         Column(modifier = Modifier.padding(vertical = 16.dp)) {
             Text(
-                text = "Customer Stories / வாடிக்கையாளர் அனுபவங்கள்",
+                text = "வாடிக்கையாளர் அனுபவங்கள்",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = Color.Black,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)

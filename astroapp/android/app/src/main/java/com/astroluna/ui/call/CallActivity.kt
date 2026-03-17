@@ -55,6 +55,9 @@ import com.astroluna.utils.CallState
 import org.json.JSONObject
 import org.webrtc.*
 import java.util.LinkedList
+import androidx.compose.foundation.Image
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class CallActivity : ComponentActivity() {
 
@@ -1067,10 +1070,7 @@ class CallActivity : ComponentActivity() {
                     put("rating", rating)
                     put("review", review)
                 }
-                val body = okhttp3.RequestBody.create(
-                    okhttp3.MediaType.parse("application/json; charset=utf-8"),
-                    json.toString()
-                )
+                val body = json.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
                 val request = okhttp3.Request.Builder()
                     .url("${com.astroluna.utils.Constants.SERVER_URL}/api/astrology/review")
                     .post(body)

@@ -53,12 +53,184 @@ mongoose.connect(MONGODB_URI)
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api', require('./routes/auth')); // Compatibility for Mobile App (Legacy paths)
+app.use('/api', require('./routes/auth')); // Compatibility for Mobile App (Legacy paths: /api/send-otp, /api/verify-otp)
 app.use('/api/user', require('./routes/user'));
 app.use('/api/astrology', require('./routes/astrology'));
 app.use('/api/payment', require('./routes/payment'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/charts', require('./routes/charts'));
+app.use('/api/rasi-eng', require('./routes/rasiEng')); // VipChart, Birth Chart, Matching, Horoscope
+
+// ── Alias routes to fix 404s from mobile app ──────────────────────────────
+
+// City search — app calls /api/city-* but server has /api/charts/city-*
+app.use('/api/city-autocomplete', (req, res, next) => { req.url = '/city-autocomplete'; require('./routes/charts')(req, res, next); });
+app.use('/api/city-timezone',     (req, res, next) => { req.url = '/city-timezone';     require('./routes/charts')(req, res, next); });
+
+// Banners — app calls /api/home/banners, server has /api/admin/banners
+app.get('/api/home/banners', async (req, res) => {
+  try {
+    const { Banner } = require('./models');
+    const banners = await Banner.find({ active: { $ne: false } }).sort({ order: 1 }).lean();
+    res.json({ ok: true, data: banners });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Porutham matching — app calls /api/match/porutham, server has /api/charts/porutham
+app.post('/api/match/porutham', (req, res, next) => { req.url = '/porutham'; require('./routes/charts')(req, res, next); });
+
+// Academy videos — app calls /api/academy/videos (read-only public), server has /api/admin/academy/videos
+app.get('/api/academy/videos', async (req, res) => {
+  try {
+    const { AcademyVideo } = require('./models');
+    const videos = await AcademyVideo.find().sort({ order: 1 }).lean();
+    res.json({ ok: true, videos });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Astrologer registration — app calls /api/astrologer/register, server has /api/auth/register-astrologer
+app.post('/api/astrologer/register', (req, res, next) => { req.url = '/register-astrologer'; require('./routes/auth')(req, res, next); });
+
+// Referral — app calls /api/referral/stats/:userId and /api/withdraw-referral, server has them under /api/user/
+app.get('/api/referral/stats/:userId', (req, res, next) => { req.url = '/referral/stats/' + req.params.userId; require('./routes/user')(req, res, next); });
+app.post('/api/withdraw-referral',    (req, res, next) => { req.url = '/withdraw-referral'; require('./routes/user')(req, res, next); });
+
+// Admin Notifications (stub — returns empty until backend is built)
+app.get('/api/admin/notifications',        (req, res) => res.json({ ok: true, notifications: [], unreadCount: 0 }));
+app.post('/api/admin/notifications/read',  (req, res) => res.json({ ok: true }));
+app.get('/api/admin/astrologers/attended', async (req, res) => {
+  try {
+    const { User } = require('./models');
+    const astrologers = await User.find({ role: 'astrologer' })
+      .select('userId name phone totalEarnings isOnline isChatOnline isAudioOnline isVideoOnline')
+      .lean();
+    res.json({ ok: true, astrologers });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Astrologer service toggle — app calls /api/astrologer/service-toggle
+app.post('/api/astrologer/service-toggle', async (req, res) => {
+  try {
+    const { userId, service, enabled } = req.body;
+    if (!userId || !service) return res.status(400).json({ ok: false, error: 'userId and service required' });
+
+    const { User } = require('./models');
+    const field = service === 'chat'  ? 'isChatOnline'  :
+                  service === 'audio' ? 'isAudioOnline' :
+                  service === 'video' ? 'isVideoOnline' : null;
+
+    if (!field) return res.status(400).json({ ok: false, error: 'Invalid service. Use: chat, audio, video' });
+
+    const update = { [field]: !!enabled };
+    // Recompute master isOnline: true if ANY service is enabled
+    const user = await User.findOne({ userId });
+    if (!user) return res.status(404).json({ ok: false, error: 'User not found' });
+
+    user[field] = !!enabled;
+    user.isOnline = user.isChatOnline || user.isAudioOnline || user.isVideoOnline;
+    await user.save();
+
+    // Broadcast status change to all clients via socket
+    const ioInstance = app.get('io');
+    if (ioInstance) {
+      ioInstance.emit('astro-status-change', {
+        userId,
+        service,
+        isEnabled: !!enabled,
+        isOnline: user.isOnline,
+        isChatOnline: user.isChatOnline,
+        isAudioOnline: user.isAudioOnline,
+        isVideoOnline: user.isVideoOnline
+      });
+    }
+
+    res.json({ ok: true, isOnline: user.isOnline, [field]: !!enabled });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Payment history — app calls /api/payment/history/:userId
+app.get('/api/payment/history/:userId', async (req, res) => {
+  try {
+    const { Payment } = require('./models');
+    const payments = await Payment.find({ userId: req.params.userId })
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .lean();
+    res.json({ ok: true, payments });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Free Horoscope (generate chart)  — app calls /api/horoscope/generate-chart
+app.use('/api/horoscope', require('./routes/freeHoroscope'));
+
+// Rasipalan — also mount on legacy path just in case
+app.use('/api/rasipalan', require('./routes/rasipalan'));
+
+// ── FCM Token Registration ─────────────────────────────────────────────────
+// App calls POST /register with { userId, fcmToken }
+app.post('/register', async (req, res) => {
+  try {
+    const { userId, fcmToken } = req.body;
+    if (!userId || !fcmToken) return res.json({ ok: false, error: 'userId and fcmToken required' });
+    const { User } = require('./models');
+    await User.findOneAndUpdate({ userId }, { fcmToken }, { new: true });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// ── Chat History ───────────────────────────────────────────────────────────
+// App calls GET /api/chat/history/:sessionId?limit=20&before=<timestamp>
+app.get('/api/chat/history/:sessionId', async (req, res) => {
+  try {
+    const { ChatMessage } = require('./models');
+    const { sessionId } = req.params;
+    const limit = Math.min(parseInt(req.query.limit) || 20, 100);
+    const before = req.query.before ? parseInt(req.query.before) : null;
+
+    const query = { sessionId };
+    if (before) query.timestamp = { $lt: before };
+
+    const messages = await ChatMessage.find(query)
+      .sort({ timestamp: -1 })
+      .limit(limit)
+      .lean();
+
+    res.json({ ok: true, messages: messages.reverse(), hasMore: messages.length === limit });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// ── PhonePe Status Check ───────────────────────────────────────────────────
+// App calls GET /api/phonepe/status/:transactionId
+app.get('/api/phonepe/status/:transactionId', async (req, res) => {
+  try {
+    const { checkPhonePeOrderStatus } = require('./utils/paymentHelpers');
+    const result = await checkPhonePeOrderStatus(req.params.transactionId);
+    res.json({ ok: true, state: result.state, data: result.data });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// ── PhonePe Sign (alias for payment/create) ────────────────────────────────
+// App calls POST /api/phonepe/sign — proxied to payment creation flow
+app.post('/api/phonepe/sign', async (req, res, next) => {
+  req.url = '/create';
+  require('./routes/payment')(req, res, next);
+});
 
 // Basic Routes
 // Root served by express.static('public')
