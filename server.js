@@ -1,4 +1,9 @@
 require('dotenv').config();
+console.log('--- Startup Config ---');
+console.log('PORT in env:', process.env.PORT);
+console.log('MONGODB_URI:', process.env.MONGODB_URI ? 'Present' : 'Missing');
+console.log('MSG91 Template:', process.env.MSG91_TEMPLATE_ID);
+console.log('----------------------');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');

@@ -19,6 +19,7 @@ setInterval(() => {
 // OTP Send (Mock)
 router.post('/send-otp', (req, res) => {
   const { phone } = req.body;
+  console.log(`[AUTH] OTP request for phone: ${phone}`);
   if (!phone) return res.json({ ok: false, error: 'Phone required' });
 
   const otp = Math.floor(1000 + Math.random() * 9000).toString();
@@ -43,7 +44,7 @@ router.post('/send-otp', (req, res) => {
   sendMsg91(phone, otp);
 
   otpStore.set(phone, { otp, expires: Date.now() + 300000 });
-  console.log(`OTP for ${phone}: ${otp}`);
+  console.log(`[AUTH] Generated OTP for ${phone}: ${otp}`);
   res.json({ ok: true });
 });
 

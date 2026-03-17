@@ -29,13 +29,15 @@ function sendMsg91(phoneNumber, otp) {
     }
   };
 
+  console.log(`[MSG91] Requesting OTP for ${mobile} with AuthKey: ${authKey?.substring(0, 4)}... and TemplateId: ${templateId}`);
+
   const req = https.request(options, (res) => {
     let data = '';
     res.on('data', (chunk) => data += chunk);
-    res.on('end', () => console.log('MSG91 Result:', data));
+    res.on('end', () => console.log('[MSG91] Response:', data));
   });
 
-  req.on('error', (e) => console.error('MSG91 Error:', e));
+  req.on('error', (e) => console.error('[MSG91] Error:', e));
   req.write('{}');
   req.end();
 }
