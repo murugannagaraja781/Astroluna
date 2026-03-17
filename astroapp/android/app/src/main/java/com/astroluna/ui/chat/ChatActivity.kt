@@ -34,6 +34,12 @@ import com.astroluna.ui.theme.CosmicAppTheme
 import com.astroluna.utils.SoundManager
 import org.json.JSONObject
 import java.util.UUID
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 
 data class ChatMessage(val id: String, val text: String, val isSent: Boolean, var status: String = "sent", val timestamp: Long = 0)
 
@@ -218,6 +224,27 @@ class ChatActivity : ComponentActivity() {
                 navigateToDashboard()
             }
         }
+
+        viewModel.sessionEnded.observe(this) { ended ->
+            if (ended && viewModel.sessionSummary.value == null) {
+                if (isFinishing || isDestroyed) return@observe
+
+                Toast.makeText(this, "Chat Ended by Partner", Toast.LENGTH_SHORT).show()
+
+                // Clear all notifications
+                val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                notificationManager.cancelAll()
+
+                navigateToDashboard()
+            }
+        }
+
+        viewModel.availableMinutes.observe(this) { mins ->
+            remainingSeconds = (mins * 60)
+            val remMins = remainingSeconds / 60
+            val remSecs = remainingSeconds % 60
+            remainingTime = String.format("%02d:%02d", remMins, remSecs)
+        }
     }
 
     private fun showReviewDialog(deducted: Double) {
@@ -243,7 +270,7 @@ class ChatActivity : ComponentActivity() {
 
     private fun submitReview(rating: Float, review: String, partnerName: String) {
         val userSession = TokenManager(this).getUserSession()
-        androidx.lifecycle.lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             try {
                 val client = okhttp3.OkHttpClient()
                 val json = JSONObject().apply {
@@ -255,42 +282,16 @@ class ChatActivity : ComponentActivity() {
                     put("rating", rating)
                     put("review", review)
                 }
-                val body = okhttp3.RequestBody.create(
-                    okhttp3.MediaType.parse("application/json; charset=utf-8"),
-                    json.toString()
-                )
+                val body = json.toString().toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
                 val request = okhttp3.Request.Builder()
                     .url("${com.astroluna.utils.Constants.SERVER_URL}/api/astrology/review")
                     .post(body)
                     .build()
                 client.newCall(request).execute()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+            } catch (e: Exception) { e.printStackTrace() }
+            lifecycleScope.launch(Dispatchers.Main) {
                 navigateToDashboard()
             }
-        }
-    }
-        }
-        viewModel.sessionEnded.observe(this) { ended ->
-            if (ended && viewModel.sessionSummary.value == null) {
-                if (isFinishing || isDestroyed) return@observe
-
-                Toast.makeText(this, "Chat Ended by Partner", Toast.LENGTH_SHORT).show()
-
-                // Clear all notifications
-                val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
-                notificationManager.cancelAll()
-
-                navigateToDashboard()
-            }
-        }
-        viewModel.availableMinutes.observe(this) { mins ->
-            remainingSeconds = (mins * 60)
-            val remMins = remainingSeconds / 60
-            val remSecs = remainingSeconds % 60
-            remainingTime = String.format("%02d:%02d", remMins, remSecs)
         }
     }
 

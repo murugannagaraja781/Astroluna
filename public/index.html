@@ -3795,9 +3795,9 @@
         <div class="astro-banner-info">
           <h2 id="astroName" style="margin: 0; font-size: 1.5rem;">Astrologer Name</h2>
           <p style="margin: 5px 0;">Expert Astrologer • ID: <span id="astroId">...</span></p>
-          <div id="astroStatusIndicator" style="margin-top: 8px; display: flex; align-items: center; gap: 6px;">
-            <div class="status-badge" style="position: static; width: 10px; height: 10px;"></div>
-            <span style="font-size: 0.75rem; color: rgba(255,255,255,0.8); font-weight: 600;">System Active</span>
+          <div id="astroStatusIndicator" style="margin-top: 12px; display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.2); padding: 5px 12px; border-radius: 20px; width: fit-content;">
+            <span style="font-size: 0.75rem; color: white; font-weight: 600;">System Online</span>
+            <div class="toggle-switch" id="toggleMainOnline" style="width: 35px; height: 18px;"></div>
           </div>
         </div>
         <button onclick="clearSession()" class="logout-btn-dash" title="Logout"
@@ -7235,11 +7235,13 @@
         avatarImg.src = `https://ui-avatars.com/api/?name=${user.name}&background=random`;
       }
 
+      setupToggle('toggleMainOnline', 'main');
       setupToggle('toggleChat', 'chat');
       setupToggle('toggleCall', 'audio');
       setupToggle('toggleVideo', 'video');
 
       // Initialize Card UI positions based on current state
+      updateToggleUI('toggleMainOnline', user.isOnline);
       updateToggleUI('toggleChat', user.isChatOnline);
       updateToggleUI('toggleCall', user.isAudioOnline);
       updateToggleUI('toggleVideo', user.isVideoOnline);
@@ -7330,15 +7332,38 @@
       if (!el) return;
 
       el.onclick = () => {
+        const isMainToggle = (id === 'toggleMainOnline');
+        const mainToggle = document.getElementById('toggleMainOnline');
+        
+        if (!isMainToggle && !mainToggle.classList.contains('active')) {
+          alert("Please Go Online using the System Toggle first!");
+          return;
+        }
+
         el.classList.toggle('active');
         const isOnline = el.classList.contains('active');
-        updateToggleUI(id, isOnline); // Use the helper
+        updateToggleUI(id, isOnline); 
+
+        // If turning off main, automatically turn off others in UI
+        if (isMainToggle && !isOnline) {
+          updateToggleUI('toggleChat', false);
+          updateToggleUI('toggleCall', false);
+          updateToggleUI('toggleVideo', false);
+          document.getElementById('toggleChat').classList.remove('active');
+          document.getElementById('toggleCall').classList.remove('active');
+          document.getElementById('toggleVideo').classList.remove('active');
+        }
 
         socket.emit('toggle-status', { online: isOnline, type: type });
 
         // Save status to localStorage for persistence
         const savedStatus = JSON.parse(localStorage.getItem('astroStatus') || '{}');
         savedStatus[type] = isOnline;
+        if (isMainToggle && !isOnline) {
+          savedStatus.chat = false;
+          savedStatus.audio = false;
+          savedStatus.video = false;
+        }
         savedStatus.timestamp = Date.now();
         localStorage.setItem('astroStatus', JSON.stringify(savedStatus));
       };

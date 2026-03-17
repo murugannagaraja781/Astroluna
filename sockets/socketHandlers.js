@@ -143,11 +143,51 @@ module.exports = function(io, socket) {
     broadcastAstroUpdate();
   });
 
+  socket.on('toggle-status', async (data) => {
+    const userId = socketToUser.get(socket.id);
+    if (!userId) return;
+    const { online, type } = data;
+    const update = { lastSeen: new Date() };
+    
+    // mapping frontend types to backend fields
+    if (type === 'chat') update.isChatOnline = !!online;
+    if (type === 'audio') update.isAudioOnline = !!online;
+    if (type === 'video') update.isVideoOnline = !!online;
+    if (type === 'main') update.isOnline = !!online;
+
+    await User.updateOne({ userId }, { $set: update });
+
+    // Re-check overall isOnline if needed, or just follow the main toggle
+    if (type === 'main' && !online) {
+       // If main is off, force all sub-services off
+       await User.updateOne({ userId }, { $set: { isChatOnline: false, isAudioOnline: false, isVideoOnline: false, isAvailable: false } });
+    }
+    
+    // Set overall isOnline if any sub-service is on? 
+    // Usually isOnline signifies "System Active"
+    
+    broadcastAstroUpdate();
+  });
+
   socket.on('disconnect', async () => {
     const userId = socketToUser.get(socket.id);
     if (!userId) return;
     socketToUser.delete(socket.id);
     if (userSockets.get(userId) === socket.id) userSockets.delete(userId);
+
+    // Set Astrologer to offline on disconnect
+    const user = await User.findOne({ userId });
+    if (user && user.role === 'astrologer') {
+      await User.updateOne({ userId }, { 
+        isOnline: false, 
+        isAvailable: false, 
+        isChatOnline: false, 
+        isAudioOnline: false, 
+        isVideoOnline: false,
+        lastSeen: new Date() 
+      });
+      broadcastAstroUpdate();
+    }
 
     const sid = userActiveSession.get(userId);
     if (sid) {
