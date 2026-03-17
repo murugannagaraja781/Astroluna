@@ -26,6 +26,13 @@ const io = new Server(server, {
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Request Logger (Debug)
+app.use((req, res, next) => {
+  console.log(`[REQ] ${req.method} ${req.url} | Body: ${JSON.stringify(req.body)}`);
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -46,6 +53,7 @@ mongoose.connect(MONGODB_URI)
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api', require('./routes/auth')); // Compatibility for Mobile App (Legacy paths)
 app.use('/api/user', require('./routes/user'));
 app.use('/api/astrology', require('./routes/astrology'));
 app.use('/api/payment', require('./routes/payment'));
