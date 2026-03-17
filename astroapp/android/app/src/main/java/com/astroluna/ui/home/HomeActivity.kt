@@ -46,6 +46,7 @@ class HomeActivity : AppCompatActivity() {
     private val _walletBalance = MutableStateFlow(0.0)
     private val _horoscope = MutableStateFlow("Loading Horoscope...")
     private val _astrologers = MutableStateFlow<List<Astrologer>>(emptyList())
+    private val _reviews = MutableStateFlow<List<HomeReviewItem>>(emptyList())
     private val _isLoading = MutableStateFlow(true)
     private val _userSession = MutableStateFlow<com.astroluna.data.model.AuthResponse?>(null)
 
@@ -72,6 +73,7 @@ class HomeActivity : AppCompatActivity() {
                 val balance by _walletBalance.collectAsState()
                 val horoscope by _horoscope.collectAsState()
                 val astrologers by _astrologers.collectAsState()
+                val reviews by _reviews.collectAsState()
                 val isLoading by _isLoading.collectAsState()
                 val session by _userSession.collectAsState()
                 val referralCode = session?.referralCode ?: ""
@@ -86,6 +88,7 @@ class HomeActivity : AppCompatActivity() {
                     referralCode = referralCode,
                     horoscope = horoscope,
                     astrologers = astrologers,
+                    reviews = reviews,
                     isLoading = isLoading,
                     onWalletClick = {
                         startActivity(Intent(this, com.astroluna.ui.wallet.WalletActivity::class.java))
@@ -163,6 +166,7 @@ class HomeActivity : AppCompatActivity() {
         loadWalletBalance()
         loadDailyHoroscope()
         loadAstrologers()
+        loadReviews()
 
         // Setup Socket for real-time updates
         setupSocket()
@@ -411,7 +415,47 @@ class HomeActivity : AppCompatActivity() {
             _userSession.value = tokenManager.getUserSession()
         }
 
+        socket?.on("new-review") {
+            lifecycleScope.launch(Dispatchers.Main) {
+                loadReviews()
+            }
+        }
+
         socket?.emit("get-astrologers")
+    }
+
+    private fun loadReviews() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val request = Request.Builder()
+                    .url("$SERVER_URL/api/astrology/reviews")
+                    .get()
+                    .build()
+                client.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        val json = JSONObject(response.body?.string() ?: "{}")
+                        val arr = json.optJSONArray("reviews") ?: JSONArray()
+                        val list = mutableListOf<HomeReviewItem>()
+                        for (i in 0 until arr.length()) {
+                            val obj = arr.getJSONObject(i)
+                            val name = obj.optString("clientName", "").trim()
+                            val review = obj.optString("review", "").trim()
+                            if (name.isNotEmpty() && review.isNotEmpty()) {
+                                list.add(HomeReviewItem(
+                                    name = name,
+                                    astrologer = obj.optString("astrologerName", "Astrologer"),
+                                    review = review,
+                                    rating = obj.optDouble("rating", 5.0).toFloat().coerceIn(1f, 5f)
+                                ))
+                            }
+                        }
+                        _reviews.value = list
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to load reviews", e)
+            }
+        }
     }
 
     private fun startChat(astro: Astrologer) {

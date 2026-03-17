@@ -1314,19 +1314,12 @@ fun CallScreen(
                     ControlBtnItem(onClick = onToggleSpeaker, icon = if (isSpeakerOn) Icons.Default.Refresh else Icons.Default.Refresh, label = "Speaker", active = isSpeakerOn)
                 }
 
-                // CENTER: Logo (Top) + Cut & Recording (Bottom)
+                // CENTER: Cut & Recording (Bottom)
                 Column(
                     modifier = Modifier.weight(1.5f),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    // Logo in the center top of this column
-                    Image(
-                        painter = painterResource(id = com.astroluna.R.drawable.logo_mayil),
-                        contentDescription = "Logo",
-                        modifier = Modifier.size(64.dp)
-                    )
-
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(20.dp),
                         verticalAlignment = Alignment.CenterVertically

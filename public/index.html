@@ -3447,6 +3447,26 @@
             </div>
           </div>
 
+          <!-- Customer Stories Section -->
+          <div id="customerStoriesSection" style="margin-bottom: 28px; padding: 0 5px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div
+                  style="width:40px; height:40px; border-radius:10px; background: rgba(245, 158, 11, 0.1); display:flex; align-items:center; justify-content:center; color:#F59E0B; font-size:1.1rem; border: 1px solid rgba(245, 158, 11, 0.15);">
+                  <i class="fas fa-quote-left"></i>
+                </div>
+                <h3
+                  style="margin:0; font-size:1.25rem; color: #0f172a; font-family: var(--font-heading); font-weight: 800;">
+                  Customer Stories</h3>
+              </div>
+            </div>
+            <div id="customerStoriesList"
+              style="display:flex; gap:15px; overflow-x:auto; padding-bottom:10px; -ms-overflow-style: none; scrollbar-width: none;">
+              <!-- Reviews will render here as cards -->
+              <div style="text-align:center; padding:20px; color:#94a3b8; width:100%;">Loading stories...</div>
+            </div>
+          </div>
+
           <div class="premium-filter-tabs" id="topFilterTabs">
             <div class="p-tab active" onclick="filterAstros('all')">All</div>
             <div class="p-tab" onclick="filterAstros('love')">Love</div>
@@ -5247,6 +5267,18 @@
         </div>
       </div>
 
+      <!-- Tab: Review Management -->
+      <div id="admin-sect-reviews" class="admin-tab-section">
+        <div class="dashboard-header">
+          <h2 class="dashboard-title" style="display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-star" style="color:#F59E0B;"></i> Review Management
+          </h2>
+        </div>
+        <div id="adminReviewsList" style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+          <!-- Loaded via JS -->
+        </div>
+      </div>
+
       <!-- Admin Footer (Static) -->
       <div class="admin-footer">
         <div class="admin-footer-content">
@@ -5323,6 +5355,10 @@
         <div id="badge-requests" class="hidden"
           style="position:absolute; top:2px; right:8px; background:#ef4444; color:white; border-radius:50%; min-width:16px; height:16px; font-size:10px; display:flex; align-items:center; justify-content:center; padding:2px; font-weight:bold;">
           0</div>
+      </div>
+      <div class="admin-nav-item" id="anav-reviews" onclick="navAdmin('reviews')">
+        <i class="fas fa-star"></i>
+        <span>Reviews</span>
       </div>
     </div>
   </div>
@@ -8220,6 +8256,8 @@
         loadAdminReferralWithdrawals();
       } else if (tab === 'requests') {
         loadAstrologerRequests();
+      } else if (tab === 'reviews') {
+        loadAdminReviews();
       }
     };
 
@@ -11241,6 +11279,107 @@
         btn.innerHTML = 'Submit Application';
       }
     }
+
+    // --- Review System Logic ---
+    async function fetchReviews() {
+      try {
+        const res = await fetch('/api/astrology/reviews');
+        const data = await res.json();
+        if (data.ok) {
+          renderClientStories(data.reviews);
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    function renderClientStories(reviews) {
+      const list = document.getElementById('customerStoriesList');
+      if (!list) return;
+      if (!reviews || reviews.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:#94a3b8; width:100%;">No happy stories yet. Be the first!</div>';
+        return;
+      }
+
+      list.innerHTML = reviews.map(r => `
+        <div style="min-width: 260px; background: white; border-radius: 16px; padding: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">
+            <div style="font-weight:700; color:#1e293b; font-size:0.9rem;">${r.clientName}</div>
+            <div style="color:#F59E0B; font-size:0.8rem;">${'★'.repeat(r.rating)}</div>
+          </div>
+          <p style="font-size:0.8rem; color:#64748b; line-height:1.5; margin:0 0 10px 0; font-style:italic;">"${r.review}"</p>
+          <div style="font-size:0.7rem; color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:8px;">
+            Consulted with <b>${r.astrologerName}</b>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function loadAdminReviews() {
+      const list = document.getElementById('adminReviewsList');
+      if (!list) return;
+      list.innerHTML = '<div style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+
+      try {
+        const res = await fetch('/api/astrology/reviews');
+        const data = await res.json();
+        if (data.ok) {
+          renderAdminReviews(data.reviews);
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    function renderAdminReviews(reviews) {
+      const list = document.getElementById('adminReviewsList');
+      if (!list) return;
+      if (!reviews || reviews.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:30px; color:#9ca3af;">No reviews found.</div>';
+        return;
+      }
+
+      list.innerHTML = reviews.map(r => `
+        <div style="background:white; padding:15px; border-radius:12px; border:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:flex-start;">
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
+              <span style="font-weight:700; color:#111827;">${r.clientName}</span>
+              <span style="color:#F59E0B; font-size:0.85rem;">${'★'.repeat(r.rating)}</span>
+            </div>
+            <div style="font-size:0.75rem; color:#6b7280; margin-bottom:8px;">To: ${r.astrologerName} | ${new Date(r.createdAt).toLocaleDateString()}</div>
+            <p style="margin:0; font-size:0.85rem; color:#374151; line-height:1.5;">${r.review}</p>
+          </div>
+          <button onclick="deleteReview('${r._id}')" style="background:#fee2e2; color:#ef4444; border:none; padding:8px; border-radius:8px; cursor:pointer; margin-left:15px;" title="Delete Review">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+    async function deleteReview(id) {
+      if (!confirm('Are you sure you want to delete this review? This action cannot be undone.')) return;
+      try {
+        const res = await fetch('/api/astrology/review/' + id, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.ok) {
+          alert('Review deleted successfully');
+          loadAdminReviews();
+          fetchReviews(); // Refresh client stories too
+        } else {
+          alert('Delete failed: ' + data.error);
+        }
+      } catch (err) { console.error(err); }
+    }
+
+    // Real-time listener for new reviews
+    socket.on('new-review', (review) => {
+      // Update client stories list instantly
+      fetchReviews();
+      // If admin is viewing reviews, refresh their list too
+      const activeTabEl = document.querySelector('.admin-nav-item.active');
+      if (activeTabEl && activeTabEl.id === 'anav-reviews') {
+        loadAdminReviews();
+      }
+    });
+
+    // Initial fetch for landing/client home
+    fetchReviews();
   </script>
 
   <!-- Session Summary Modal -->

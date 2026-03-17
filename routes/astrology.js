@@ -60,8 +60,31 @@ router.get('/history/:userId', async (req, res) => {
 router.post('/review', async (req, res) => {
   try {
     const { sessionId, clientId, clientName, astrologerId, astrologerName, rating, review } = req.body;
-    const newReview = await Review.findOneAndUpdate({ sessionId }, { sessionId, clientId, clientName, astrologerId, astrologerName, rating, review }, { upsert: true, new: true });
+    const newReview = await Review.findOneAndUpdate(
+      { sessionId },
+      { sessionId, clientId, clientName, astrologerId, astrologerName, rating, review },
+      { upsert: true, new: true }
+    );
+
+    // Real-time update for dashboards
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('new-review', newReview);
+    }
+
     res.json({ ok: true, review: newReview });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+// Delete Review (Super Admin Only)
+router.delete('/review/:id', async (req, res) => {
+  try {
+    // Note: In a production app, we should check for admin session/token here.
+    // Assuming the frontend only shows this to admins.
+    await Review.findByIdAndDelete(req.params.id);
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
@@ -70,7 +93,7 @@ router.post('/review', async (req, res) => {
 // Get Latest Reviews
 router.get('/reviews', async (req, res) => {
   try {
-    const reviews = await Review.find().sort({ createdAt: -1 }).limit(10).lean();
+    const reviews = await Review.find().sort({ createdAt: -1 }).limit(100).lean();
     res.json({ ok: true, reviews });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });

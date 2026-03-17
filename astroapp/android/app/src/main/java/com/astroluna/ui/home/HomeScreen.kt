@@ -242,6 +242,7 @@ fun HomeScreen(
     referralCode: String = "",
     horoscope: String,
     astrologers: List<Astrologer>,
+    reviews: List<HomeReviewItem> = emptyList(),
     isLoading: Boolean,
     onWalletClick: () -> Unit,
     onChatClick: (Astrologer) -> Unit,
@@ -437,7 +438,7 @@ fun HomeScreen(
                             }
                             item { RasiGridSection(onRasiClick) }
                         }
-                        item { CustomerStoriesSection() }
+                        item { CustomerStoriesSection(reviews) }
                         item {
                             val title = when(selectedTab) {
                                 1 -> Localization.get("chat_services", isTamil)
@@ -1749,44 +1750,7 @@ fun ServiceItem(name: String, iconRes: Int, onClick: () -> Unit) {
 }
 
 @Composable
-fun CustomerStoriesSection() {
-    var reviews by remember { mutableStateOf<List<HomeReviewItem>>(emptyList()) }
-    
-    LaunchedEffect(Unit) {
-        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-            try {
-                val client = okhttp3.OkHttpClient()
-                val request = okhttp3.Request.Builder()
-                    .url("${com.astroluna.utils.Constants.SERVER_URL}/api/astrology/reviews")
-                    .build()
-                val response = client.newCall(request).execute()
-                if (response.isSuccessful) {
-                    val body = response.body?.string()
-                    val json = JSONObject(body ?: "{}")
-                    val array = json.optJSONArray("reviews")
-                    if (array != null) {
-                        val list = mutableListOf<HomeReviewItem>()
-                        for (i in 0 until array.length()) {
-                            val obj = array.getJSONObject(i)
-                            val clientName = obj.optString("clientName", "").trim()
-                            val reviewText = obj.optString("review", "").trim()
-                            // Skip entries with no real content
-                            if (clientName.isNotEmpty() && reviewText.isNotEmpty()) {
-                                list.add(HomeReviewItem(
-                                    name = clientName,
-                                    astrologer = obj.optString("astrologerName", "Astrologer").trim(),
-                                    review = reviewText,
-                                    rating = obj.optDouble("rating", 5.0).toFloat().coerceIn(1f, 5f)
-                                ))
-                            }
-                        }
-                        reviews = list
-                    }
-                }
-            } catch (e: Exception) { e.printStackTrace() }
-        }
-    }
-
+fun CustomerStoriesSection(reviews: List<HomeReviewItem>) {
     // Only show when real reviews exist in database — no dummy data shown
     if (reviews.isNotEmpty()) {
         Column(modifier = Modifier.padding(vertical = 16.dp)) {
