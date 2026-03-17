@@ -1,7 +1,7 @@
 const io = require('socket.io-client');
 const mongoose = require('mongoose');
 
-const MONGO_URI = 'mongodb+srv://murugannagaraja781_db_user:NewLife2025@cluster0.tp2gekn.mongodb.net/astrofive';
+const MONGODB_URI = 'mongodb+srv://murugannagaraja781_db_user:NewLife2025@cluster0.tp2gekn.mongodb.net/astrofive';
 const URL = 'http://localhost:3000';
 
 const BillingLedger = mongoose.model('BillingLedger', new mongoose.Schema({
@@ -18,7 +18,7 @@ const Session = mongoose.model('SessionTestTerm', new mongoose.Schema({
 }, { strict: false }), 'sessions');
 
 async function runTest() {
-    await mongoose.connect(MONGO_URI);
+    await mongoose.connect(MONGODB_URI);
     console.log('DB Connected');
 
     const clientSocket = io(URL);

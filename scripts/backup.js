@@ -8,7 +8,7 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
  * Handles: MongoDB Dump -> Zip -> Google Drive Sync
  */
 
-const MONGO_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI;
 const BACKUP_DIR = path.join(__dirname, '../backups');
 const TIMESTAMP = new Date().toISOString().replace(/[:.]/g, '-');
 const BACKUP_NAME = `astroluna_db_${TIMESTAMP}`;
@@ -16,7 +16,7 @@ const FULL_PATH = path.join(BACKUP_DIR, BACKUP_NAME);
 
 async function runBackup() {
     try {
-        if (!MONGO_URI) throw new Error("MONGODB_URI not found in .env");
+        if (!MONGODB_URI) throw new Error("MONGODB_URI not found in .env");
 
         // 1. Create backup directory
         if (!fs.existsSync(BACKUP_DIR)) {
@@ -27,7 +27,7 @@ async function runBackup() {
 
         // 2. Run mongodump
         console.log("-> Running mongodump...");
-        execSync(`mongodump --uri="${MONGO_URI}" --out="${FULL_PATH}"`);
+        execSync(`mongodump --uri="${MONGODB_URI}" --out="${FULL_PATH}"`);
 
         // 3. Zip the backup
         console.log("-> Compressing backup...");

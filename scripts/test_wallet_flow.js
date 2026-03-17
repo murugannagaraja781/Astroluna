@@ -2,11 +2,11 @@ const io = require('socket.io-client');
 const fetch = require('node-fetch');
 const mongoose = require('mongoose');
 
-const MONGO_URI = 'mongodb+srv://murugannagaraja781_db_user:NewLife2025@cluster0.tp2gekn.mongodb.net/astrofive';
+const MONGODB_URI = 'mongodb+srv://murugannagaraja781_db_user:NewLife2025@cluster0.tp2gekn.mongodb.net/astrofive';
 const URL = 'http://localhost:3000';
 
 async function runTest() {
-  await mongoose.connect(MONGO_URI);
+  await mongoose.connect(MONGODB_URI);
   console.log('DB Connected');
   // Need to clear user balance or create new user
   // Let's create new user 'LowBalanceUser'

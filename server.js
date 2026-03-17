@@ -32,7 +32,9 @@ setSessionIo(io);
 startTicker();
 
 // Database Connection
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/astroluna')
+const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/astroluna';
+mongoose.connect(MONGODB_URI)
+
   .then(() => console.log('✓ MongoDB Connected'))
   .catch(err => console.error('✗ MongoDB Connection Error:', err));
 

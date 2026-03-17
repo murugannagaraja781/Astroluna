@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const MONGO_URI = 'mongodb+srv://murugannagaraja781_db_user:NewLife2025@cluster0.tp2gekn.mongodb.net/astrofive';
+const MONGODB_URI = 'mongodb+srv://murugannagaraja781_db_user:NewLife2025@cluster0.tp2gekn.mongodb.net/astrofive';
 
 const BillingLedger = mongoose.model('BillingLedger', new mongoose.Schema({
     sessionId: String,
@@ -12,7 +12,7 @@ const BillingLedger = mongoose.model('BillingLedger', new mongoose.Schema({
 }));
 
 async function runAudit() {
-    await mongoose.connect(MONGO_URI);
+    await mongoose.connect(MONGODB_URI);
     console.log('--- Ledger Audit Starting ---');
 
     const entries = await BillingLedger.find({});

@@ -1,7 +1,7 @@
 const io = require('socket.io-client');
 const mongoose = require('mongoose');
 
-const MONGO_URI = 'mongodb+srv://murugannagaraja781_db_user:NewLife2025@cluster0.tp2gekn.mongodb.net/astrofive';
+const MONGODB_URI = 'mongodb+srv://murugannagaraja781_db_user:NewLife2025@cluster0.tp2gekn.mongodb.net/astrofive';
 const URL = 'http://localhost:3000';
 
 const PairMonth = mongoose.model('PairMonthTest', new mongoose.Schema({
@@ -12,7 +12,7 @@ const PairMonth = mongoose.model('PairMonthTest', new mongoose.Schema({
 }, { strict: false }), 'pairmonths');
 
 async function runTest() {
-    await mongoose.connect(MONGO_URI);
+    await mongoose.connect(MONGODB_URI);
     console.log('DB Connected');
 
     const clientSocket = io(URL);
