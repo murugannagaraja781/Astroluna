@@ -6,7 +6,6 @@ const ReviewSchema = new mongoose.Schema({
   astrologerId: String,
   astrologerName: String,
   rating: { type: Number, min: 1, max: 5 },
-  review: String,
-  createdAt: { type: Date, default: Date.now }
-});
+  review: String
+}, { timestamps: true });
 module.exports = mongoose.model('Review', ReviewSchema);

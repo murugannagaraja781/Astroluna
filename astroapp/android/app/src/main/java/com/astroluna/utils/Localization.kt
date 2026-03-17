@@ -41,6 +41,9 @@ object Localization {
         "lord" to "Lord",
         "category" to "Category",
         "daily_prediction" to "Daily Prediction",
+        "customer_stories" to "Customer Stories",
+        "rate_experience" to "Rate your experience",
+        "feedback_hint" to "Write your feedback and experience...",
         "ok" to "OK"
     )
 
@@ -84,6 +87,9 @@ object Localization {
         "lord" to "அதிபதி",
         "category" to "வகை",
         "daily_prediction" to "இன்றைய பலன்",
+        "customer_stories" to "வாடிக்கையாளர் அனுபவங்கள்",
+        "rate_experience" to "உங்கள் அனுபவத்தை மதிப்பிடவும்",
+        "feedback_hint" to "உங்கள் கருத்து மற்றும் அனுபவத்தை எழுதவும்...",
         "ok" to "சரி"
     )
 

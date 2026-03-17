@@ -60,6 +60,8 @@ router.get('/history/:userId', async (req, res) => {
 router.post('/review', async (req, res) => {
   try {
     const { sessionId, clientId, clientName, astrologerId, astrologerName, rating, review } = req.body;
+    console.log(`[Review] Submitting for session ${sessionId}: Rating ${rating}`);
+    
     const newReview = await Review.findOneAndUpdate(
       { sessionId },
       { sessionId, clientId, clientName, astrologerId, astrologerName, rating, review },
@@ -69,11 +71,15 @@ router.post('/review', async (req, res) => {
     // Real-time update for dashboards
     const io = req.app.get('io');
     if (io) {
-      io.emit('new-review', newReview);
+      console.log(`[Review] Broadcasting new-review for session ${sessionId}`);
+      io.emit('new-review', newReview.toJSON());
+    } else {
+      console.warn('[Review] io instance not found in app.set');
     }
 
     res.json({ ok: true, review: newReview });
   } catch (err) {
+    console.error('[Review] Error:', err.message);
     res.status(500).json({ ok: false, error: err.message });
   }
 });
@@ -93,7 +99,7 @@ router.delete('/review/:id', async (req, res) => {
 // Get Latest Reviews
 router.get('/reviews', async (req, res) => {
   try {
-    const reviews = await Review.find().sort({ createdAt: -1 }).limit(100).lean();
+    const reviews = await Review.find().sort({ updatedAt: -1 }).limit(100).lean();
     res.json({ ok: true, reviews });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });

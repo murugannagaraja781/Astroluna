@@ -416,6 +416,7 @@ class HomeActivity : AppCompatActivity() {
         }
 
         socket?.on("new-review") {
+            Log.d(TAG, "[Socket] Received new-review event")
             lifecycleScope.launch(Dispatchers.Main) {
                 loadReviews()
             }
@@ -433,7 +434,9 @@ class HomeActivity : AppCompatActivity() {
                     .build()
                 client.newCall(request).execute().use { response ->
                     if (response.isSuccessful) {
-                        val json = JSONObject(response.body?.string() ?: "{}")
+                        val bodyStr = response.body?.string()
+                        Log.d(TAG, "[Review] Fetched: $bodyStr")
+                        val json = JSONObject(bodyStr ?: "{}")
                         val arr = json.optJSONArray("reviews") ?: JSONArray()
                         val list = mutableListOf<HomeReviewItem>()
                         for (i in 0 until arr.length()) {

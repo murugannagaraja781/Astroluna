@@ -11369,6 +11369,7 @@
 
     // Real-time listener for new reviews
     socket.on('new-review', (review) => {
+      console.log('[Socket] New review received:', review);
       // Update client stories list instantly
       fetchReviews();
       // If admin is viewing reviews, refresh their list too

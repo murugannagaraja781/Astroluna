@@ -438,7 +438,7 @@ fun HomeScreen(
                             }
                             item { RasiGridSection(onRasiClick) }
                         }
-                        item { CustomerStoriesSection(reviews) }
+                        item { CustomerStoriesSection(reviews, isTamil = isTamil) }
                         item {
                             val title = when(selectedTab) {
                                 1 -> Localization.get("chat_services", isTamil)
@@ -1750,14 +1750,14 @@ fun ServiceItem(name: String, iconRes: Int, onClick: () -> Unit) {
 }
 
 @Composable
-fun CustomerStoriesSection(reviews: List<HomeReviewItem>) {
+fun CustomerStoriesSection(reviews: List<HomeReviewItem>, isTamil: Boolean = true) {
     // Only show when real reviews exist in database — no dummy data shown
     if (reviews.isNotEmpty()) {
         Column(modifier = Modifier.padding(vertical = 16.dp)) {
             Text(
-                text = "வாடிக்கையாளர் அனுபவங்கள்",
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = Color.Black,
+                text = com.astroluna.utils.Localization.get("customer_stories", isTamil),
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                color = CosmicAppTheme.colors.accent,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
