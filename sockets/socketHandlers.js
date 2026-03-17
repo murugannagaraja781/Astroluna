@@ -158,7 +158,21 @@ module.exports = function(io, socket) {
     }
   });
 
+  // --- Astrologers ---
+  socket.on('get-astrologers', async (cb) => {
+    try {
+      const astros = await User.find(
+        { role: 'astrologer' },
+        'userId name isOnline isChatOnline isAudioOnline isVideoOnline isAvailable isBusy price image skills experience rating isVerified languages orderCount'
+      ).lean();
+      safeAck(cb, { ok: true, astrologers: astros });
+    } catch (err) {
+      safeAck(cb, { ok: false, error: 'Failed to fetch' });
+    }
+  });
+
   // --- Admin ---
+
   socket.on('get-all-users', async (cb) => {
     if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     const users = await User.find({}).sort({ name: 1 }).lean();

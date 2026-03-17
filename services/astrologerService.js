@@ -10,7 +10,8 @@ async function broadcastAstroUpdate() {
   try {
     const astros = await User.find(
       { role: 'astrologer' },
-      'userId name isOnline isChatOnline isAudioOnline isVideoOnline isAvailable isBusy price image skills experience rating isVerified phone'
+      'userId name isOnline isChatOnline isAudioOnline isVideoOnline isAvailable isBusy price image skills experience rating isVerified phone languages orderCount'
+
     ).lean();
 
     if (ioInstance) ioInstance.emit('astrologer-update', astros);
