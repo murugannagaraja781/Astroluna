@@ -6,6 +6,7 @@ const { logActivity } = require('../utils/logger');
 const { callPhonePePayV2, checkPhonePeOrderStatus } = require('../utils/paymentHelpers');
 const { userSockets } = require('../utils/socketRegistry');
 const { paymentTokens } = require('../utils/registry');
+const { sendFcmV1Push } = require('../services/fcmService');
 
 // Token cleanup interval
 setInterval(() => {
@@ -29,7 +30,7 @@ async function processPaymentResult(req, merchantTransactionId, isSuccess, provi
 
   if (!payment) {
     console.error('Payment not found for:', merchantTransactionId);
-    return res.redirect('/?status=fail&reason=not_found');
+    return res.redirect('/payment.html?status=fail&reason=not_found');
   }
 
   const redirectIsApp = isApp || payment.isApp;
@@ -45,7 +46,7 @@ async function processPaymentResult(req, merchantTransactionId, isSuccess, provi
         const creditAmount = Math.round(payment.amount / 1.18);
         user.walletBalance += creditAmount;
         await user.save();
-        
+
         const io = req.app.get('io');
         const sId = userSockets.get(user.userId);
         if (sId && io) {
@@ -55,20 +56,38 @@ async function processPaymentResult(req, merchantTransactionId, isSuccess, provi
           });
           io.to(sId).emit('app-notification', { text: `✅ Recharge Successful! +₹${creditAmount} (Excl. 18% GST)` });
         }
+
+        // Send FCM notification for deposit (red color big font on Android)
+        if (user.fcmToken) {
+          sendFcmV1Push(
+            user.fcmToken,
+            {
+              type: 'DEPOSIT',
+              amount: creditAmount.toString(),
+              title: 'Deposit Successful',
+              action: 'OPEN_WALLET'
+            },
+            {
+              title: '💰 Deposit Successful!',
+              body: `₹${creditAmount} has been added to your wallet`
+            },
+            user.userId
+          );
+        }
       }
     }
 
     if (redirectIsApp) {
-      return res.redirect(`/payment-success?amount=${payment.amount || ''}&txnId=${merchantTransactionId || ''}`);
+      return res.redirect(`/payment.html?status=success&amount=${payment.amount || ''}&txnId=${merchantTransactionId || ''}`);
     }
-    return res.redirect(`/wallet?status=success&amount=${payment.amount}`);
+    return res.redirect(`/payment.html?status=success&amount=${payment.amount}`);
   } else {
     if (payment.status !== 'success') {
       payment.status = 'failed';
       await payment.save();
     }
-    if (redirectIsApp) return res.redirect('/payment-failed');
-    return res.redirect(`/wallet?status=failure`);
+    if (redirectIsApp) return res.redirect('/payment.html?status=fail');
+    return res.redirect(`/payment.html?status=failure`);
   }
 }
 
@@ -144,9 +163,9 @@ router.post('/create', async (req, res) => {
     if (!amount || !userId) return res.json({ ok: false, error: 'Missing Amount or User' });
 
     if (!token) {
-        const baseAmt = parseFloat(amount);
-        const gst = Math.round(baseAmt * 0.18 * 100) / 100;
-        amount = Math.round((baseAmt + gst) * 100) / 100;
+      const baseAmt = parseFloat(amount);
+      const gst = Math.round(baseAmt * 0.18 * 100) / 100;
+      amount = Math.round((baseAmt + gst) * 100) / 100;
     }
 
     const userObj = await User.findOne({ userId });
@@ -187,12 +206,12 @@ router.all('/callback', async (req, res) => {
       const providerRefId = statusResult.data?.paymentDetails?.[0]?.providerReferenceId || '';
       return await processPaymentResult(req, merchantTransactionId, isSuccess, providerRefId, isApp, res);
     }
-    
+
     // Fallback for direct callback body (v1 logic if any remains)
     if (req.body.response) {
-       const decoded = JSON.parse(Buffer.from(req.body.response, 'base64').toString('utf-8'));
-       const isSuccess = decoded.code === 'PAYMENT_SUCCESS';
-       return await processPaymentResult(req, decoded.data.merchantTransactionId, isSuccess, decoded.data.providerReferenceId, isApp, res);
+      const decoded = JSON.parse(Buffer.from(req.body.response, 'base64').toString('utf-8'));
+      const isSuccess = decoded.code === 'PAYMENT_SUCCESS';
+      return await processPaymentResult(req, decoded.data.merchantTransactionId, isSuccess, decoded.data.providerReferenceId, isApp, res);
     }
 
     res.status(200).json({ ok: true });

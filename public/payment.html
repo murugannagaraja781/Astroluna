@@ -354,7 +354,7 @@
             showLoading(true, 'Verifying payment token...');
 
             try {
-                const response = await fetch(`/api/verify-payment-token?token=${paymentToken}`);
+                const response = await fetch(`/api/payment/verify-token?token=${paymentToken}`);
                 const result = await response.json();
 
                 if (result.valid) {

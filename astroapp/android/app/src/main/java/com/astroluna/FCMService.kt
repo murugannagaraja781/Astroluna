@@ -161,7 +161,27 @@ class FCMService : FirebaseMessagingService() {
                     val amount = data["amount"] ?: ""
                     val msgTitle = data["title"] ?: "Wallet Updated"
                     val msgBody = data["body"] ?: if (amount.isNotEmpty()) "Amount: ₹$amount" else "Your wallet has been updated"
-                    showWalletNotification(msgTitle, msgBody)
+                    val action = data["action"] ?: "OPEN_WALLET"
+                    showWalletNotification(msgTitle, msgBody, action)
+                }
+                "DEPOSIT" -> {
+                    val amount = data["amount"] ?: ""
+                    val msgTitle = data["title"] ?: "Deposit Successful"
+                    if (amount.isNotEmpty()) {
+                        showDepositNotification(msgTitle, amount)
+                    }
+                }
+                "CALL_ENDED" -> {
+                    Log.d(TAG, "Call ended - clearing notification and opening app")
+                    val notificationManager = getSystemService(NotificationManager::class.java)
+                    notificationManager.cancel(CALL_NOTIFICATION_ID)
+
+                    // Navigate to call history when call ends
+                    val historyIntent = Intent(this, com.astroluna.ui.profile.UserHistoryActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        putExtra("navigate_to", "call_history")
+                    }
+                    startActivity(historyIntent)
                 }
                 "INCOMING_CHAT" -> {
                     val callerName = data["callerName"] ?: "Unknown"
@@ -463,8 +483,15 @@ class FCMService : FirebaseMessagingService() {
         notificationManager.notify(senderId.hashCode(), notification)
     }
 
-    private fun showWalletNotification(title: String, body: String) {
-        val walletIntent = Intent(this, com.astroluna.ui.wallet.WalletActivity::class.java).apply {
+    private fun showWalletNotification(title: String, body: String, action: String = "OPEN_WALLET") {
+        // Determine which activity to open based on action
+        val targetActivity = when (action) {
+            "OPEN_HISTORY" -> com.astroluna.ui.profile.UserHistoryActivity::class.java
+            "OPEN_WALLET" -> com.astroluna.ui.wallet.WalletActivity::class.java
+            else -> com.astroluna.ui.wallet.WalletActivity::class.java
+        }
+
+        val walletIntent = Intent(this, targetActivity).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
         val pendingIntent = PendingIntent.getActivity(
@@ -473,16 +500,62 @@ class FCMService : FirebaseMessagingService() {
             walletIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val notification = NotificationCompat.Builder(this, WALLET_CHANNEL_ID)
+
+        // Check if this is a deposit/credit notification (red color for emphasis)
+        val isDepositOrCredit = title.contains("Credit", ignoreCase = true) ||
+                                 title.contains("Deposit", ignoreCase = true) ||
+                                 title.contains("Added", ignoreCase = true) ||
+                                 body.contains("credited", ignoreCase = true) ||
+                                 body.contains("deposited", ignoreCase = true)
+
+        // Build notification with red color styling for deposits
+        val builder = NotificationCompat.Builder(this, WALLET_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_manage)
             .setContentTitle(title)
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        // Add red color LED and big font for deposit/credit notifications
+        if (isDepositOrCredit) {
+            builder.setColor(0xFFE53935) // Red color
+            builder.setVibrate(longArrayOf(0, 500, 200, 500))
+        }
+
+        val notification = builder.build()
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.notify(WALLET_NOTIFICATION_ID, notification)
+    }
+
+    // New function for deposit notifications with red color big font
+    private fun showDepositNotification(title: String, amount: String) {
+        val walletIntent = Intent(this, com.astroluna.ui.wallet.WalletActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            WALLET_NOTIFICATION_ID + 1,
+            walletIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val body = "Amount: ₹$amount has been deposited to your wallet"
+
+        val notification = NotificationCompat.Builder(this, WALLET_CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_menu_manage)
+            .setContentTitle("🔴 $title")
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setColor(0xFFE53935) // Red color for deposit
+            .setVibrate(longArrayOf(0, 500, 200, 500))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()
+
         val notificationManager = getSystemService(NotificationManager::class.java)
-        notificationManager.notify(WALLET_NOTIFICATION_ID, notification)
+        notificationManager.notify(WALLET_NOTIFICATION_ID + 1, notification)
     }
 }

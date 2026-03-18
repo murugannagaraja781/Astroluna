@@ -15,7 +15,7 @@ const { endSessionRecord, handleUserConnection } = require('../services/sessionS
 const { sendFcmV1Push, sendChatMessagePush } = require('../services/fcmService');
 const { SLAB_RATES } = require('../config/billing');
 
-module.exports = function(io, socket) {
+module.exports = function (io, socket) {
   const checkAdmin = async (sid) => {
     const uid = socketToUser.get(sid);
     if (!uid) return false;
@@ -62,9 +62,9 @@ module.exports = function(io, socket) {
       if (!toUser) return safeAck(cb, { ok: false, error: 'User not found' });
 
       if (userActiveSession.has(toUserId)) {
-         const sid = userActiveSession.get(toUserId);
-         if (activeSessions.has(sid)) return safeAck(cb, { ok: false, error: 'User busy' });
-         userActiveSession.delete(toUserId);
+        const sid = userActiveSession.get(toUserId);
+        if (activeSessions.has(sid)) return safeAck(cb, { ok: false, error: 'User busy' });
+        userActiveSession.delete(toUserId);
       }
 
       const sessionId = crypto.randomUUID();
@@ -77,7 +77,7 @@ module.exports = function(io, socket) {
       userActiveSession.set(toUserId, sessionId);
 
       io.to(toUserId).emit('incoming-session', { sessionId, fromUserId, callerName: fromUser.name, type, birthData });
-      
+
       if (toUser.fcmToken) {
         sendFcmV1Push(toUser.fcmToken, { type: 'INCOMING_CALL', sessionId, callType: type, callerName: fromUser.name, callerId: fromUserId }, { title: '📞 Incoming Call', body: `${fromUser.name} is calling you` }, toUserId);
       }
@@ -170,6 +170,31 @@ module.exports = function(io, socket) {
     if (fromUserId && toUserId) io.to(toUserId).emit('typing', { fromUserId, isTyping });
   });
 
+  // --- Message Status (Double Tick) ---
+  socket.on('message-status', async (data) => {
+    const { messageId, status, sessionId, toUserId } = data;
+    const fromUserId = socketToUser.get(socket.id);
+    if (!fromUserId || !messageId || !status || !toUserId) return;
+
+    // Forward the status to the message sender (toUserId)
+    io.to(toUserId).emit('message-status', {
+      messageId,
+      status,
+      fromUserId
+    });
+
+    // Also update in database
+    try {
+      const ChatMessage = require('../models/ChatMessage');
+      await ChatMessage.updateOne(
+        { messageId },
+        { $set: { status } }
+      );
+    } catch (e) {
+      console.error('Error updating message status:', e);
+    }
+  });
+
   // --- Presence & Lifecycle ---
   socket.on('update-status', async (data) => {
     const userId = socketToUser.get(socket.id);
@@ -184,7 +209,7 @@ module.exports = function(io, socket) {
     if (!userId) return;
     const { online, type } = data;
     const update = { lastSeen: new Date() };
-    
+
     // mapping frontend types to backend fields
     if (type === 'chat') update.isChatOnline = !!online;
     if (type === 'audio') update.isAudioOnline = !!online;
@@ -195,13 +220,13 @@ module.exports = function(io, socket) {
 
     // Re-check overall isOnline if needed, or just follow the main toggle
     if (type === 'main' && !online) {
-       // If main is off, force all sub-services off
-       await User.updateOne({ userId }, { $set: { isChatOnline: false, isAudioOnline: false, isVideoOnline: false, isAvailable: false } });
+      // If main is off, force all sub-services off
+      await User.updateOne({ userId }, { $set: { isChatOnline: false, isAudioOnline: false, isVideoOnline: false, isAvailable: false } });
     }
-    
-    // Set overall isOnline if any sub-service is on? 
+
+    // Set overall isOnline if any sub-service is on?
     // Usually isOnline signifies "System Active"
-    
+
     broadcastAstroUpdate();
   });
 
@@ -253,7 +278,7 @@ module.exports = function(io, socket) {
     if (!await checkAdmin(socket.id)) return safeAck(cb, { ok: false });
     const users = data.allUsers ? await User.find({ fcmToken: { $exists: true } }) : await User.find({ userId: { $in: data.userIds } });
     users.forEach(u => {
-        if (u.fcmToken) sendFcmV1Push(u.fcmToken, { type: 'PROMO' }, { title: data.title, body: data.body }, u.userId);
+      if (u.fcmToken) sendFcmV1Push(u.fcmToken, { type: 'PROMO' }, { title: data.title, body: data.body }, u.userId);
     });
     safeAck(cb, { ok: true });
   });
@@ -284,9 +309,9 @@ module.exports = function(io, socket) {
       const { userId, service, isEnabled } = data || {};
       if (!userId || !service) return;
 
-      const field = service === 'chat'  ? 'isChatOnline'  :
-                    service === 'audio' ? 'isAudioOnline' :
-                    service === 'video' ? 'isVideoOnline' : null;
+      const field = service === 'chat' ? 'isChatOnline' :
+        service === 'audio' ? 'isAudioOnline' :
+          service === 'video' ? 'isVideoOnline' : null;
       if (!field) return;
 
       const user = await User.findOne({ userId });

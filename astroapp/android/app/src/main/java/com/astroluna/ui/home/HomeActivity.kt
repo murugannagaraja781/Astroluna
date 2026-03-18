@@ -415,6 +415,33 @@ class HomeActivity : AppCompatActivity() {
             _userSession.value = tokenManager.getUserSession()
         }
 
+        // Listen for session ended events to show call end info on home screen
+        socket?.on("session-ended") { args ->
+            Log.d(TAG, "[Socket] Received session-ended event on home screen")
+            if (args.isNotEmpty()) {
+                val data = args[0] as? JSONObject
+                val reason = data?.optString("reason", "Call Ended") ?: "Call Ended"
+                val duration = data?.optInt("duration", 0) ?: 0
+                val deducted = data?.optDouble("deducted", 0.0) ?: 0.0
+                val earned = data?.optDouble("earned", 0.0) ?: 0.0
+
+                lifecycleScope.launch(Dispatchers.Main) {
+                    val minutes = duration / 60
+                    val seconds = duration % 60
+                    val durationStr = String.format("%02d:%02d", minutes, seconds)
+
+                    val session = tokenManager.getUserSession()
+                    val message = if (session?.role == "astrologer") {
+                        "Call Ended! Duration: $durationStr, Earned: ₹${String.format("%.2f", earned)}"
+                    } else {
+                        "Call Ended! Duration: $durationStr, Deducted: ₹${String.format("%.2f", deducted)}"
+                    }
+
+                    Toast.makeText(this@HomeActivity, message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
         socket?.on("new-review") {
             Log.d(TAG, "[Socket] Received new-review event")
             lifecycleScope.launch(Dispatchers.Main) {
