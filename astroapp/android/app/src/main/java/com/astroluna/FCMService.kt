@@ -51,8 +51,11 @@ class FCMService : FirebaseMessagingService() {
         private const val CALL_CHANNEL_NAME = "Incoming Calls"
         private const val CHAT_CHANNEL_ID = "chat_messages_v1"
         private const val CHAT_CHANNEL_NAME = "Chat Messages"
+        private const val WALLET_CHANNEL_ID = "wallet_updates_v1"
+        private const val WALLET_CHANNEL_NAME = "Wallet Updates"
         private const val CALL_NOTIFICATION_ID = 9999
         private const val GENERIC_NOTIFICATION_ID = 1002
+        private const val WALLET_NOTIFICATION_ID = 2001
     }
 
     // Coroutine scope for async operations within service lifecycle
@@ -153,15 +156,12 @@ class FCMService : FirebaseMessagingService() {
                     Log.d(TAG, "Call ended - clearing notification and opening app")
                     val notificationManager = getSystemService(NotificationManager::class.java)
                     notificationManager.cancel(CALL_NOTIFICATION_ID)
-
-                    // User Request: Open app when call ends
-                    try {
-                        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)
-                        launchIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(launchIntent)
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to open app on CALL_ENDED", e)
-                    }
+                }
+                "WALLET_UPDATE" -> {
+                    val amount = data["amount"] ?: ""
+                    val msgTitle = data["title"] ?: "Wallet Updated"
+                    val msgBody = data["body"] ?: if (amount.isNotEmpty()) "Amount: ₹$amount" else "Your wallet has been updated"
+                    showWalletNotification(msgTitle, msgBody)
                 }
                 "INCOMING_CHAT" -> {
                     val callerName = data["callerName"] ?: "Unknown"
@@ -378,7 +378,7 @@ class FCMService : FirebaseMessagingService() {
             }
             notificationManager.createNotificationChannel(callChannel)
 
-            // 2. Chat Channel (Default Importance - less intrusive)
+            // 2. Chat Channel (Default Importance)
             val chatChannel = NotificationChannel(
                 CHAT_CHANNEL_ID,
                 CHAT_CHANNEL_NAME,
@@ -389,6 +389,18 @@ class FCMService : FirebaseMessagingService() {
                 setShowBadge(true)
             }
             notificationManager.createNotificationChannel(chatChannel)
+
+            // 3. Wallet Channel (Default Importance)
+            val walletChannel = NotificationChannel(
+                WALLET_CHANNEL_ID,
+                WALLET_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Notifications for wallet credits and debits"
+                enableVibration(true)
+                setShowBadge(true)
+            }
+            notificationManager.createNotificationChannel(walletChannel)
 
             Log.d(TAG, "Notification channels created")
         }
@@ -449,5 +461,28 @@ class FCMService : FirebaseMessagingService() {
 
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager.notify(senderId.hashCode(), notification)
+    }
+
+    private fun showWalletNotification(title: String, body: String) {
+        val walletIntent = Intent(this, com.astroluna.ui.wallet.WalletActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            WALLET_NOTIFICATION_ID,
+            walletIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val notification = NotificationCompat.Builder(this, WALLET_CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_menu_manage)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+            .build()
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.notify(WALLET_NOTIFICATION_ID, notification)
     }
 }

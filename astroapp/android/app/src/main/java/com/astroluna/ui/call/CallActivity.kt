@@ -1353,25 +1353,27 @@ fun CallScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    // Show Chart on right
-                    ControlBtnItem(
-                        onClick = onShowRasi, 
-                        icon = com.astroluna.R.drawable.ic_chart, 
-                        label = "Chart", 
-                        active = (role == "astrologer")
-                    )
-                    
-                    // Show Edit on right
-                    ControlBtnItem(
-                        onClick = onEditIntake, 
-                        icon = com.astroluna.R.drawable.ic_edit, 
-                        label = "Edit", 
-                        active = false
-                    )
+                    if (role == "astrologer") {
+                        // Show Chart on right
+                        ControlBtnItem(
+                            onClick = onShowRasi, 
+                            icon = com.astroluna.R.drawable.ic_chart, 
+                            label = "Chart", 
+                            active = true
+                        )
+                        
+                        // Show Edit on right
+                        ControlBtnItem(
+                            onClick = onEditIntake, 
+                            icon = com.astroluna.R.drawable.ic_edit, 
+                            label = "Edit", 
+                            active = false
+                        )
+                    }
 
                     // Video toggle if applicable
                     if (callType == "video") {
-                        ControlBtnItem(onClick = onToggleCamera, icon = if (isVideoEnabled) Icons.Default.PlayArrow else Icons.Default.PlayArrow, label = "Video", active = isVideoEnabled)
+                        ControlBtnItem(onClick = onToggleCamera, icon = if (isVideoEnabled) Icons.Filled.PlayArrow else Icons.Default.PlayArrow, label = "Video", active = isVideoEnabled)
                     }
                 }
             }

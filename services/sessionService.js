@@ -130,6 +130,30 @@ async function endSessionRecord(sessionId) {
   if (s.clientId && ioInstance) ioInstance.to(s.clientId).emit('session-ended', payload);
   if (s.astrologerId && ioInstance) ioInstance.to(s.astrologerId).emit('session-ended', payload);
 
+  // Send dedicated Credit/Debit notifications
+  if (s.clientId) {
+    User.findOne({ userId: s.clientId }).then(u => {
+      if (u?.fcmToken && s.totalDeducted > 0) {
+        sendFcmV1Push(u.fcmToken, 
+          { type: 'WALLET_UPDATE', amount: s.totalDeducted, action: 'OPEN_WALLET' },
+          { title: 'Call/Chat Finished', body: `₹${s.totalDeducted} has been debited for your consultation. Click to view wallet.` },
+          s.clientId
+        );
+      }
+    });
+  }
+  if (s.astrologerId) {
+    User.findOne({ userId: s.astrologerId }).then(u => {
+      if (u?.fcmToken && s.totalEarned > 0) {
+        sendFcmV1Push(u.fcmToken,
+          { type: 'WALLET_UPDATE', amount: s.totalEarned },
+          { title: 'Consultation Complete', body: `₹${s.totalEarned.toFixed(2)} has been credited to your earnings.` },
+          s.astrologerId
+        );
+      }
+    });
+  }
+
   s.users.forEach(async uid => {
     const u = await User.findOne({ userId: uid });
     if (u?.fcmToken) sendFcmV1Push(u.fcmToken, { type: 'CALL_ENDED', sessionId }, null, uid);

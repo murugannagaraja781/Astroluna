@@ -210,20 +210,7 @@ module.exports = function(io, socket) {
     if (!userId) return;
     socketToUser.delete(socket.id);
     if (userSockets.get(userId) === socket.id) userSockets.delete(userId);
-
-    // Set Astrologer to offline on disconnect
-    const user = await User.findOne({ userId });
-    if (user && user.role === 'astrologer') {
-      await User.updateOne({ userId }, { 
-        isOnline: false, 
-        isAvailable: false, 
-        isChatOnline: false, 
-        isAudioOnline: false, 
-        isVideoOnline: false,
-        lastSeen: new Date() 
-      });
-      broadcastAstroUpdate();
-    }
+    broadcastAstroUpdate();
 
     const sid = userActiveSession.get(userId);
     if (sid) {

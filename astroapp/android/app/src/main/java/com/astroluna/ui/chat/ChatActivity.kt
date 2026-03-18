@@ -1,5 +1,8 @@
 package com.astroluna.ui.chat
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -22,7 +25,11 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -126,6 +133,15 @@ class ChatActivity : ComponentActivity() {
                             startActivity(intent)
                         } else {
                              Toast.makeText(this, "Waiting for Client Data...", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    onViewMatching = {
+                        if (clientBirthData != null && clientBirthData!!.has("partner")) {
+                            val intent = Intent(this, com.astroluna.ui.chart.MatchDisplayActivity::class.java)
+                            intent.putExtra("birthData", clientBirthData.toString())
+                            startActivity(intent)
+                        } else {
+                             Toast.makeText(this, "No Partner Details Found in Horoscope", Toast.LENGTH_SHORT).show()
                         }
                     },
                     isAstrologer = TokenManager(this).getUserSession()?.role == "astrologer",
@@ -382,255 +398,269 @@ fun ChatScreen(
     onEndChat: () -> Unit,
     onEditIntake: () -> Unit,
     onViewChart: () -> Unit,
+    onViewMatching: () -> Unit,
     isAstrologer: Boolean,
     toUserId: String?,
     sessionId: String?,
     remainingTime: String,
     clientBirthData: JSONObject? = null
 ) {
-    val messages by viewModel.history.observeAsState(emptyList())
-    val isTyping by viewModel.typingStatus.observeAsState(false)
-    val listState = rememberLazyListState()
-    var inputText by remember { mutableStateOf("") }
+        val messages by viewModel.history.observeAsState(emptyList())
+        val isTyping by viewModel.typingStatus.observeAsState(false)
+        val listState = rememberLazyListState()
+        var inputText by remember { mutableStateOf("") }
+        var replyingTo by remember { mutableStateOf<ChatMessage?>(null) }
+        val displayedMessages = remember(messages) { messages }
+        val context = LocalContext.current
 
-    // Reply State
-    // Reply State
-    var replyingTo by remember { mutableStateOf<ChatMessage?>(null) }
-
-    // History Visibility State
-    // Filter messages: Show all messages by default to ensure no data loss
-    val displayedMessages = remember(messages) { messages }
-
-    LaunchedEffect(displayedMessages.size) {
-        if (displayedMessages.isNotEmpty()) listState.animateScrollToItem(displayedMessages.size - 1)
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                modifier = Modifier.statusBarsPadding(),
-                title = {
-                    Column {
-                        Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1)
-                        if (isAstrologer && remainingTime.isNotEmpty() && remainingTime != "00:00") {
-                             Text("Time: $remainingTime", fontSize = 12.sp, color = Color.Red, fontWeight = FontWeight.Bold)
-                        } else {
-                             Text("Online", fontSize = 12.sp, color = Color.White.copy(alpha=0.7f))
-                        }
-                    }
-                },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back", tint = Color.White) } },
-                actions = {
-                    Text(sessionDuration, color = Color.White, fontWeight = FontWeight.Bold, modifier = Modifier.padding(end=12.dp))
-                    IconButton(onClick = onEditIntake) { Icon(Icons.Default.Edit, "Intake", tint = Color.White) }
-                    TextButton(onClick = onEndChat) { Text("End", color = Color.Red, fontWeight = FontWeight.Bold) }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF4A148C),
-                    titleContentColor = Color.White
-                )
-            )
-        },
-        bottomBar = {
-            ChatInputBar(
-                text = inputText,
-                replyingTo = replyingTo,
-                onTextChange = {
-                    inputText = it
-                    if (toUserId != null) viewModel.sendTyping(toUserId)
-                },
-                onCancelReply = { replyingTo = null },
-                onSend = {
-                    if (inputText.isNotBlank() && toUserId != null && sessionId != null) {
-                         var finalText = inputText
-                         if (replyingTo != null) {
-                             // Prepend Reply Quote
-                             val snippet = replyingTo!!.text.take(50).replace("\n", " ")
-                             finalText = "> Replying to: $snippet\n$inputText"
-                         }
-
-                         val payload = JSONObject().apply {
-                            put("toUserId", toUserId)
-                            put("sessionId", sessionId)
-                            put("messageId", UUID.randomUUID().toString())
-                            put("timestamp", System.currentTimeMillis())
-                            put("content", JSONObject().put("text", finalText))
-                         }
-                         viewModel.sendMessage(payload)
-                         SoundManager.playSentSound()
-                         inputText = ""
-                         replyingTo = null
-                         viewModel.sendStopTyping(toUserId)
-                    }
-                },
-                onViewChart = if (isAstrologer) onViewChart else null,
-                clientBirthData = clientBirthData
-            )
+        LaunchedEffect(displayedMessages.size) {
+            if (displayedMessages.isNotEmpty()) listState.animateScrollToItem(displayedMessages.size - 1)
         }
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .background(Color(0xFFF5F5F5))
-        ) {
 
-            LazyColumn(
-                state = listState,
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
+        // WhatsApp-style background
+        val waBg = Brush.verticalGradient(listOf(Color(0xFFE5DDD5), Color(0xFFD4C5B2)))
 
-                if (displayedMessages.isEmpty()) {
-                    item {
-                        Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
-                             Text(
-                                 text = "No messages yet",
-                                 color = Color.Gray,
-                                 fontSize = 16.sp
-                             )
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    modifier = Modifier.statusBarsPadding(),
+                    title = {
+                        Column {
+                            Text(title, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1)
+                            if (isAstrologer && remainingTime.isNotEmpty() && remainingTime != "00:00") {
+                                 Text("Time: $remainingTime", fontSize = 12.sp, color = Color.Red, fontWeight = FontWeight.Bold)
+                            } else {
+                                 Text("Online", fontSize = 12.sp, color = Color.White.copy(alpha=0.7f))
+                            }
+                        }
+                    },
+                    navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back", tint = Color.White) } },
+                    actions = {
+                        Text(sessionDuration, color = Color.White, fontWeight = FontWeight.Bold, modifier = Modifier.padding(end=12.dp))
+                        if (isAstrologer) IconButton(onClick = onEditIntake) { Icon(Icons.Default.Edit, "Intake", tint = Color.White) }
+                        TextButton(onClick = onEndChat) { Text("End", color = Color.Red, fontWeight = FontWeight.Bold) }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color(0xFF075E54),
+                        titleContentColor = Color.White
+                    )
+                )
+            },
+            bottomBar = {
+                ChatInputBar(
+                    text = inputText,
+                    replyingTo = replyingTo,
+                    onTextChange = {
+                        inputText = it
+                        if (toUserId != null) viewModel.sendTyping(toUserId)
+                    },
+                    onCancelReply = { replyingTo = null },
+                    onSend = {
+                        if (inputText.isNotBlank() && toUserId != null && sessionId != null) {
+                             var finalText = inputText
+                             if (replyingTo != null) {
+                                 val snippet = replyingTo!!.text.take(50).replace("\n", " ")
+                                 finalText = "> Replying to: $snippet\n$inputText"
+                             }
+                             val payload = JSONObject().apply {
+                                put("toUserId", toUserId)
+                                put("sessionId", sessionId)
+                                put("messageId", UUID.randomUUID().toString())
+                                put("timestamp", System.currentTimeMillis())
+                                put("content", JSONObject().put("text", finalText))
+                             }
+                             viewModel.sendMessage(payload)
+                             com.astroluna.utils.SoundManager.playSentSound()
+                             inputText = ""
+                             replyingTo = null
+                             viewModel.sendStopTyping(toUserId)
+                        }
+                    },
+                    onViewChart = if (isAstrologer) onViewChart else null,
+                    onViewMatching = if (isAstrologer) onViewMatching else null,
+                    clientBirthData = clientBirthData
+                )
+            }
+        ) { padding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .background(waBg)
+                    .drawBehind {
+                        // Subtle tiled dot pattern for WhatsApp look
+                        val dotColor = Color(0xFF000000).copy(alpha = 0.04f)
+                        val step = 28.dp.toPx()
+                        var y = 0f
+                        while (y < size.height) {
+                            var x = if ((y / step).toInt() % 2 == 0) 0f else step / 2
+                            while (x < size.width) {
+                                drawCircle(dotColor, radius = 2.dp.toPx(), center = Offset(x, y))
+                                x += step
+                            }
+                            y += step
                         }
                     }
+            ) {
+                LazyColumn(
+                    state = listState,
+                    contentPadding = PaddingValues(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    if (displayedMessages.isEmpty()) {
+                        item {
+                            Box(modifier = Modifier.fillMaxWidth().height(200.dp), contentAlignment = Alignment.Center) {
+                                 Text(
+                                     text = "No messages yet",
+                                     color = Color.Gray,
+                                     fontSize = 16.sp
+                                 )
+                            }
+                        }
+                    }
+                    items(displayedMessages) { msg ->
+                        ChatBubble(
+                            msg = msg,
+                            amIAstrologer = isAstrologer,
+                            onReply = { replyingTo = msg },
+                            onCopy = {
+                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                clipboard.setPrimaryClip(ClipData.newPlainText("chat", msg.text))
+                                Toast.makeText(context, "Copied!", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
+                    if (isTyping) item { TypingBubble() }
                 }
-
-                items(displayedMessages) { msg ->
-                    ChatBubble(msg, isAstrologer, onReply = { replyingTo = msg })
-                }
-                if (isTyping) item { TypingBubble() }
             }
         }
     }
-}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun ChatBubble(msg: ChatMessage, amIAstrologer: Boolean, onReply: () -> Unit) {
+fun ChatBubble(msg: ChatMessage, amIAstrologer: Boolean, onReply: () -> Unit, onCopy: () -> Unit) {
     val isMe = msg.isSent
-    val isMsgFromAstrologer = if (isMe) amIAstrologer else !amIAstrologer
-
-    // Colors: Astrologer = Pink, Client = Violet
-    val bubbleColor = if (isMsgFromAstrologer) Color(0xFFFFD1DC) else Color(0xFFE1BEE7)
     val align = if (isMe) Alignment.End else Alignment.Start
+    val context = LocalContext.current
+
+    // WhatsApp-like colors: sent = green, received = white
+    val bubbleColor = if (isMe) Color(0xFFDCF8C6) else Color.White
+    val shape = if (isMe)
+        RoundedCornerShape(topStart = 12.dp, topEnd = 2.dp, bottomStart = 12.dp, bottomEnd = 12.dp)
+    else
+        RoundedCornerShape(topStart = 2.dp, topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 12.dp)
+
+    // Context menu state
+    var showMenu by remember { mutableStateOf(false) }
 
     // Swipe State
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = {
             if (it == SwipeToDismissBoxValue.StartToEnd) {
                 onReply()
-                return@rememberSwipeToDismissBoxState false // Snap back
+                return@rememberSwipeToDismissBoxState false
             }
             return@rememberSwipeToDismissBoxState false
         }
     )
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp, vertical = 2.dp),
         horizontalAlignment = align
     ) {
         SwipeToDismissBox(
             state = dismissState,
             backgroundContent = {
-                val color = Color.Transparent
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(start = 20.dp),
+                    modifier = Modifier.fillMaxSize().padding(start = 20.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {
-                    // Only show icon when swiping
                     if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
-                         Icon(Icons.Default.Send, contentDescription = "Reply", tint = Color.Gray)
+                        Icon(Icons.Default.Reply, contentDescription = "Reply", tint = Color(0xFF128C7E))
                     }
                 }
             },
             content = {
-                 Surface(
-                    color = bubbleColor,
-                    shape = RoundedCornerShape(8.dp),
-                    shadowElevation = 1.dp,
-                    modifier = Modifier
-                        .widthIn(max = 280.dp)
-                        .combinedClickable(
-                            onClick = {},
-                            onLongClick = onReply
-                        )
-                ) {
-                    Column(modifier = Modifier.padding(8.dp)) {
-
-                        var displayText = msg.text
-                        // Check if this is a reply message
-                        if (msg.text.contains("> Replying to:")) {
-                            // Robust splitting
-                            val parts = msg.text.split("\n", limit = 2)
-                            if (parts.size >= 1 && parts[0].startsWith("> Replying to:")) {
-                                val quoteText = parts[0].removePrefix("> Replying to: ").trim()
-                                if (parts.size > 1) displayText = parts[1] else displayText = ""
-
-                                // WhatsApp Style Quote Block
-                                Surface(
-                                    color = Color.Black.copy(alpha = 0.05f), // Slightly dimmed inside bubble
-                                    shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 6.dp)
-                                ) {
-                                    Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-                                        // Accent Bar
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxHeight()
-                                                .width(4.dp)
-                                                .background(Color(0xFF6200EE))
-                                        )
-                                        // Quote Content
-                                        Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-                                            Text(
-                                                text = "Replying to:",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = Color(0xFF6200EE),
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                            Text(
-                                                text = quoteText,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = Color.Black.copy(alpha = 0.7f),
-                                                maxLines = 3
-                                            )
+                // Dropdown menu
+                Box {
+                    Surface(
+                        color = bubbleColor,
+                        shape = shape,
+                        shadowElevation = 1.dp,
+                        modifier = Modifier
+                            .widthIn(max = 280.dp)
+                            .combinedClickable(
+                                onClick = {},
+                                onLongClick = { showMenu = true }
+                            )
+                    ) {
+                        Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)) {
+                            var displayText = msg.text
+                            if (msg.text.contains("> Replying to:")) {
+                                val parts = msg.text.split("\n", limit = 2)
+                                if (parts.size >= 1 && parts[0].startsWith("> Replying to:")) {
+                                    val quoteText = parts[0].removePrefix("> Replying to: ").trim()
+                                    displayText = if (parts.size > 1) parts[1] else ""
+                                    Surface(
+                                        color = Color.Black.copy(alpha = 0.07f),
+                                        shape = RoundedCornerShape(topEnd = 8.dp, bottomEnd = 8.dp),
+                                        modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp)
+                                    ) {
+                                        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                                            Box(modifier = Modifier.fillMaxHeight().width(4.dp).background(Color(0xFF128C7E)))
+                                            Column(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
+                                                Text("Replying to:", style = MaterialTheme.typography.bodySmall, color = Color(0xFF128C7E), fontWeight = FontWeight.Bold)
+                                                Text(quoteText, style = MaterialTheme.typography.bodySmall, color = Color.Black.copy(alpha = 0.7f), maxLines = 3)
+                                            }
                                         }
                                     }
                                 }
                             }
-                        }
 
-                        Text(
-                            text = displayText,
-                            fontSize = 16.sp,
-                            color = Color.Black,
-                            modifier = Modifier.padding(bottom = if (isMe) 0.dp else 4.dp)
-                        )
+                            Text(displayText, fontSize = 15.sp, color = Color(0xFF111111), lineHeight = 20.sp)
 
-                        if (isMe) {
                             Row(
-                                modifier = Modifier
-                                    .align(Alignment.End)
-                                    .padding(top = 2.dp),
-                                verticalAlignment = Alignment.CenterVertically
+                                modifier = Modifier.align(Alignment.End).padding(top = 2.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
                             ) {
-                                val icon = when (msg.status) {
-                                    "read", "delivered" -> Icons.Default.DoneAll
-                                    else -> Icons.Default.Done
-                                }
-                                val tint = if (msg.status == "read") Color(0xFF2196F3) else Color.Gray
+                                val timeStr = if (msg.timestamp > 0L) {
+                                    val cal = java.util.Calendar.getInstance().apply { timeInMillis = msg.timestamp }
+                                    String.format("%02d:%02d", cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE))
+                                } else ""
+                                Text(timeStr, fontSize = 10.sp, color = Color.Gray)
 
-                                Icon(
-                                    imageVector = icon,
-                                    contentDescription = msg.status,
-                                    tint = tint,
-                                    modifier = Modifier.size(16.dp)
-                                )
+                                if (isMe) {
+                                    val icon = when (msg.status) {
+                                        "read" -> Icons.Default.DoneAll
+                                        "delivered" -> Icons.Default.DoneAll
+                                        else -> Icons.Default.Done
+                                    }
+                                    val tint = if (msg.status == "read") Color(0xFF34B7F1) else Color.Gray
+                                    Icon(imageVector = icon, contentDescription = msg.status, tint = tint, modifier = Modifier.size(14.dp))
+                                }
                             }
                         }
+                    }
+
+                    // Context menu on long press
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Copy") },
+                            leadingIcon = { Icon(Icons.Default.ContentCopy, null) },
+                            onClick = { showMenu = false; onCopy() }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Reply") },
+                            leadingIcon = { Icon(Icons.Default.Reply, null) },
+                            onClick = { showMenu = false; onReply() }
+                        )
                     }
                 }
             }
@@ -657,6 +687,7 @@ fun ChatInputBar(
     onCancelReply: () -> Unit,
     onSend: () -> Unit,
     onViewChart: (() -> Unit)?,
+    onViewMatching: (() -> Unit)?,
     clientBirthData: JSONObject? = null
 ) {
     Surface(
@@ -684,20 +715,20 @@ fun ChatInputBar(
                 if (onViewChart != null) {
                     val isReady = clientBirthData != null
                     IconButton(onClick = onViewChart) {
-                        if (isReady) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_chart),
-                                contentDescription = "Chart",
-                                tint = Color(0xFF4CAF50) // Green when ready
-                            )
-                        } else {
-                            // Spin icon replacement - Use Refresh as a placeholder for "loading/pending"
-                            Icon(
-                                Icons.Default.Refresh,
-                                contentDescription = "Waiting for data",
-                                tint = Color.Gray
-                            )
-                        }
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_chart),
+                            contentDescription = "Chart",
+                            tint = if (isReady) Color(0xFF128C7E) else Color.Gray
+                        )
+                    }
+                }
+                if (onViewMatching != null) {
+                    IconButton(onClick = onViewMatching!!) {
+                        Icon(
+                            Icons.Default.Favorite,
+                            contentDescription = "Porutham",
+                            tint = if (clientBirthData?.has("partner") == true) Color(0xFFE91E63) else Color.Gray
+                        )
                     }
                 }
                 OutlinedTextField(

@@ -731,12 +731,21 @@ fun DashaNodeInternal(period: DashaPeriod) {
 
 private suspend fun fetchFullChart(birthData: JSONObject): ChartData? = withContext(Dispatchers.IO) {
     try {
+        // Safely read lat/lng with fallback keys
+        val lat = birthData.optDouble("latitude", 0.0).takeIf { it != 0.0 }
+            ?: birthData.optDouble("lat", 13.0827)
+        val lng = birthData.optDouble("longitude", 0.0).takeIf { it != 0.0 }
+            ?: birthData.optDouble("lng", 80.2707)
+        val tz = birthData.optDouble("timezone", 0.0).takeIf { it != 0.0 } ?: 5.5
+
+        android.util.Log.d("VipChart", "Fetching chart: date=${birthData.optInt("year")}-${birthData.optInt("month")}-${birthData.optInt("day")} lat=$lat lng=$lng tz=$tz")
+
         val payload = com.google.gson.JsonObject().apply {
             addProperty("date", String.format("%04d-%02d-%02d", birthData.optInt("year"), birthData.optInt("month"), birthData.optInt("day")))
             addProperty("time", String.format("%02d:%02d", birthData.optInt("hour"), birthData.optInt("minute")))
-            addProperty("lat", birthData.optDouble("latitude"))
-            addProperty("lng", birthData.optDouble("longitude"))
-            addProperty("timezone", birthData.optDouble("timezone", 5.5))
+            addProperty("lat", lat)
+            addProperty("lng", lng)
+            addProperty("timezone", tz)
         }
 
         val response = com.astroluna.data.api.ApiClient.api.getRasiEngBirthChart(payload)
@@ -746,7 +755,7 @@ private suspend fun fetchFullChart(birthData: JSONObject): ChartData? = withCont
         }
         null
     } catch (e: Exception) {
-        e.printStackTrace()
+        android.util.Log.e("VipChart", "Chart fetch failed: ${e.message}", e)
         null
     }
 }
