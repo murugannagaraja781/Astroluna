@@ -36,6 +36,10 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// ── Health Checks (for monitoring/hosting) ──────────────────────────────────
+app.get('/', (req, res) => res.json({ ok: true, message: 'Astroluna Backend is running' }));
+app.get('/version', (req, res) => res.json({ version: '1.0.0', status: 'healthy' }));
+
 // Attach io to app for use in routes
 app.set('io', io);
 

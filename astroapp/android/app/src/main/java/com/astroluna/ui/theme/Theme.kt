@@ -83,11 +83,12 @@ fun CosmicAppTheme(
     // Side Effect for System Bars
     if (!view.isInEditMode) {
         SideEffect {
-            val window = (view.context as Activity).window
-            window.statusBarColor = Color.White.toArgb() // Pure White
-            window.navigationBarColor = Color.White.toArgb()
-            // isAppearanceLightStatusBars = true means DARK icons for LIGHT background
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+            val window = (view.context as? Activity)?.window
+            if (window != null) {
+                window.statusBarColor = Color.White.toArgb()
+                window.navigationBarColor = Color.White.toArgb()
+                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+            }
         }
     }
 
