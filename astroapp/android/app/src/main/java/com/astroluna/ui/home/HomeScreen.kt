@@ -273,13 +273,19 @@ fun HomeScreen(
         // Initial Fetch
         try {
             val response = ApiClient.api.getBanners()
-            if (response.isSuccessful && response.body()?.ok == true) {
-                banners = response.body()!!.banners
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null && body.ok) {
+                    banners = body.banners ?: emptyList()
+                }
             }
             if (!isGuest && userId.isNotEmpty()) {
                 val statsRes = ApiClient.api.getReferralStats(userId)
-                if (statsRes.isSuccessful && statsRes.body()?.ok == true) {
-                    refStats = statsRes.body()!!.stats
+                if (statsRes.isSuccessful) {
+                    val sBody = statsRes.body()
+                    if (sBody != null && sBody.ok) {
+                        refStats = sBody.stats
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -292,8 +298,11 @@ fun HomeScreen(
                 kotlinx.coroutines.delay(30000)
                 try {
                     val rRes = ApiClient.api.getReferralStats(userId)
-                    if (rRes.isSuccessful && rRes.body()?.ok == true) {
-                        refStats = rRes.body()!!.stats
+                    if (rRes.isSuccessful) {
+                        val rBody = rRes.body()
+                        if (rBody != null && rBody.ok) {
+                            refStats = rBody.stats
+                        }
                     }
                 } catch (e: Exception) { }
             }
@@ -550,9 +559,12 @@ fun ReferralDashboard(referralCode: String, isTamil: Boolean) {
     LaunchedEffect(Unit) {
         try {
             val response = ApiClient.api.getReferralStats(userId)
-            if (response.isSuccessful && response.body()?.ok == true) {
-                stats = response.body()!!.stats
-                referrals = response.body()!!.referrals
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null && body.ok) {
+                    stats = body.stats
+                    referrals = body.referrals
+                }
             }
         } catch (e: Exception) {
             e.printStackTrace()

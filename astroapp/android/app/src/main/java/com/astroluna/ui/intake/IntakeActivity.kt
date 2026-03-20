@@ -213,8 +213,8 @@ fun IntakeScreen(
     val specificCityLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-         if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            val d = result.data!!
+         if (result.resultCode == Activity.RESULT_OK) {
+            val d = result.data ?: return@rememberLauncherForActivityResult
             val fullName = d.getStringExtra("name") ?: ""
             val cityRes = d.getStringExtra("city") ?: ""
             val stateRes = d.getStringExtra("state") ?: ""
@@ -286,10 +286,9 @@ fun IntakeScreen(
         specificCityLauncher.launch(intent)
     }
 
-    // Prefill
     LaunchedEffect(Unit) {
-        if (existingData != null) {
-            val d = existingData!!
+        val d = existingData
+        if (d != null) {
             name = d.optString("name")
             val placeRaw = d.optString("city")
             val parsed = parsePlaceName(placeRaw)
@@ -388,18 +387,20 @@ fun IntakeScreen(
     DisposableEffect(Unit) {
         val socket = SocketManager.getSocket()
         val listener: (Array<Any>) -> Unit = { args ->
-            val data = args[0] as JSONObject
-            val accepted = data.optBoolean("accept", false)
-            if (isWaiting) {
-                if (accepted) {
-                    isWaiting = false
-                    val sid = waitingSessionId ?: ""
-                    onSessionConnected(sid, callType ?: "chat")
-                } else {
-                     isWaiting = false
-                     // Rejected
-                     scope.launch { Toast.makeText(context, "Request Rejected by Astrologer", Toast.LENGTH_LONG).show() }
-                     onClose()
+            if (args != null && args.isNotEmpty()) {
+                val data = args[0] as? JSONObject
+                val accepted = data?.optBoolean("accept", false) ?: false
+                if (isWaiting) {
+                    if (accepted) {
+                        isWaiting = false
+                        val sid = waitingSessionId ?: ""
+                        onSessionConnected(sid, callType ?: "chat")
+                    } else {
+                         isWaiting = false
+                         // Rejected
+                         scope.launch { Toast.makeText(context, "Request Rejected by Astrologer", Toast.LENGTH_LONG).show() }
+                         onClose()
+                    }
                 }
             }
         }

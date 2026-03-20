@@ -215,9 +215,10 @@ class ChatActivity : ComponentActivity() {
             SoundManager.playAcceptSound()
             pendingAccept = true // Will emit in onResume after socket registration
         }
-        if (sessionId != null) {
-              viewModel.loadHistory(sessionId!!)
-              viewModel.joinSessionSafe(sessionId!!)
+        val sid = sessionId
+        if (sid != null) {
+              viewModel.loadHistory(sid)
+              viewModel.joinSessionSafe(sid)
         }
     }
 
@@ -336,10 +337,10 @@ class ChatActivity : ComponentActivity() {
     }
 
     private fun endChat() {
-        android.util.Log.d("ChatActivity", "endChat clicked. SessionId: $sessionId")
-        if (sessionId != null) {
+        val sid = sessionId
+        if (sid != null) {
             Toast.makeText(this, "Ending Chat...", Toast.LENGTH_SHORT).show()
-            viewModel.endSession(sessionId!!)
+            viewModel.endSession(sid)
 
             // Clear all notifications
             val notificationManager = getSystemService(android.content.Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
@@ -371,9 +372,11 @@ class ChatActivity : ComponentActivity() {
         if (myUserId != null) {
             SocketManager.registerUser(myUserId) {
                 // Socket registered - now emit pending accept if any
-                if (pendingAccept && sessionId != null && toUserId != null) {
+                val sid = sessionId
+                val tid = toUserId
+                if (pendingAccept && sid != null && tid != null) {
                     pendingAccept = false
-                    viewModel.acceptSession(sessionId!!, toUserId!!)
+                    viewModel.acceptSession(sid, tid)
                     android.util.Log.d("ChatActivity", "Emitted acceptSession after socket registration")
                 }
             }
@@ -467,25 +470,27 @@ fun ChatScreen(
                     },
                     onCancelReply = { replyingTo = null },
                     onSend = {
-                        if (inputText.isNotBlank() && toUserId != null && sessionId != null) {
-                             var finalText = inputText
-                             if (replyingTo != null) {
-                                 val snippet = replyingTo!!.text.take(50).replace("\n", " ")
-                                 finalText = "> Replying to: $snippet\n$inputText"
+                             val sid = sessionId
+                             val tid = toUserId
+                             if (inputText.isNotBlank() && tid != null && sid != null) {
+                                  var finalText = inputText
+                                  if (replyingTo != null) {
+                                      val snippet = (replyingTo?.text ?: "").take(50).replace("\n", " ")
+                                      finalText = "> Replying to: $snippet\n$inputText"
+                                  }
+                                  val payload = JSONObject().apply {
+                                     put("toUserId", tid)
+                                     put("sessionId", sid)
+                                     put("messageId", UUID.randomUUID().toString())
+                                     put("timestamp", System.currentTimeMillis())
+                                     put("content", JSONObject().put("text", finalText))
+                                  }
+                                  viewModel.sendMessage(payload)
+                                  com.astroluna.utils.SoundManager.playSentSound()
+                                  inputText = ""
+                                  replyingTo = null
+                                  viewModel.sendStopTyping(tid)
                              }
-                             val payload = JSONObject().apply {
-                                put("toUserId", toUserId)
-                                put("sessionId", sessionId)
-                                put("messageId", UUID.randomUUID().toString())
-                                put("timestamp", System.currentTimeMillis())
-                                put("content", JSONObject().put("text", finalText))
-                             }
-                             viewModel.sendMessage(payload)
-                             com.astroluna.utils.SoundManager.playSentSound()
-                             inputText = ""
-                             replyingTo = null
-                             viewModel.sendStopTyping(toUserId)
-                        }
                     },
                     onViewChart = if (isAstrologer) onViewChart else null,
                     onViewMatching = if (isAstrologer) onViewMatching else null,

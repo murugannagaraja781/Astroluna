@@ -6,6 +6,7 @@ import io.socket.client.Ack
 import io.socket.client.IO
 import io.socket.client.Socket
 import org.json.JSONObject
+import org.json.JSONArray
 
 object SocketManager {
     private const val TAG = "SocketManager"
@@ -110,7 +111,7 @@ object SocketManager {
         socket?.off("session-answered")
         socket?.on("session-answered") { args ->
             if (args != null && args.isNotEmpty()) {
-                val data = args[0] as JSONObject
+                val data = args[0] as? JSONObject ?: return@on
                 listener(data)
             }
         }
@@ -120,7 +121,7 @@ object SocketManager {
         socket?.off("signal")
         socket?.on("signal") { args ->
             if (args != null && args.isNotEmpty()) {
-                val data = args[0] as JSONObject
+                val data = args[0] as? JSONObject ?: return@on
                 listener(data)
             }
         }
@@ -134,7 +135,7 @@ object SocketManager {
         socket?.off("message-status")
         socket?.on("message-status") { args ->
             if (args != null && args.isNotEmpty()) {
-                val data = args[0] as JSONObject
+                val data = args[0] as? JSONObject ?: return@on
                 listener(data)
             }
         }
@@ -259,11 +260,13 @@ object SocketManager {
         socket?.emit("update-status", data)
     }
 
-    fun onAstrologerUpdate(listener: (JSONObject) -> Unit) {
+    fun onAstrologerUpdate(listener: (org.json.JSONArray) -> Unit) {
         socket?.on("astrologer-update") { args ->
             if (args != null && args.isNotEmpty()) {
-                val data = args[0] as JSONObject
-                listener(data)
+                val data = args[0] as? org.json.JSONArray
+                if (data != null) {
+                    listener(data)
+                }
             }
         }
     }
@@ -272,7 +275,7 @@ object SocketManager {
         socket?.off("incoming-session")
         socket?.on("incoming-session") { args ->
             if (args != null && args.isNotEmpty()) {
-                val data = args[0] as JSONObject
+                val data = args[0] as? JSONObject ?: return@on
                 Log.d(TAG, "Incoming session received: $data")
                 listener(data)
             }

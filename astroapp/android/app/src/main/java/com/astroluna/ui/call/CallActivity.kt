@@ -842,16 +842,18 @@ class CallActivity : ComponentActivity() {
 
         SocketManager.getSocket()?.on("client-birth-chart") { args ->
             try {
-                val data = args[0] as JSONObject
-                val bData = data.optJSONObject("birthData")
-                if (bData != null) {
-                    clientBirthData = bData
-                    runOnUiThread {
-                        val myRole = TokenManager(this@CallActivity).getUserSession()?.role
-                        if (myRole == "client") {
-                            Toast.makeText(this@CallActivity, "Astrologer updated your birth details", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(this@CallActivity, "Client updated their birth details", Toast.LENGTH_SHORT).show()
+                if (args != null && args.isNotEmpty()) {
+                    val data = args[0] as? JSONObject
+                    val bData = data?.optJSONObject("birthData")
+                    if (bData != null) {
+                        clientBirthData = bData
+                        runOnUiThread {
+                            val myRole = TokenManager(this@CallActivity).getUserSession()?.role
+                            if (myRole == "client") {
+                                Toast.makeText(this@CallActivity, "Astrologer updated your birth details", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(this@CallActivity, "Client updated their birth details", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }

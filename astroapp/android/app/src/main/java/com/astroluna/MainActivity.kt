@@ -27,11 +27,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import android.os.Handler
+import android.os.Looper
 import com.astroluna.data.api.ApiService
 import com.astroluna.data.local.TokenManager
 import com.astroluna.ui.home.HomeActivity
 import com.astroluna.ui.theme.CosmicAppTheme
 import com.astroluna.utils.Constants
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -67,31 +70,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Upload FCM Token
-        com.google.firebase.messaging.FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
-                return@addOnCompleteListener
-            }
-            val token = task.result
-            val session = tokenManager.getUserSession()
-            if (session != null && token != null) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    try {
-                        ApiService.register(Constants.SERVER_URL, session.userId!!, token)
-                        Log.d(TAG, "Token uploaded successfully on launch")
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Failed to upload token", e)
+        // 1. FCM Token Registration (Safe)
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                val session = TokenManager(this).getUserSession()
+                val userId = session?.userId
+                if (userId != null && token != null) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            ApiService.register(Constants.SERVER_URL, userId, token)
+                            Log.d(TAG, "Token uploaded successfully for $userId")
+                        } catch (e: Exception) {
+                            Log.e(TAG, "Token upload failed", e)
+                        }
                     }
                 }
             }
         }
 
-        // Add a small delay for splash effect or to ensure permissions logic runs
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(1000)
+        // 2. Delayed Redirection (Safe)
+        Handler(Looper.getMainLooper()).postDelayed({
             checkPermissionsAndProceed()
-        }
+        }, 2000)
     }
 
     private fun checkPermissionsAndProceed() {

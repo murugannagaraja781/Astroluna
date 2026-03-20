@@ -89,8 +89,8 @@ class GuestDashboardActivity : AppCompatActivity() {
         socket?.connect()
 
         socket?.on("astro-list") { args ->
-            val data = args[0] as JSONObject
-            val arr = data.optJSONArray("list")
+            val data = args[0] as? JSONObject
+            val arr = data?.optJSONArray("list")
             if (arr != null) {
                 updateAstrologerList(arr)
             }
@@ -98,8 +98,10 @@ class GuestDashboardActivity : AppCompatActivity() {
 
         socket?.on("astrologer-update") { args ->
             // Server broadcasts full list on update
-            val data = args[0] as org.json.JSONArray
-            updateAstrologerList(data)
+            val data = args[0] as? org.json.JSONArray
+            if (data != null) {
+                updateAstrologerList(data)
+            }
         }
 
         socket?.emit("get-astrologers")

@@ -178,6 +178,19 @@ app.use('/api/horoscope', require('./routes/freeHoroscope'));
 // Rasipalan — also mount on legacy path just in case
 app.use('/api/rasipalan', require('./routes/rasipalan'));
 
+// ── Compatibility Aliases for Mobile App ───────────────────────────────────
+// App calls /api/daily-horoscope, server has /api/astrology/daily-horoscope
+app.get('/api/daily-horoscope', (req, res, next) => {
+  req.url = '/daily-horoscope';
+  require('./routes/astrology')(req, res, next);
+});
+
+// App calls /api/rasi-eng/horoscope/daily, server has /api/astrology/daily-horoscope (or similar)
+app.get('/api/rasi-eng/horoscope/daily', (req, res, next) => {
+  req.url = '/daily-horoscope';
+  require('./routes/astrology')(req, res, next);
+});
+
 // ── FCM Token Registration ─────────────────────────────────────────────────
 // App calls POST /register with { userId, fcmToken }
 app.post('/register', async (req, res) => {

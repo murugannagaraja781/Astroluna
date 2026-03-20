@@ -100,7 +100,10 @@ class OtpVerificationActivity : AppCompatActivity() {
                         if (token != null) {
                             kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
                                 try {
-                                    com.astroluna.data.api.ApiService.register(com.astroluna.utils.Constants.SERVER_URL, user.userId!!, token)
+                                    val uid = user.userId
+                                    if (uid != null) {
+                                        com.astroluna.data.api.ApiService.register(com.astroluna.utils.Constants.SERVER_URL, uid, token)
+                                    }
                                 } catch (e: Exception) { e.printStackTrace() }
                             }
                         }
