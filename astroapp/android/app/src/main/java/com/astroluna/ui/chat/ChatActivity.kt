@@ -60,6 +60,7 @@ class ChatActivity : ComponentActivity() {
     private var remainingTime by mutableStateOf("")
     private var chatDurationSeconds = 0
     private var remainingSeconds = 0
+    private var intakeLaunchedAuto = false
     private var timerHandler = android.os.Handler(android.os.Looper.getMainLooper())
     private val timerRunnable = object : Runnable {
         override fun run() {
@@ -167,7 +168,17 @@ class ChatActivity : ComponentActivity() {
                         if (myRole == "client") {
                             Toast.makeText(this@ChatActivity, "Astrologer updated your birth details", Toast.LENGTH_SHORT).show()
                         } else {
-                            Toast.makeText(this@ChatActivity, "Client updated their birth details", Toast.LENGTH_SHORT).show()
+                            // Auto-show intake form once when client data is received
+                            if (myRole == "astrologer" && !intakeLaunchedAuto) {
+                                intakeLaunchedAuto = true
+                                val intent = Intent(this, com.astroluna.ui.intake.IntakeActivity::class.java)
+                                intent.putExtra("isEditMode", true)
+                                intent.putExtra("existingData", updatedData.toString())
+                                intent.putExtra("targetUserId", toUserId)
+                                editIntakeLauncher.launch(intent)
+                            } else {
+                                Toast.makeText(this@ChatActivity, "Client updated their birth details", Toast.LENGTH_SHORT).show()
+                            }
                         }
                     }
                 }
@@ -223,7 +234,7 @@ class ChatActivity : ComponentActivity() {
                     .setTitle("Chat Summary")
                     .setMessage("Duration: $durationStr\nDeducted: ₹${String.format("%.2f", summary.deducted)}")
                     .setCancelable(false)
-                
+
                 val userSession = TokenManager(this).getUserSession()
                 if (userSession?.role == "client") {
                     builder.setPositiveButton("Next / Review") { _, _ ->
@@ -639,8 +650,13 @@ fun ChatBubble(msg: ChatMessage, amIAstrologer: Boolean, onReply: () -> Unit, on
                                         "delivered" -> Icons.Default.DoneAll
                                         else -> Icons.Default.Done
                                     }
-                                    val tint = if (msg.status == "read") Color(0xFF34B7F1) else Color.Gray
-                                    Icon(imageVector = icon, contentDescription = msg.status, tint = tint, modifier = Modifier.size(14.dp))
+                                    // Enhanced double tick colors: Gold for delivered, Bright Blue for read
+                                    val tint = when (msg.status) {
+                                        "read" -> Color(0xFF34B7F1)  // WhatsApp blue for read
+                                        "delivered" -> Color(0xFFFFD700)  // Gold for delivered
+                                        else -> Color.Gray  // Gray for sent
+                                    }
+                                    Icon(imageVector = icon, contentDescription = msg.status, tint = tint, modifier = Modifier.size(16.dp))
                                 }
                             }
                         }

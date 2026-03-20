@@ -96,6 +96,7 @@ class CallActivity : ComponentActivity() {
     private var isEditingIntake by mutableStateOf(false) // Track when edit form is open
     private var remainingTime by mutableStateOf("") // Available time from wallet
     private var isRecordingState by mutableStateOf(false)
+    private var intakeLaunchedAuto = false
     private var mediaRecorder: MediaRecorder? = null
     private var audioFile: File? = null
 
@@ -861,6 +862,13 @@ class CallActivity : ComponentActivity() {
             runOnUiThread {
                 statusText = "🔴 Billing Active"
                 isBillingActive = true
+                
+                // Auto-show intake form for astrologer when call connects
+                if (session?.role == "astrologer" && clientBirthData != null && !intakeLaunchedAuto) {
+                    intakeLaunchedAuto = true
+                    openEditIntake()
+                }
+
                 // Removed duplicate createOffer here to avoid race conditions
                 androidx.core.os.HandlerCompat.postDelayed(android.os.Handler(android.os.Looper.getMainLooper()), {
                    if(statusText == "🔴 Billing Active") statusText = ""

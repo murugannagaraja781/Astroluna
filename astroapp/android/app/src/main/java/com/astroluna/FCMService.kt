@@ -520,7 +520,7 @@ class FCMService : FirebaseMessagingService() {
 
         // Add red color LED and big font for deposit/credit notifications
         if (isDepositOrCredit) {
-            builder.setColor(0xFFE53935) // Red color
+            builder.setColor(0xFFE53935.toInt()) // Red color
             builder.setVibrate(longArrayOf(0, 500, 200, 500))
         }
 
@@ -549,7 +549,7 @@ class FCMService : FirebaseMessagingService() {
             .setContentText(body)
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setColor(0xFFE53935) // Red color for deposit
+            .setColor(0xFFE53935.toInt()) // Red color for deposit
             .setVibrate(longArrayOf(0, 500, 200, 500))
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)

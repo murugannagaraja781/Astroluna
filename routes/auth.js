@@ -219,21 +219,42 @@ router.post('/verify-otp', async (req, res) => {
 // Astrologer Application Submission
 router.post('/register-astrologer', async (req, res) => {
   try {
-    const { name, phone, experience, about, bankDetails } = req.body;
-    if (!name || !phone) return res.json({ ok: false, error: 'Name and phone required' });
+    const { 
+      realName, displayName, gender, dob, tob, pob, 
+      cellNumber1, cellNumber2, whatsAppNumber, email, 
+      address, aadharNumber, panNumber, astrologyExperience, 
+      profession, bankDetails, upiName, upiNumber 
+    } = req.body;
+
+    if (!realName || !cellNumber1) {
+      return res.json({ ok: false, error: 'Real Name and Primary Cell Number are required' });
+    }
 
     const newApp = await AstrologerApplication.create({
       applicationId: crypto.randomUUID(),
-      name,
-      phone,
-      experience,
-      about,
+      realName,
+      displayName,
+      gender,
+      dob,
+      tob,
+      pob,
+      cellNumber1,
+      cellNumber2,
+      whatsAppNumber,
+      email,
+      address,
+      aadharNumber,
+      panNumber,
+      astrologyExperience,
+      profession,
       bankDetails,
+      upiName,
+      upiNumber,
       status: 'pending',
       appliedAt: new Date()
     });
 
-    logActivity('auth', 'New Astrologer Application', { name, phone });
+    logActivity('auth', 'New Astrologer Application', { realName, cellNumber1 });
     res.json({ ok: true, application: newApp });
   } catch (err) {
     console.error(err);

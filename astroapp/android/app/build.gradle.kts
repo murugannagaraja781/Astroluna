@@ -16,9 +16,14 @@ android {
         applicationId = "com.astroluna"
         minSdk = 21
         targetSdk = 35
-        versionCode = 20260311
-        versionName = "7.0.0"
+        versionCode = 1
+        versionName = "1.0"
         multiDexEnabled = true
+
+        // Enable 64-bit architectures for PlayStore
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        }
     }
 
     signingConfigs {
@@ -47,6 +52,16 @@ android {
         }
         debug {
             isMinifyEnabled = false
+        }
+    }
+
+    // Enable splits for 64-bit PlayStore support
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            isUniversalApk = true
         }
     }
 

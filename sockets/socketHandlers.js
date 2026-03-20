@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { User, Session, ChatMessage, AstrologerApplication, BillingLedger, Notification, PairMonth } = require('../models');
+const { User, Session, ChatMessage, AstrologerApplication, BillingLedger, Notification, PairMonth, CallRequest } = require('../models');
 const { logActivity } = require('../utils/logger');
 const { safeAck, getOtherUserIdFromSession } = require('../utils/socketHelpers');
 const {
@@ -72,6 +72,15 @@ module.exports = function (io, socket) {
       let astrologerId = fromUser.role === 'astrologer' ? fromUserId : toUserId;
 
       await Session.create({ sessionId, fromUserId, toUserId, type, startTime: Date.now(), clientId, astrologerId });
+      
+      // Track call attempt
+      await CallRequest.create({
+        callId: sessionId,
+        callerId: fromUserId,
+        receiverId: toUserId,
+        status: 'initiated'
+      });
+
       activeSessions.set(sessionId, { type, users: [fromUserId, toUserId], startedAt: Date.now(), clientId, astrologerId, status: 'ringing' });
       userActiveSession.set(fromUserId, sessionId);
       userActiveSession.set(toUserId, sessionId);
@@ -101,7 +110,9 @@ module.exports = function (io, socket) {
       if (session.astrologerId) User.updateOne({ userId: session.astrologerId }, { isBusy: true }).then(() => broadcastAstroUpdate());
       const otherId = session.users.find(u => u !== userId);
       io.to(otherId).emit('session-answered', { sessionId, fromUserId: userId, accept: true });
+      CallRequest.updateOne({ callId: sessionId }, { status: 'accepted' }).exec();
     } else {
+      CallRequest.updateOne({ callId: sessionId }, { status: 'rejected' }).exec();
       endSessionRecord(sessionId);
     }
   });
@@ -127,8 +138,10 @@ module.exports = function (io, socket) {
       // Notify the caller (the other user) that the call was accepted
       const callerId = session.users.find(u => u !== userId);
       io.to(callerId).emit('session-answered', { sessionId, fromUserId: userId, accept: true, callType });
+      CallRequest.updateOne({ callId: sessionId }, { status: 'accepted' }).exec();
       safeAck(cb, { ok: true, fromUserId: callerId, sessionId });
     } else {
+      CallRequest.updateOne({ callId: sessionId }, { status: 'rejected' }).exec();
       endSessionRecord(sessionId);
       safeAck(cb, { ok: true });
     }

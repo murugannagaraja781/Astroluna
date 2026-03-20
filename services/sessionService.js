@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const { User, Session, PairMonth, BillingLedger, Notification } = require('../models');
+const { User, Session, PairMonth, BillingLedger, Notification, CallRequest } = require('../models');
 const { activeSessions, userActiveSession, userSockets, sessionDisconnectTimeouts } = require('../utils/socketRegistry');
 const { SLAB_RATES, COMMISSION_L1, COMMISSION_L2, COMMISSION_L3, CASHBACK_CLIENT } = require('../config/billing');
 const { broadcastAstroUpdate } = require('./astrologerService');
@@ -160,6 +160,9 @@ async function endSessionRecord(sessionId) {
   });
 
   User.updateMany({ userId: { $in: s.users }, role: 'astrologer' }, { isBusy: false }).then(() => broadcastAstroUpdate());
+  
+  // Finalize call request status — if still 'initiated', it's a missed call
+  CallRequest.updateOne({ callId: sessionId, status: 'initiated' }, { status: 'missed' }).exec();
 }
 
 function tickSessions() {

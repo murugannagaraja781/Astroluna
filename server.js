@@ -99,9 +99,7 @@ app.post('/api/astrologer/register', (req, res, next) => { req.url = '/register-
 app.get('/api/referral/stats/:userId', (req, res, next) => { req.url = '/referral/stats/' + req.params.userId; require('./routes/user')(req, res, next); });
 app.post('/api/withdraw-referral',    (req, res, next) => { req.url = '/withdraw-referral'; require('./routes/user')(req, res, next); });
 
-// Admin Notifications (stub — returns empty until backend is built)
-app.get('/api/admin/notifications',        (req, res) => res.json({ ok: true, notifications: [], unreadCount: 0 }));
-app.post('/api/admin/notifications/read',  (req, res) => res.json({ ok: true }));
+// Admin Dashboard Data
 app.get('/api/admin/astrologers/attended', async (req, res) => {
   try {
     const { User } = require('./models');
