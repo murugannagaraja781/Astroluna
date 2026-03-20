@@ -30,8 +30,9 @@ object SocketManager {
 
             socket?.on(Socket.EVENT_CONNECT) {
                 Log.d(TAG, "Socket connected: ${socket?.id()}")
-                if (currentUserId != null) {
-                    registerUser(currentUserId!!)
+                val uid = currentUserId
+                if (uid != null) {
+                    registerUser(uid)
                 }
             }
 
@@ -110,10 +111,8 @@ object SocketManager {
     fun onSessionAnswered(listener: (JSONObject) -> Unit) {
         socket?.off("session-answered")
         socket?.on("session-answered") { args ->
-            if (args != null && args.isNotEmpty()) {
-                val data = args[0] as? JSONObject ?: return@on
-                listener(data)
-            }
+            val data = args?.getOrNull(0) as? JSONObject ?: return@on
+            listener(data)
         }
     }
 
@@ -134,10 +133,8 @@ object SocketManager {
     fun onMessageStatus(listener: (JSONObject) -> Unit) {
         socket?.off("message-status")
         socket?.on("message-status") { args ->
-            if (args != null && args.isNotEmpty()) {
-                val data = args[0] as? JSONObject ?: return@on
-                listener(data)
-            }
+            val data = args?.getOrNull(0) as? JSONObject ?: return@on
+            listener(data)
         }
     }
 
@@ -207,15 +204,13 @@ object SocketManager {
 
     fun onBillingStarted(listener: (BillingInfo) -> Unit) {
         socket?.on("billing-started") { args ->
-            if (args != null && args.isNotEmpty()) {
-                val data = args[0] as? JSONObject
-                val startTime = data?.optLong("startTime", System.currentTimeMillis()) ?: System.currentTimeMillis()
-                val clientBalance = data?.optDouble("clientBalance", 0.0) ?: 0.0
-                val ratePerMinute = data?.optDouble("ratePerMinute", 10.0) ?: 10.0
-                val availableMinutes = data?.optInt("availableMinutes", 0) ?: 0
-                Log.d(TAG, "Billing started. Available: $availableMinutes mins, Balance: ₹$clientBalance")
-                listener(BillingInfo(startTime, clientBalance, ratePerMinute, availableMinutes))
-            }
+            val data = args?.getOrNull(0) as? JSONObject ?: return@on
+            val startTime = data.optLong("startTime", System.currentTimeMillis())
+            val clientBalance = data.optDouble("clientBalance", 0.0)
+            val ratePerMinute = data.optDouble("ratePerMinute", 10.0)
+            val availableMinutes = data.optInt("availableMinutes", 0)
+            Log.d(TAG, "Billing started. Available: $availableMinutes mins, Balance: ₹$clientBalance")
+            listener(BillingInfo(startTime, clientBalance, ratePerMinute, availableMinutes))
         }
     }
 
@@ -262,12 +257,8 @@ object SocketManager {
 
     fun onAstrologerUpdate(listener: (org.json.JSONArray) -> Unit) {
         socket?.on("astrologer-update") { args ->
-            if (args != null && args.isNotEmpty()) {
-                val data = args[0] as? org.json.JSONArray
-                if (data != null) {
-                    listener(data)
-                }
-            }
+            val data = args?.getOrNull(0) as? org.json.JSONArray ?: return@on
+            listener(data)
         }
     }
 

@@ -309,7 +309,8 @@ class HomeActivity : AppCompatActivity() {
         val skills = mutableListOf<String>()
         if (skillsArr != null) {
             for (i in 0 until skillsArr.length()) {
-                skills.add(skillsArr.getString(i))
+                val s = skillsArr.optString(i)
+                if (s.isNotEmpty()) skills.add(s)
             }
         }
 
@@ -359,10 +360,11 @@ class HomeActivity : AppCompatActivity() {
         }
 
         socket?.on("astrologer-update") { args ->
-            val data = args[0] as JSONArray
+            val data = args?.getOrNull(0) as? org.json.JSONArray ?: return@on
             val list = mutableListOf<Astrologer>()
             for (i in 0 until data.length()) {
-                list.add(parseAstrologer(data.getJSONObject(i)))
+                val obj = data.optJSONObject(i) ?: continue
+                list.add(parseAstrologer(obj))
             }
             val sortedList = list.sortedWith(
                 compareByDescending<Astrologer> {
@@ -419,27 +421,25 @@ class HomeActivity : AppCompatActivity() {
         // Listen for session ended events to show call end info on home screen
         socket?.on("session-ended") { args ->
             Log.d(TAG, "[Socket] Received session-ended event on home screen")
-            if (args.isNotEmpty()) {
-                val data = args[0] as? JSONObject
-                val reason = data?.optString("reason", "Call Ended") ?: "Call Ended"
-                val duration = data?.optInt("duration", 0) ?: 0
-                val deducted = data?.optDouble("deducted", 0.0) ?: 0.0
-                val earned = data?.optDouble("earned", 0.0) ?: 0.0
+            val data = args?.getOrNull(0) as? JSONObject ?: return@on
+            val reason = data.optString("reason", "Call Ended")
+            val duration = data.optInt("duration", 0)
+            val deducted = data.optDouble("deducted", 0.0)
+            val earned = data.optDouble("earned", 0.0)
 
-                lifecycleScope.launch(Dispatchers.Main) {
-                    val minutes = duration / 60
-                    val seconds = duration % 60
-                    val durationStr = String.format("%02d:%02d", minutes, seconds)
+            lifecycleScope.launch(Dispatchers.Main) {
+                val minutes = duration / 60
+                val seconds = duration % 60
+                val durationStr = String.format("%02d:%02d", minutes, seconds)
 
-                    val session = tokenManager.getUserSession()
-                    val message = if (session?.role == "astrologer") {
-                        "Call Ended! Duration: $durationStr, Earned: ₹${String.format("%.2f", earned)}"
-                    } else {
-                        "Call Ended! Duration: $durationStr, Deducted: ₹${String.format("%.2f", deducted)}"
-                    }
-
-                    Toast.makeText(this@HomeActivity, message, Toast.LENGTH_LONG).show()
+                val session = tokenManager.getUserSession()
+                val message = if (session?.role == "astrologer") {
+                    "Call Ended! Duration: $durationStr, Earned: ₹${String.format("%.2f", earned)}"
+                } else {
+                    "Call Ended! Duration: $durationStr, Deducted: ₹${String.format("%.2f", deducted)}"
                 }
+
+                Toast.makeText(this@HomeActivity, message, Toast.LENGTH_LONG).show()
             }
         }
 

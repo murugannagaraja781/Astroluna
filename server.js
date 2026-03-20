@@ -29,7 +29,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Request Logger (Debug)
 app.use((req, res, next) => {
-  console.log(`[REQ] ${req.method} ${req.url} | Body: ${JSON.stringify(req.body)}`);
+  if (req.url === '/' || req.url === '/version') return next();
+  console.log(`[REQ] ${req.method} ${req.url} | UA: ${req.headers['user-agent']} | Body: ${JSON.stringify(req.body)}`);
   next();
 });
 

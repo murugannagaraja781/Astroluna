@@ -89,7 +89,7 @@ class GuestDashboardActivity : AppCompatActivity() {
         socket?.connect()
 
         socket?.on("astro-list") { args ->
-            val data = args[0] as? JSONObject
+            val data = args?.getOrNull(0) as? JSONObject
             val arr = data?.optJSONArray("list")
             if (arr != null) {
                 updateAstrologerList(arr)
@@ -98,7 +98,7 @@ class GuestDashboardActivity : AppCompatActivity() {
 
         socket?.on("astrologer-update") { args ->
             // Server broadcasts full list on update
-            val data = args[0] as? org.json.JSONArray
+            val data = args?.getOrNull(0) as? org.json.JSONArray
             if (data != null) {
                 updateAstrologerList(data)
             }
@@ -229,11 +229,12 @@ class GuestDashboardActivity : AppCompatActivity() {
          val skills = mutableListOf<String>()
          if (skillsArr != null) {
              for (i in 0 until skillsArr.length()) {
-                 skills.add(skillsArr.getString(i))
+                 val s = skillsArr.optString(i)
+                 if (s.isNotEmpty()) skills.add(s)
              }
          }
 
-         val price = if (json.has("price")) json.getInt("price") else json.optInt("charges", 15)
+         val price = if (json.has("price")) json.optInt("price", 15) else json.optInt("charges", 15)
 
          return Astrologer(
              userId = json.optString("userId", ""),
